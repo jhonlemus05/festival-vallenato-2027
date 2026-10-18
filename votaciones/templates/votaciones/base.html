@@ -253,7 +253,7 @@
     <!-- 1. ENCABEZADO INSTITUCIONAL OFICIAL (RESPONSIVE) -->
     <header class="app-header">
       <div class="header-inner-container">
-        <a href="{% url 'home' %}" class="header-brand-lockup">
+        <a href="{% url 'index' %}" class="header-brand-lockup">
           <!-- Escudo con isotipo oficial del Festival -->
           <div class="emblem-wrapper">
             <img
@@ -275,7 +275,7 @@
 
         <!-- Enlaces superiores visibles únicamente en pantallas grandes (Desktop / PC) -->
         <ul class="desktop-nav-links d-none d-md-flex">
-          <li><a href="{% url 'home' %}" class="desktop-nav-link {% if seccion_activa == 'inicio' or not seccion_activa %}active{% endif %}"><i class="bi bi-house"></i> Inicio</a></li>
+          <li><a href="{% url 'index' %}" class="desktop-nav-link {% if seccion_activa == 'inicio' or not seccion_activa %}active{% endif %}"><i class="bi bi-house"></i> Inicio</a></li>
           <li><a href="#" class="desktop-nav-link {% if seccion_activa == 'categorias' %}active{% endif %}"><i class="bi bi-grid"></i> Categorías</a></li>
           <li><a href="#" class="desktop-nav-link {% if seccion_activa == 'cuenta' %}active{% endif %}"><i class="bi bi-person"></i> Mi cuenta</a></li>
           <li><a href="#" class="desktop-nav-link {% if seccion_activa == 'admin' %}active{% endif %}"><i class="bi bi-speedometer2"></i> Administración</a></li>
@@ -320,7 +320,7 @@
         <div class="desktop-footer-column">
           <h4>Navegación</h4>
           <ul class="desktop-footer-links">
-            <li><a href="{% url 'home' %}">Inicio</a></li>
+            <li><a href="{% url 'index' %}">Inicio</a></li>
             <li><a href="#">Categorías</a></li>
             <li><a href="#">Encuestas Activas</a></li>
             <li><a href="#">Registro y Cuenta</a></li>
@@ -360,7 +360,7 @@
     <!-- 5. BARRA DE NAVEGACIÓN INFERIOR FIJA (MÓVIL) -->
     <nav class="bottom-tab-bar d-md-none" aria-label="Navegación principal">
       <!-- Tab 1: Inicio -->
-      <a href="{% url 'home' %}" class="tab-item {% if seccion_activa == 'inicio' or not seccion_activa %}active{% endif %}">
+      <a href="{% url 'index' %}" class="tab-item {% if seccion_activa == 'inicio' or not seccion_activa %}active{% endif %}">
         <i class="bi bi-house"></i>
         <span>Inicio</span>
       </a>
@@ -400,7 +400,7 @@
     </div>
     <div class="offcanvas-body p-0">
       <div class="list-group list-group-flush bg-transparent">
-        <a href="{% url 'home' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+        <a href="{% url 'index' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-house text-warning"></i> <span>Inicio</span>
         </a>
         <a href="#" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
