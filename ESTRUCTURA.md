@@ -49,9 +49,3 @@ pr_festivalVallenato/
     ├── urls.py                      # Rutas administrativas (ej: /admin-panel/resultados/)
     └── views.py                     # Lógica del panel (Protegida para que solo entre el staff)
 ```
-
-## Notas de Implementación
-
-1. **Creación de Apps:** Recuerda ejecutar los comandos `python manage.py startapp usuarios`, `python manage.py startapp votaciones` y `python manage.py startapp administracion` desde la raíz.
-2. **Registro:** No olvides añadir `'usuarios',`, `'votaciones',` y `'administracion',` en la lista `INSTALLED_APPS` dentro de tu `settings.py`.
-3. **Herencia de Plantillas:** Los archivos de la carpeta `votaciones` heredarán de `votaciones/base.html`, mientras que los archivos de `administracion` utilizarán `administracion/admin_base.html` para mantener sus diseños totalmente independientes.
