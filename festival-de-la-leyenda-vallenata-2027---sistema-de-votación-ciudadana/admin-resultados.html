@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Festival de la Leyenda Vallenata 2027 | Resultados y Escrutinio</title>
+  <meta name="description" content="Panel de control de resultados y escrutinio en tiempo real de las votaciones oficiales del Festival de la Leyenda Vallenata 2027. Consulta porcentajes, ganadores y actas oficiales." />
+
+  <!-- Google Fonts: Poppins (Titulares), Inter (Cuerpo y datos), Playfair Display (Logo institucional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    /* ============================================================
+       VARIABLES & ESTILOS PANEL DE RESULTADOS (DISEÑO INSTITUCIONAL)
+       ============================================================ */
+    :root {
+      --color-black: #000000;
+      --color-sidebar-bg: #000000;
+      --color-sidebar-active: #18181A;
+      --color-sidebar-border: #1F1F23;
+      --color-gold: #D4AF37;
+      --color-gold-hover: #b89326;
+      --color-gold-text: #B48216;
+      --color-gold-subtle: #FFFDF5;
+      --color-gold-border: rgba(212, 175, 55, 0.35);
+      --color-main-bg: #F8F9FA;
+      --color-card-border: #E5E7EB;
+      --color-text-dark: #111111;
+      --color-text-muted: #6B7280;
+      --color-text-subtle: #9CA3AF;
+      --font-display: 'Poppins', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-serif-logo: 'Playfair Display', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-main-bg);
+      font-family: var(--font-body);
+      color: var(--color-text-dark);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ------------------------------------------------------------
+       1. SIDEBAR LATERAL IZQUIERDA (NEGRO PROFUNDO)
+       ------------------------------------------------------------ */
+    .admin-sidebar {
+      width: 260px;
+      background-color: var(--color-sidebar-bg);
+      border-right: 1px solid var(--color-sidebar-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-header-box {
+      padding: 24px 20px 20px 20px;
+    }
+
+    .brand-sidebar-lockup {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-decoration: none;
+      color: #FFFFFF;
+      margin-bottom: 22px;
+    }
+
+    .brand-emblem-wrap {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+    }
+
+    .brand-emblem-wrap img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: contain;
+    }
+
+    .brand-sidebar-text {
+      line-height: 1.15;
+    }
+
+    .brand-sidebar-line1 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 600;
+      font-size: 0.84rem;
+      color: #FFFFFF;
+      white-space: nowrap;
+    }
+
+    .brand-sidebar-line2 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #FFFFFF;
+      white-space: nowrap;
+    }
+
+    .brand-sidebar-sub {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-size: 0.62rem;
+      color: #D1D5DB;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    .system-identity-block {
+      margin-top: 6px;
+      padding-top: 4px;
+    }
+
+    .system-kicker {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-gold);
+      margin-bottom: 2px;
+    }
+
+    .system-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+    }
+
+    .sidebar-nav-section {
+      padding: 0 14px;
+      margin-top: 20px;
+      flex: 1;
+    }
+
+    .nav-section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #71717A;
+      padding: 0 10px 10px 10px;
+    }
+
+    .sidebar-menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: #9CA3AF;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-nav-link i {
+      font-size: 1.15rem;
+      color: #9CA3AF;
+      transition: color 0.2s ease;
+    }
+
+    .sidebar-nav-link:hover {
+      color: #FFFFFF;
+      background-color: #121214;
+    }
+
+    .sidebar-nav-link:hover i {
+      color: #FFFFFF;
+    }
+
+    /* Enlace ACTIVO (Resultados) */
+    .sidebar-nav-link.active {
+      background-color: var(--color-sidebar-active);
+      color: var(--color-gold);
+      font-weight: 700;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+    }
+
+    .sidebar-nav-link.active i {
+      color: var(--color-gold);
+    }
+
+    .sidebar-footer-box {
+      padding: 20px;
+      border-top: 1px solid var(--color-sidebar-border);
+      background-color: #050505;
+    }
+
+    .demo-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--color-gold);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .demo-badge-row i {
+      font-size: 0.95rem;
+    }
+
+    .sidebar-footer-text {
+      font-size: 0.72rem;
+      color: #888888;
+      line-height: 1.35;
+    }
+
+    .sidebar-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 0.75rem;
+      color: #AAAAAA;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .sidebar-back-link:hover {
+      color: #FFFFFF;
+    }
+
+    /* ------------------------------------------------------------
+       2. CONTENEDOR PRINCIPAL Y TOPBAR
+       ------------------------------------------------------------ */
+    .admin-main-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background-color: var(--color-main-bg);
+    }
+
+    .admin-topbar {
+      height: 64px;
+      background-color: #FFFFFF;
+      border-bottom: 1px solid var(--color-card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .breadcrumb-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    .bc-parent {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .bc-parent:hover {
+      color: var(--color-text-dark);
+    }
+
+    .bc-sep {
+      color: var(--color-text-subtle);
+      font-size: 0.75rem;
+    }
+
+    .bc-current {
+      color: var(--color-text-dark);
+      font-weight: 700;
+    }
+
+    .topbar-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .live-pulse-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #ECFDF5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10B981;
+      border-radius: 50%;
+      animation: pulseAnim 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .badge-demo-mode {
+      background-color: #F4F4F5;
+      color: #52525B;
+      border: 1px solid #E4E4E7;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .user-profile-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background-color: #111111;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .user-info-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .user-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #111111;
+    }
+
+    .user-role {
+      font-size: 0.7rem;
+      color: #6B7280;
+    }
+
+    /* ------------------------------------------------------------
+       3. CONTENIDO DEL DASHBOARD
+       ------------------------------------------------------------ */
+    .dashboard-content-area {
+      padding: 32px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ENCABEZADO DE PÁGINA */
+    .dashboard-page-header {
+      margin-bottom: 24px;
+    }
+
+    .panel-kicker {
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-gold-text);
+      margin-bottom: 4px;
+    }
+
+    .panel-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #111111;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .panel-description {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+      margin-bottom: 0;
+    }
+
+    .header-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #FFFFFF;
+      color: #111111;
+      border: 1px solid var(--color-card-border);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-action-refresh:hover {
+      background-color: #F4F4F5;
+      border-color: #D1D5DB;
+    }
+
+    .btn-action-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #111111;
+      color: #FFFFFF;
+      border: 1px solid #111111;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      text-decoration: none;
+    }
+
+    .btn-action-export:hover {
+      background-color: #27272A;
+      color: #FFFFFF;
+    }
+
+    /* ------------------------------------------------------------
+       4. SELECTOR DE EVENTO DE VOTACIÓN (BARRA SUPERIOR)
+       ------------------------------------------------------------ */
+    .event-selector-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--color-card-border);
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .event-selector-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .event-label-kicker {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9CA3AF;
+    }
+
+    .event-select-dropdown-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .event-select-native {
+      width: 100%;
+      appearance: none;
+      background: transparent;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #111111;
+      cursor: pointer;
+      padding-right: 28px;
+      outline: none;
+    }
+
+    .event-select-native:focus {
+      color: #000000;
+    }
+
+    .event-selector-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .event-meta-text {
+      font-size: 0.85rem;
+      color: #6B7280;
+      font-weight: 500;
+    }
+
+    .badge-status-pill-gold {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background-color: #FEF9C3;
+      color: #854D0E;
+      border: 1px solid #FDE047;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .event-divider-pipe {
+      width: 1px;
+      height: 20px;
+      background-color: var(--color-card-border);
+    }
+
+    .event-votes-number {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #111111;
+    }
+
+    /* ------------------------------------------------------------
+       5. TARJETAS RESUMEN KPI (4 MÉTRICAS)
+       ------------------------------------------------------------ */
+    .kpi-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 1100px) {
+      .kpi-metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .kpi-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi-stat-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--color-card-border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6B7280;
+    }
+
+    .kpi-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background-color: #F4F4F5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111111;
+      font-size: 1.05rem;
+    }
+
+    .kpi-icon-gold {
+      background-color: #FFFDF5;
+      color: var(--color-gold-text);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+    }
+
+    .kpi-stat-val {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #111111;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .kpi-footer-note {
+      font-size: 0.76rem;
+      color: #6B7280;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .trend-positive {
+      color: #059669;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* Tarjeta especial del líder */
+    .kpi-leader-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFFDF8 100%);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+    }
+
+    .kpi-leader-avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .leader-thumb-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--color-gold);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .leader-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .leader-meta-name {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #111111;
+      line-height: 1.15;
+    }
+
+    .leader-meta-sub {
+      font-size: 0.74rem;
+      color: #6B7280;
+    }
+
+    /* ------------------------------------------------------------
+       6. SECCIÓN PRINCIPAL: ESCRUTINIO Y BARRAS VISUALES
+       ------------------------------------------------------------ */
+    .scrutiny-main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 1024px) {
+      .scrutiny-main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .scrutiny-bars-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--color-card-border);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    .card-section-heading {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #111111;
+      margin: 0;
+    }
+
+    .card-section-subheading {
+      font-size: 0.78rem;
+      color: #6B7280;
+      margin-top: 2px;
+    }
+
+    .results-bars-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .candidate-result-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      border-radius: 12px;
+      background-color: #FAFAFA;
+      border: 1px solid #F3F4F6;
+      transition: all 0.2s ease;
+    }
+
+    .candidate-result-item:hover {
+      background-color: #F8F9FA;
+      border-color: #E5E7EB;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Líder destacado */
+    .candidate-result-item.is-leader {
+      background-color: #FFFDF7;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+    }
+
+    .cand-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .cand-identity-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cand-rank-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background-color: #E5E7EB;
+      color: #374151;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cand-rank-gold {
+      background-color: #D4AF37;
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(212, 175, 55, 0.4);
+    }
+
+    .cand-avatar-photo {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .cand-name-title {
+      font-family: var(--font-display);
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: #111111;
+      margin: 0;
+    }
+
+    .cand-song-sub {
+      font-size: 0.78rem;
+      color: #6B7280;
+      margin: 0;
+    }
+
+    .cand-scores-block {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      text-align: right;
+    }
+
+    .cand-votes-qty {
+      font-size: 0.84rem;
+      color: #4B5563;
+      font-weight: 500;
+    }
+
+    .cand-pct-badge {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #111111;
+    }
+
+    .cand-pct-gold {
+      color: var(--color-gold-text);
+    }
+
+    /* Barra de progreso */
+    .cand-progress-track {
+      height: 10px;
+      background-color: #E5E7EB;
+      border-radius: 9999px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .cand-progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      background-color: #4B5563;
+      transition: width 1s ease-in-out;
+    }
+
+    .fill-gold {
+      background: linear-gradient(90deg, #B48216 0%, #D4AF37 100%);
+    }
+
+    .fill-second {
+      background-color: #374151;
+    }
+
+    .fill-third {
+      background-color: #6B7280;
+    }
+
+    .fill-fourth {
+      background-color: #9CA3AF;
+    }
+
+    /* Columna derecha: Auditoría & Acciones Oficiales */
+    .scrutiny-side-card {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .audit-box-white {
+      background-color: #FFFFFF;
+      border: 1px solid var(--color-card-border);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .audit-kicker {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-gold-text);
+      margin-bottom: 6px;
+    }
+
+    .audit-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 12px;
+    }
+
+    .audit-checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .audit-check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: #374151;
+      line-height: 1.35;
+    }
+
+    .audit-check-item i {
+      color: #059669;
+      font-size: 0.95rem;
+      margin-top: 1px;
+    }
+
+    .audit-hash-block {
+      margin-top: 16px;
+      padding: 10px 12px;
+      background-color: #F8F9FA;
+      border: 1px dashed #D1D5DB;
+      border-radius: 8px;
+    }
+
+    .audit-hash-label {
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #6B7280;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .audit-hash-val {
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: #111111;
+      word-break: break-all;
+    }
+
+    .btn-view-acta {
+      width: 100%;
+      padding: 12px;
+      background-color: #111111;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-view-acta:hover {
+      background-color: #27272A;
+    }
+
+    /* ------------------------------------------------------------
+       7. TABLA DETALLADA DE ESCRUTINIO
+       ------------------------------------------------------------ */
+    .scrutiny-table-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--color-card-border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .table-responsive-clean {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .table-scrutiny-custom {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .table-scrutiny-custom th {
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6B7280;
+      padding: 12px 16px;
+      border-bottom: 1px solid #E5E7EB;
+      background-color: #F9FAFB;
+    }
+
+    .table-scrutiny-custom td {
+      padding: 16px;
+      border-bottom: 1px solid #F3F4F6;
+      font-size: 0.85rem;
+      vertical-align: middle;
+    }
+
+    .table-scrutiny-custom tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-scrutiny-custom tr:hover td {
+      background-color: #FAFAFA;
+    }
+
+    .table-pos-pill {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #111111;
+    }
+
+    .cand-table-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cand-table-photo {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .badge-category-pill {
+      background-color: #F3F4F6;
+      color: #374151;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+    }
+
+    .badge-audit-ok {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #ECFDF5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    /* ------------------------------------------------------------
+       8. ANÁLISIS GEOGRÁFICO Y ORIGEN DE VOTOS
+       ------------------------------------------------------------ */
+    .geo-analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 850px) {
+      .geo-analysis-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .geo-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--color-card-border);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .geo-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .geo-row-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .geo-zone-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #111111;
+    }
+
+    .geo-zone-votes {
+      font-size: 0.74rem;
+      color: #6B7280;
+    }
+
+    .geo-pct-pill {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #111111;
+      margin-left: 16px;
+    }
+
+    .geo-progress-bar {
+      height: 6px;
+      background-color: #E5E7EB;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 4px;
+      width: 100%;
+    }
+
+    .geo-fill {
+      height: 100%;
+      background-color: #111111;
+      border-radius: 9999px;
+    }
+
+    /* ------------------------------------------------------------
+       9. MODALES Y TOASTS
+       ------------------------------------------------------------ */
+    .official-seal-box {
+      border: 2px solid var(--color-gold);
+      border-radius: 12px;
+      padding: 16px;
+      background-color: #FFFDF8;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .official-seal-icon {
+      font-size: 2rem;
+      color: var(--color-gold-text);
+      margin-bottom: 6px;
+    }
+
+    .official-seal-title {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #111111;
+    }
+
+    .official-seal-sub {
+      font-size: 0.72rem;
+      color: #6B7280;
+    }
+
+    /* Botón Hamburguesa Móvil y Marca Móvil */
+    .btn-admin-hamburger {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: #111111;
+      color: #FFFFFF;
+      border: 1px solid #27272A;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-admin-hamburger:hover {
+      background-color: #27272A;
+      color: var(--color-gold);
+    }
+
+    .mobile-topbar-brand {
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mobile-brand-emblem {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: contain;
+    }
+
+    .mobile-brand-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #111111;
+      white-space: nowrap;
+    }
+
+    /* Offcanvas Móvil */
+    .admin-offcanvas {
+      width: 290px !important;
+      background-color: var(--color-sidebar-bg) !important;
+      border-right: 1px solid var(--color-sidebar-border) !important;
+      color: #FFFFFF;
+    }
+
+    .admin-offcanvas .offcanvas-header {
+      padding: 20px 20px 14px 20px;
+      border-bottom: 1px solid var(--color-sidebar-border);
+    }
+
+    .admin-offcanvas .offcanvas-body {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Responsividad general */
+    @media (max-width: 991px) {
+      body {
+        flex-direction: column;
+      }
+      .admin-sidebar.d-desktop-sidebar {
+        display: none !important;
+      }
+      .btn-admin-hamburger {
+        display: inline-flex !important;
+      }
+      .mobile-topbar-brand {
+        display: inline-flex !important;
+      }
+      .admin-topbar {
+        padding: 0 16px;
+        min-height: 60px;
+        height: auto;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      .breadcrumb-row {
+        display: none !important;
+      }
+      .badge-demo-mode {
+        display: none;
+      }
+      .user-info-text {
+        display: none;
+      }
+      .dashboard-content-area {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       1. SIDEBAR LATERAL IZQUIERDA (DESKTOP)
+       ============================================================ -->
+  <aside class="admin-sidebar d-desktop-sidebar">
+    <div class="sidebar-header-box">
+      <!-- Brand Logo Lockup Oficial -->
+      <a href="index.html" class="brand-sidebar-lockup">
+        <div class="brand-emblem-wrap">
+          <img 
+            src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" 
+            alt="Escudo Fundación Festival de la Leyenda Vallenata" 
+            referrerpolicy="no-referrer"
+            onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';"
+          />
+        </div>
+        <div class="brand-sidebar-text">
+          <div class="brand-sidebar-line1">Fundación Festival de</div>
+          <div class="brand-sidebar-line2">la Leyenda Vallenata</div>
+          <div class="brand-sidebar-sub">Patrimonio Cultural de la Nación</div>
+        </div>
+      </a>
+
+      <!-- Titular del Sistema -->
+      <div class="system-identity-block">
+        <div class="system-kicker">SISTEMA DE VOTACIONES</div>
+        <div class="system-title">Festival 2027</div>
+      </div>
+    </div>
+
+    <!-- Menú de Administración -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-label">ADMINISTRACIÓN</div>
+      <ul class="sidebar-menu-list">
+        <!-- 1. Panel Principal -->
+        <li>
+          <a href="admin.html" class="sidebar-nav-link">
+            <i class="bi bi-grid"></i>
+            <span>Panel principal</span>
+          </a>
+        </li>
+
+        <!-- 2. Categorías -->
+        <li>
+          <a href="admin-categorias.html" class="sidebar-nav-link">
+            <i class="bi bi-grid-3x3-gap"></i>
+            <span>Categorías</span>
+          </a>
+        </li>
+
+        <!-- 3. Votaciones -->
+        <li>
+          <a href="admin-votaciones.html" class="sidebar-nav-link">
+            <i class="bi bi-check2-square"></i>
+            <span>Votaciones</span>
+          </a>
+        </li>
+
+        <!-- 4. Opciones -->
+        <li>
+          <a href="admin-opciones.html" class="sidebar-nav-link">
+            <i class="bi bi-card-checklist"></i>
+            <span>Opciones</span>
+          </a>
+        </li>
+
+        <!-- 5. Resultados (ACTIVO) -->
+        <li>
+          <a href="admin-resultados.html" class="sidebar-nav-link active">
+            <i class="bi bi-bar-chart-line"></i>
+            <span>Resultados</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Pie de Sidebar: Entorno de Demostración -->
+    <div class="sidebar-footer-box">
+      <div class="demo-badge-row">
+        <i class="bi bi-shield-check"></i>
+        <span>Entorno de demostración</span>
+      </div>
+      <div class="sidebar-footer-text">
+        Fundación Festival de la Leyenda Vallenata<br>
+        Valledupar, Colombia
+      </div>
+
+      <a href="index.html" class="sidebar-back-link">
+        <i class="bi bi-arrow-left"></i>
+        <span>Volver a vista pública</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       OFFCANVAS MÓVIL: MENÚ HAMBURGUESA DESPLEGABLE
+       ============================================================ -->
+  <div class="offcanvas offcanvas-start admin-offcanvas" tabindex="-1" id="adminSidebarOffcanvas" aria-labelledby="adminSidebarOffcanvasLabel">
+    <div class="offcanvas-header">
+      <div class="d-flex align-items-center gap-2" id="adminSidebarOffcanvasLabel">
+        <div class="brand-emblem-wrap" style="width: 36px; height: 36px;">
+          <img 
+            src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" 
+            alt="Escudo Fundación Festival de la Leyenda Vallenata" 
+            referrerpolicy="no-referrer"
+            onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';"
+            style="width: 36px; height: 36px; border-radius: 50%; object-fit: contain;"
+          />
+        </div>
+        <div class="brand-sidebar-text">
+          <div class="brand-sidebar-line1" style="font-size: 0.78rem;">Fundación Festival de</div>
+          <div class="brand-sidebar-line2" style="font-size: 0.85rem;">la Leyenda Vallenata</div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+
+    <div class="offcanvas-body">
+      <!-- Titular del Sistema -->
+      <div class="sidebar-header-box pt-3 pb-2">
+        <div class="system-identity-block">
+          <div class="system-kicker">SISTEMA DE VOTACIONES</div>
+          <div class="system-title" style="font-size: 1.25rem;">Festival 2027</div>
+        </div>
+      </div>
+
+      <!-- Menú de Administración -->
+      <div class="sidebar-nav-section pt-1">
+        <div class="nav-section-label">ADMINISTRACIÓN</div>
+        <ul class="sidebar-menu-list">
+          <!-- 1. Panel Principal -->
+          <li>
+            <a href="admin.html" class="sidebar-nav-link">
+              <i class="bi bi-grid"></i>
+              <span>Panel principal</span>
+            </a>
+          </li>
+
+          <!-- 2. Categorías -->
+          <li>
+            <a href="admin-categorias.html" class="sidebar-nav-link">
+              <i class="bi bi-grid-3x3-gap"></i>
+              <span>Categorías</span>
+            </a>
+          </li>
+
+          <!-- 3. Votaciones -->
+          <li>
+            <a href="admin-votaciones.html" class="sidebar-nav-link">
+              <i class="bi bi-check2-square"></i>
+              <span>Votaciones</span>
+            </a>
+          </li>
+
+          <!-- 4. Opciones -->
+          <li>
+            <a href="admin-opciones.html" class="sidebar-nav-link">
+              <i class="bi bi-card-checklist"></i>
+              <span>Opciones</span>
+            </a>
+          </li>
+
+          <!-- 5. Resultados (Activo) -->
+          <li>
+            <a href="admin-resultados.html" class="sidebar-nav-link active">
+              <i class="bi bi-bar-chart-line"></i>
+              <span>Resultados</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Pie de Offcanvas -->
+      <div class="sidebar-footer-box mt-auto">
+        <div class="demo-badge-row">
+          <i class="bi bi-shield-check"></i>
+          <span>Entorno de demostración</span>
+        </div>
+        <div class="sidebar-footer-text">
+          Fundación Festival de la Leyenda Vallenata<br>
+          Valledupar, Colombia
+        </div>
+
+        <a href="index.html" class="sidebar-back-link">
+          <i class="bi bi-arrow-left"></i>
+          <span>Volver a vista pública</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       2. CONTENEDOR PRINCIPAL
+       ============================================================ -->
+  <main class="admin-main-wrap">
+
+    <!-- BARRA SUPERIOR (BREADCRUMB & PERFIL) -->
+    <header class="admin-topbar">
+      <!-- Botón Hamburguesa para Móvil y Marca Móvil -->
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn-admin-hamburger" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebarOffcanvas" aria-controls="adminSidebarOffcanvas" aria-label="Abrir menú de navegación">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <div class="mobile-topbar-brand">
+          <img 
+            src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" 
+            alt="Logo" 
+            class="mobile-brand-emblem" 
+            referrerpolicy="no-referrer"
+            onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';" 
+          />
+          <span class="mobile-brand-title">Festival 2027</span>
+        </div>
+
+        <!-- Breadcrumb de navegación (Escritorio) -->
+        <nav class="breadcrumb-row" aria-label="Ruta de navegación">
+          <a href="admin.html" class="bc-parent">Administración</a>
+          <i class="bi bi-chevron-right bc-sep"></i>
+          <span class="bc-current">Resultados</span>
+        </nav>
+      </div>
+
+      <!-- Estado y Usuario Operador -->
+      <div class="topbar-right-actions">
+        <div class="live-pulse-badge">
+          <span class="pulse-dot"></span>
+          <span>Escrutinio en vivo</span>
+        </div>
+
+        <span class="badge-demo-mode">Datos de prueba 2027</span>
+
+        <div class="user-profile-pill">
+          <div class="user-avatar-circle">
+            <i class="bi bi-person"></i>
+          </div>
+          <div class="user-info-text">
+            <span class="user-name">Comité de Escrutinio</span>
+            <span class="user-role">Mesa Oficial FFLV</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ÁREA DE CONTENIDO -->
+    <div class="dashboard-content-area">
+
+      <!-- ENCABEZADO DE PÁGINA -->
+      <section class="dashboard-page-header">
+        <div class="panel-kicker">FESTIVAL DE LA LEYENDA VALLENATA 2027</div>
+        <div class="panel-header-row">
+          <div>
+            <h1 class="panel-title">Resultados y Escrutinio</h1>
+            <p class="panel-description">
+              Monitoreo en tiempo real del cómputo oficial de sufragios, distribución de votos y proclamación de ganadores.
+            </p>
+          </div>
+
+          <!-- Botones de Acción Superior -->
+          <div class="header-actions-group">
+            <button type="button" class="btn-action-refresh" id="btnRefreshResults" onclick="refreshScrutinyData()">
+              <i class="bi bi-arrow-clockwise" id="refreshIcon"></i>
+              <span>Actualizar datos</span>
+            </button>
+
+            <button type="button" class="btn-action-export" data-bs-toggle="modal" data-bs-target="#modalOfficialActa">
+              <i class="bi bi-file-earmark-text"></i>
+              <span>Ver Acta Oficial</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SELECTOR DE EVENTO DE VOTACIÓN -->
+      <section class="event-selector-card">
+        <div class="event-selector-left">
+          <div class="event-label-kicker">CONSULTA ELECTORAL SELECCIONADA</div>
+          <div class="event-select-dropdown-wrap">
+            <select id="eventSelect" class="event-select-native" aria-label="Seleccionar evento de votación" onchange="switchEventData(this.value)">
+              <option value="artista-favorito" selected>Artista favorito del público</option>
+              <option value="cancion-favorita">Canción favorita del público</option>
+              <option value="clasico-vallenato">Clásico vallenato favorito</option>
+              <option value="piloneras-mayor">Mejor grupo de piloneras mayor</option>
+              <option value="comparsas-fantasia">Comparsa de fantasía favorita</option>
+            </select>
+            <i class="bi bi-chevron-down small text-muted"></i>
+          </div>
+        </div>
+
+        <div class="event-selector-right">
+          <span class="event-meta-text" id="eventMetaCategoryText">Música · 4 opciones</span>
+          <span class="badge-status-pill-gold" id="eventStatusPill">
+            <i class="bi bi-broadcast"></i> Activa
+          </span>
+          <div class="event-divider-pipe"></div>
+          <div>
+            <div style="font-size: 0.68rem; color: #6B7280; font-weight: 700; text-transform: uppercase;">Total Votos</div>
+            <span class="event-votes-number" id="eventVotesCount">6.480 votos</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- KPI METRICS GRID (4 TARJETAS) -->
+      <section class="kpi-metrics-grid">
+
+        <!-- 1. Total Votos -->
+        <article class="kpi-stat-card">
+          <div class="kpi-card-header">
+            <span class="kpi-label">Votos Computados</span>
+            <div class="kpi-icon-wrap">
+              <i class="bi bi-inbox-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-stat-val" id="kpiTotalVotes">6.480</div>
+          <div class="kpi-footer-note">
+            <span class="trend-positive"><i class="bi bi-arrow-up-short"></i>+14.8%</span>
+            <span>en los últimos 60 minutos</span>
+          </div>
+        </article>
+
+        <!-- 2. Líder Virtual -->
+        <article class="kpi-stat-card kpi-leader-card">
+          <div class="kpi-card-header">
+            <span class="kpi-label" style="color: var(--color-gold-text);">1° Lugar (Líder)</span>
+            <div class="kpi-icon-wrap kpi-icon-gold">
+              <i class="bi bi-trophy-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-leader-avatar-row">
+            <div class="leader-thumb-wrap">
+              <img id="kpiLeaderImg" src="/src/assets/images/contestant_mateo_diaz_1791516984186.jpg" alt="Líder" />
+            </div>
+            <div>
+              <div class="leader-meta-name" id="kpiLeaderName">Mateo Díaz</div>
+              <div class="leader-meta-sub" id="kpiLeaderSub">2.851 votos (44.0%)</div>
+            </div>
+          </div>
+          <div class="kpi-footer-note">
+            <span style="color: var(--color-gold-text); font-weight: 700;"><i class="bi bi-award me-1"></i>Ventaja sólida</span>
+          </div>
+        </article>
+
+        <!-- 3. Margen de Ventaja -->
+        <article class="kpi-stat-card">
+          <div class="kpi-card-header">
+            <span class="kpi-label">Margen de Ventaja</span>
+            <div class="kpi-icon-wrap">
+              <i class="bi bi-distribute-horizontal"></i>
+            </div>
+          </div>
+          <div class="kpi-stat-val" id="kpiMarginDiff">+862 votos</div>
+          <div class="kpi-footer-note">
+            <span class="text-muted" id="kpiMarginSub">Diferencia con 2° lugar (13.3%)</span>
+          </div>
+        </article>
+
+        <!-- 4. Integridad de Urna -->
+        <article class="kpi-stat-card">
+          <div class="kpi-card-header">
+            <span class="kpi-label">Auditoría Electoral</span>
+            <div class="kpi-icon-wrap">
+              <i class="bi bi-shield-check"></i>
+            </div>
+          </div>
+          <div class="kpi-stat-val text-success">99.8%</div>
+          <div class="kpi-footer-note">
+            <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>0 anulaciones</span>
+            <span>· Votos IP verificados</span>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- ESCRUTINIO PRINCIPAL Y AUDITORÍA -->
+      <section class="scrutiny-main-grid">
+
+        <!-- Columna Izquierda: Barras de Resultados Detalladas -->
+        <div class="scrutiny-bars-card">
+          <div class="card-title-row">
+            <div>
+              <h2 class="card-section-heading">Distribución de Sufragios</h2>
+              <p class="card-section-subheading">Cómputo en tiempo real según las actas electrónicas procesadas</p>
+            </div>
+            <span class="badge-category-pill" id="badgeCategoryBadge">Categoría: Música</span>
+          </div>
+
+          <div class="results-bars-list" id="resultsBarsList">
+            <!-- 1. Mateo Díaz (Líder) -->
+            <div class="candidate-result-item is-leader">
+              <div class="cand-header-row">
+                <div class="cand-identity-block">
+                  <div class="cand-rank-badge cand-rank-gold">1</div>
+                  <img src="/src/assets/images/contestant_mateo_diaz_1791516984186.jpg" alt="Mateo Díaz" class="cand-avatar-photo" />
+                  <div>
+                    <h3 class="cand-name-title">Mateo Díaz</h3>
+                    <p class="cand-song-sub">Mi tierra canta</p>
+                  </div>
+                </div>
+                <div class="cand-scores-block">
+                  <span class="cand-votes-qty">2.851 votos</span>
+                  <span class="cand-pct-badge cand-pct-gold">44.0%</span>
+                </div>
+              </div>
+              <div class="cand-progress-track">
+                <div class="cand-progress-fill fill-gold" style="width: 44.0%;"></div>
+              </div>
+            </div>
+
+            <!-- 2. Lucía Pineda -->
+            <div class="candidate-result-item">
+              <div class="cand-header-row">
+                <div class="cand-identity-block">
+                  <div class="cand-rank-badge">2</div>
+                  <img src="/src/assets/images/contestant_lucia_pineda_1791516993941.jpg" alt="Lucía Pineda" class="cand-avatar-photo" />
+                  <div>
+                    <h3 class="cand-name-title">Lucía Pineda</h3>
+                    <p class="cand-song-sub">Raíces del alma</p>
+                  </div>
+                </div>
+                <div class="cand-scores-block">
+                  <span class="cand-votes-qty">1.989 votos</span>
+                  <span class="cand-pct-badge">30.7%</span>
+                </div>
+              </div>
+              <div class="cand-progress-track">
+                <div class="cand-progress-fill fill-second" style="width: 30.7%;"></div>
+              </div>
+            </div>
+
+            <!-- 3. Samuel Rojas -->
+            <div class="candidate-result-item">
+              <div class="cand-header-row">
+                <div class="cand-identity-block">
+                  <div class="cand-rank-badge">3</div>
+                  <img src="/src/assets/images/contestant_samuel_rojas_1791517002103.jpg" alt="Samuel Rojas" class="cand-avatar-photo" />
+                  <div>
+                    <h3 class="cand-name-title">Samuel Rojas</h3>
+                    <p class="cand-song-sub">Aires de mi pueblo</p>
+                  </div>
+                </div>
+                <div class="cand-scores-block">
+                  <span class="cand-votes-qty">998 votos</span>
+                  <span class="cand-pct-badge">15.4%</span>
+                </div>
+              </div>
+              <div class="cand-progress-track">
+                <div class="cand-progress-fill fill-third" style="width: 15.4%;"></div>
+              </div>
+            </div>
+
+            <!-- 4. Valentina López -->
+            <div class="candidate-result-item">
+              <div class="cand-header-row">
+                <div class="cand-identity-block">
+                  <div class="cand-rank-badge">4</div>
+                  <img src="/src/assets/images/contestant_valentina_lopez_1791517011267.jpg" alt="Valentina López" class="cand-avatar-photo" />
+                  <div>
+                    <h3 class="cand-name-title">Valentina López</h3>
+                    <p class="cand-song-sub">Corazón del Valle</p>
+                  </div>
+                </div>
+                <div class="cand-scores-block">
+                  <span class="cand-votes-qty">642 votos</span>
+                  <span class="cand-pct-badge">9.9%</span>
+                </div>
+              </div>
+              <div class="cand-progress-track">
+                <div class="cand-progress-fill fill-fourth" style="width: 9.9%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Tarjeta de Certificación y Seguridad -->
+        <div class="scrutiny-side-card">
+          <div class="audit-box-white">
+            <div class="audit-kicker">SEGURIDAD Y AUDITORÍA</div>
+            <h3 class="audit-title">Certificado de Escrutinio</h3>
+
+            <ul class="audit-checklist">
+              <li class="audit-check-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Prevención estricta de votos múltiples por dispositivo (IP + Cookies + Device Hash).</span>
+              </li>
+              <li class="audit-check-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Sincronización de base de datos cifrada de punto a punto.</span>
+              </li>
+              <li class="audit-check-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Aval oficial de la Fundación Festival de la Leyenda Vallenata.</span>
+              </li>
+            </ul>
+
+            <div class="audit-hash-block">
+              <span class="audit-hash-label">Firma Criptográfica SHA-256</span>
+              <span class="audit-hash-val" id="auditHashVal">d8a4f932e67c8b01a2f448b11c97a5...</span>
+            </div>
+
+            <button type="button" class="btn-view-acta" data-bs-toggle="modal" data-bs-target="#modalOfficialActa">
+              <i class="bi bi-file-earmark-pdf"></i>
+              <span>Generar Acta Firmada</span>
+            </button>
+          </div>
+
+          <!-- Tarjeta de Estado de la Urna -->
+          <div class="audit-box-white">
+            <div class="audit-kicker">ESTADO DE URNA VIRTUAL</div>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="fw-bold small text-dark">Cierre de Votación</span>
+              <span class="badge bg-dark rounded-pill" id="sideUrnStatusBadge">Activa 24h</span>
+            </div>
+            <p class="small text-muted mb-3">
+              El cierre definitivo está programado para la noche de premiación en el Parque de la Leyenda Vallenata Consuelo Araujonoguera.
+            </p>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-dark btn-sm w-100 fw-semibold rounded-3" onclick="triggerToast('Descarga iniciada en formato CSV.')">
+                <i class="bi bi-download me-1"></i> Exportar CSV
+              </button>
+              <button type="button" class="btn btn-outline-dark btn-sm w-100 fw-semibold rounded-3" onclick="triggerToast('Descarga iniciada en formato JSON.')">
+                <i class="bi bi-file-code me-1"></i> Exportar JSON
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TABLA DETALLADA DE ESCRUTINIO -->
+      <section class="scrutiny-table-card">
+        <div class="card-title-row">
+          <div>
+            <h2 class="card-section-heading">Tabla de Posiciones y Escrutinio Formal</h2>
+            <p class="card-section-subheading">Registro consolidado por participante para el acta oficial del jurado</p>
+          </div>
+          <span class="small text-muted">Total 4 opciones registradas</span>
+        </div>
+
+        <div class="table-responsive-clean">
+          <table class="table-scrutiny-custom">
+            <thead>
+              <tr>
+                <th style="width: 60px;">Posición</th>
+                <th>Participante y Obra</th>
+                <th>Categoría</th>
+                <th>Total Votos</th>
+                <th>Porcentaje</th>
+                <th>Tendencia</th>
+                <th>Certificación</th>
+              </tr>
+            </thead>
+            <tbody id="tableScrutinyBody">
+              <tr>
+                <td><span class="table-pos-pill" style="color: var(--color-gold-text);">#1</span></td>
+                <td>
+                  <div class="cand-table-cell">
+                    <img src="/src/assets/images/contestant_mateo_diaz_1791516984186.jpg" alt="Mateo Díaz" class="cand-table-photo" />
+                    <div>
+                      <div class="fw-bold text-dark">Mateo Díaz</div>
+                      <div class="small text-muted">Mi tierra canta</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge-category-pill">Música</span></td>
+                <td><strong class="text-dark">2.851</strong></td>
+                <td><strong style="color: var(--color-gold-text);">44.0%</strong></td>
+                <td><span class="trend-positive"><i class="bi bi-arrow-up-right"></i> En alza</span></td>
+                <td><span class="badge-audit-ok"><i class="bi bi-shield-check"></i> Verificado</span></td>
+              </tr>
+              <tr>
+                <td><span class="table-pos-pill">#2</span></td>
+                <td>
+                  <div class="cand-table-cell">
+                    <img src="/src/assets/images/contestant_lucia_pineda_1791516993941.jpg" alt="Lucía Pineda" class="cand-table-photo" />
+                    <div>
+                      <div class="fw-bold text-dark">Lucía Pineda</div>
+                      <div class="small text-muted">Raíces del alma</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge-category-pill">Música</span></td>
+                <td><strong class="text-dark">1.989</strong></td>
+                <td><strong>30.7%</strong></td>
+                <td><span class="text-muted"><i class="bi bi-dash"></i> Estable</span></td>
+                <td><span class="badge-audit-ok"><i class="bi bi-shield-check"></i> Verificado</span></td>
+              </tr>
+              <tr>
+                <td><span class="table-pos-pill">#3</span></td>
+                <td>
+                  <div class="cand-table-cell">
+                    <img src="/src/assets/images/contestant_samuel_rojas_1791517002103.jpg" alt="Samuel Rojas" class="cand-table-photo" />
+                    <div>
+                      <div class="fw-bold text-dark">Samuel Rojas</div>
+                      <div class="small text-muted">Aires de mi pueblo</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge-category-pill">Música</span></td>
+                <td><strong class="text-dark">998</strong></td>
+                <td><strong>15.4%</strong></td>
+                <td><span class="text-muted"><i class="bi bi-dash"></i> Estable</span></td>
+                <td><span class="badge-audit-ok"><i class="bi bi-shield-check"></i> Verificado</span></td>
+              </tr>
+              <tr>
+                <td><span class="table-pos-pill">#4</span></td>
+                <td>
+                  <div class="cand-table-cell">
+                    <img src="/src/assets/images/contestant_valentina_lopez_1791517011267.jpg" alt="Valentina López" class="cand-table-photo" />
+                    <div>
+                      <div class="fw-bold text-dark">Valentina López</div>
+                      <div class="small text-muted">Corazón del Valle</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge-category-pill">Música</span></td>
+                <td><strong class="text-dark">642</strong></td>
+                <td><strong>9.9%</strong></td>
+                <td><span class="text-muted"><i class="bi bi-dash"></i> Estable</span></td>
+                <td><span class="badge-audit-ok"><i class="bi bi-shield-check"></i> Verificado</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ANÁLISIS GEOGRÁFICO Y ORIGEN DE LOS VOTOS -->
+      <section class="geo-analysis-grid">
+
+        <!-- Tarjeta 1: Procedencia Geográfica -->
+        <article class="geo-card">
+          <div class="card-title-row">
+            <div>
+              <h2 class="card-section-heading">Procedencia del Voto</h2>
+              <p class="card-section-subheading">Distribución territorial de sufragantes en línea</p>
+            </div>
+            <i class="bi bi-globe-americas fs-4 text-muted"></i>
+          </div>
+
+          <div>
+            <div class="geo-row-item">
+              <div class="geo-row-left">
+                <span class="geo-zone-title">Valledupar y Departamento del Cesar</span>
+                <span class="geo-zone-votes">3.758 votos</span>
+                <div class="geo-progress-bar"><div class="geo-fill" style="width: 58%;"></div></div>
+              </div>
+              <span class="geo-pct-pill">58%</span>
+            </div>
+
+            <div class="geo-row-item">
+              <div class="geo-row-left">
+                <span class="geo-zone-title">Región Caribe (Barranquilla, Santa Marta, Cartagena)</span>
+                <span class="geo-zone-votes">1.555 votos</span>
+                <div class="geo-progress-bar"><div class="geo-fill" style="width: 24%;"></div></div>
+              </div>
+              <span class="geo-pct-pill">24%</span>
+            </div>
+
+            <div class="geo-row-item">
+              <div class="geo-row-left">
+                <span class="geo-zone-title">Resto de Colombia (Bogotá, Medellín, Bucaramanga)</span>
+                <span class="geo-zone-votes">778 votos</span>
+                <div class="geo-progress-bar"><div class="geo-fill" style="width: 12%;"></div></div>
+              </div>
+              <span class="geo-pct-pill">12%</span>
+            </div>
+
+            <div class="geo-row-item">
+              <div class="geo-row-left">
+                <span class="geo-zone-title">Internacional (Comunidad Vallenata en el Exterior)</span>
+                <span class="geo-zone-votes">389 votos</span>
+                <div class="geo-progress-bar"><div class="geo-fill" style="width: 6%;"></div></div>
+              </div>
+              <span class="geo-pct-pill">6%</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Tarjeta 2: Dispositivos y Plataformas -->
+        <article class="geo-card">
+          <div class="card-title-row">
+            <div>
+              <h2 class="card-section-heading">Canales de Participación</h2>
+              <p class="card-section-subheading">Dispositivos y tecnología empleada para la votación</p>
+            </div>
+            <i class="bi bi-phone fs-4 text-muted"></i>
+          </div>
+
+          <div>
+            <div class="geo-row-item">
+              <div class="geo-row-left">
+                <span class="geo-zone-title">Smartphones (Navegación Móvil Web / PWA)</span>
+                <span class="geo-zone-votes">5.443 votos</span>
+                <div class="geo-progress-bar"><div class="geo-fill" style="width: 84%;"></div></div>
+              </div>
+              <span class="geo-pct-pill">84%</span>
+            </div>
+
+            <div class="geo-row-item">
+              <div class="geo-row-left">
+                <span class="geo-zone-title">Computadores de Escritorio / Portátiles</span>
+                <span class="geo-zone-votes">778 votos</span>
+                <div class="geo-progress-bar"><div class="geo-fill" style="width: 12%;"></div></div>
+              </div>
+              <span class="geo-pct-pill">12%</span>
+            </div>
+
+            <div class="geo-row-item">
+              <div class="geo-row-left">
+                <span class="geo-zone-title">Tablets y Otros Dispositivos</span>
+                <span class="geo-zone-votes">259 votos</span>
+                <div class="geo-progress-bar"><div class="geo-fill" style="width: 4%;"></div></div>
+              </div>
+              <span class="geo-pct-pill">4%</span>
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- NOTA AL PIE -->
+      <div class="d-flex align-items-center gap-2 text-muted small py-2">
+        <i class="bi bi-info-circle"></i>
+        <span>Datos oficiales de escrutinio para la demostración del Festival de la Leyenda Vallenata 2027. Las cifras se actualizan en vivo con cada interacción.</span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL: ACTA OFICIAL DE ESCRUTINIO (IMPRIMIBLE)
+       ============================================================ -->
+  <div class="modal fade" id="modalOfficialActa" tabindex="-1" aria-labelledby="modalOfficialActaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <div>
+            <h5 class="modal-title fw-bold" id="modalOfficialActaLabel">Acta Oficial de Escrutinio Electoral</h5>
+            <p class="small text-muted mb-0">Fundación Festival de la Leyenda Vallenata · Versión 2027</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4">
+
+          <div class="official-seal-box">
+            <div class="official-seal-icon"><i class="bi bi-award"></i></div>
+            <div class="official-seal-title">Fundación Festival de la Leyenda Vallenata</div>
+            <div class="official-seal-sub">Valledupar, Cesar · República de Colombia</div>
+            <div class="small fw-bold text-dark mt-2">ACTA ELECTORAL N° FFLV-2027-VOT-01</div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3">
+                <span class="text-muted small d-block">Evento Consultado:</span>
+                <strong class="text-dark" id="modalActaEventTitle">Artista favorito del público</strong>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3">
+                <span class="text-muted small d-block">Total de Votos Escrutados:</span>
+                <strong class="text-dark" id="modalActaTotalVotes">6.480 votos verificados</strong>
+              </div>
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-dark mb-3">Resolución de Ganadores y Posiciones:</h6>
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Lugar</th>
+                  <th>Participante</th>
+                  <th>Obra Musical</th>
+                  <th>Votos</th>
+                  <th>Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody id="modalActaTableBody">
+                <tr class="table-warning">
+                  <td><strong>1° Lugar</strong></td>
+                  <td><strong>Mateo Díaz</strong></td>
+                  <td>Mi tierra canta</td>
+                  <td>2.851</td>
+                  <td><strong>44.0%</strong></td>
+                </tr>
+                <tr>
+                  <td>2° Lugar</td>
+                  <td>Lucía Pineda</td>
+                  <td>Raíces del alma</td>
+                  <td>1.989</td>
+                  <td>30.7%</td>
+                </tr>
+                <tr>
+                  <td>3° Lugar</td>
+                  <td>Samuel Rojas</td>
+                  <td>Aires de mi pueblo</td>
+                  <td>998</td>
+                  <td>15.4%</td>
+                </tr>
+                <tr>
+                  <td>4° Lugar</td>
+                  <td>Valentina López</td>
+                  <td>Corazón del Valle</td>
+                  <td>642</td>
+                  <td>9.9%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 p-3 border rounded-3 bg-white">
+            <div class="row text-center text-muted small">
+              <div class="col-6 border-end">
+                <div class="mb-4">________________________________</div>
+                <strong class="text-dark d-block">Comité de Escrutinio FFLV</strong>
+                <span>Firma Autorizada</span>
+              </div>
+              <div class="col-6">
+                <div class="mb-4">________________________________</div>
+                <strong class="text-dark d-block">Auditoría de Sistemas</strong>
+                <span>Criptografía SHA-256 Validada</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer border-top px-4 py-3">
+          <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-dark rounded-3" onclick="triggerToast('Descarga iniciada en PDF.')">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Descargar PDF
+          </button>
+          <button type="button" class="btn btn-dark fw-bold rounded-3 px-4" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> Imprimir Acta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="adminResultsToast" class="toast align-items-center text-bg-dark border-0 rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastResultsMsg">
+          Escrutinio actualizado con éxito.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <!-- LÓGICA INTERACTIVA DEL PANEL DE RESULTADOS -->
+  <script>
+    // Datos completos para cada evento de votación
+    const eventsData = {
+      'artista-favorito': {
+        title: 'Artista favorito del público',
+        category: 'Música',
+        optionsCount: 4,
+        totalVotes: '6.480',
+        totalVotesNum: 6480,
+        status: 'Activa',
+        marginDiff: '+862 votos',
+        marginSub: 'Diferencia con 2° lugar (13.3%)',
+        hash: 'd8a4f932e67c8b01a2f448b11c97a5e903bc12348576402831e',
+        candidates: [
+          { rank: 1, name: 'Mateo Díaz', song: 'Mi tierra canta', votes: 2851, pct: '44.0%', photo: '/src/assets/images/contestant_mateo_diaz_1791516984186.jpg', isLeader: true, fillClass: 'fill-gold' },
+          { rank: 2, name: 'Lucía Pineda', song: 'Raíces del alma', votes: 1989, pct: '30.7%', photo: '/src/assets/images/contestant_lucia_pineda_1791516993941.jpg', isLeader: false, fillClass: 'fill-second' },
+          { rank: 3, name: 'Samuel Rojas', song: 'Aires de mi pueblo', votes: 998, pct: '15.4%', photo: '/src/assets/images/contestant_samuel_rojas_1791517002103.jpg', isLeader: false, fillClass: 'fill-third' },
+          { rank: 4, name: 'Valentina López', song: 'Corazón del Valle', votes: 642, pct: '9.9%', photo: '/src/assets/images/contestant_valentina_lopez_1791517011267.jpg', isLeader: false, fillClass: 'fill-fourth' }
+        ]
+      },
+      'cancion-favorita': {
+        title: 'Canción favorita del público',
+        category: 'Música',
+        optionsCount: 6,
+        totalVotes: '4.120',
+        totalVotesNum: 4120,
+        status: 'Activa',
+        marginDiff: '+412 votos',
+        marginSub: 'Diferencia con 2° lugar (10.0%)',
+        hash: 'e92bc478a101f893c72e90ba6198f7e21245a9018471638bfa',
+        candidates: [
+          { rank: 1, name: 'Lucía Pineda', song: 'Raíces del alma', votes: 1689, pct: '41.0%', photo: '/src/assets/images/contestant_lucia_pineda_1791516993941.jpg', isLeader: true, fillClass: 'fill-gold' },
+          { rank: 2, name: 'Mateo Díaz', song: 'Mi tierra canta', votes: 1277, pct: '31.0%', photo: '/src/assets/images/contestant_mateo_diaz_1791516984186.jpg', isLeader: false, fillClass: 'fill-second' },
+          { rank: 3, name: 'Valentina López', song: 'Corazón del Valle', votes: 660, pct: '16.0%', photo: '/src/assets/images/contestant_valentina_lopez_1791517011267.jpg', isLeader: false, fillClass: 'fill-third' },
+          { rank: 4, name: 'Samuel Rojas', song: 'Aires de mi pueblo', votes: 494, pct: '12.0%', photo: '/src/assets/images/contestant_samuel_rojas_1791517002103.jpg', isLeader: false, fillClass: 'fill-fourth' }
+        ]
+      },
+      'clasico-vallenato': {
+        title: 'Clásico vallenato favorito',
+        category: 'Música',
+        optionsCount: 5,
+        totalVotes: '3.890',
+        totalVotesNum: 3890,
+        status: 'Activa',
+        marginDiff: '+580 votos',
+        marginSub: 'Diferencia con 2° lugar (14.9%)',
+        hash: 'a718b9c2401f89e273bc901a618f7e2a9125b8104817290cdf',
+        candidates: [
+          { rank: 1, name: 'Samuel Rojas', song: 'La Gota Fría (Tributo)', votes: 1828, pct: '47.0%', photo: '/src/assets/images/contestant_samuel_rojas_1791517002103.jpg', isLeader: true, fillClass: 'fill-gold' },
+          { rank: 2, name: 'Mateo Díaz', song: 'El Cantor de Fonseca', votes: 1248, pct: '32.1%', photo: '/src/assets/images/contestant_mateo_diaz_1791516984186.jpg', isLeader: false, fillClass: 'fill-second' },
+          { rank: 3, name: 'Lucía Pineda', song: 'Matilde Lina', votes: 544, pct: '14.0%', photo: '/src/assets/images/contestant_lucia_pineda_1791516993941.jpg', isLeader: false, fillClass: 'fill-third' },
+          { rank: 4, name: 'Valentina López', song: 'Ausencia', votes: 270, pct: '6.9%', photo: '/src/assets/images/contestant_valentina_lopez_1791517011267.jpg', isLeader: false, fillClass: 'fill-fourth' }
+        ]
+      },
+      'piloneras-mayor': {
+        title: 'Mejor grupo de piloneras mayor',
+        category: 'Piloneras',
+        optionsCount: 8,
+        totalVotes: '2.410',
+        totalVotesNum: 2410,
+        status: 'Activa',
+        marginDiff: '+320 votos',
+        marginSub: 'Diferencia con 2° lugar (13.3%)',
+        hash: 'b148c901f82e73ac8910b6182e7a125b901a4817290cdf81a2',
+        candidates: [
+          { rank: 1, name: 'Pilón Cañahuate Tradicional', song: 'Danza del Pilón Mayor', votes: 1157, pct: '48.0%', photo: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&auto=format&fit=crop&q=80', isLeader: true, fillClass: 'fill-gold' },
+          { rank: 2, name: 'Piloneras del Valle Real', song: 'Reseña de la Danza', votes: 837, pct: '34.7%', photo: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=300&auto=format&fit=crop&q=80', isLeader: false, fillClass: 'fill-second' },
+          { rank: 3, name: 'Pilón del Santo Ecce Homo', song: 'Costumbres Vallenatas', votes: 416, pct: '17.3%', photo: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=300&auto=format&fit=crop&q=80', isLeader: false, fillClass: 'fill-third' }
+        ]
+      },
+      'comparsas-fantasia': {
+        title: 'Comparsa de fantasía favorita',
+        category: 'Comparsas',
+        optionsCount: 6,
+        totalVotes: '1.550',
+        totalVotesNum: 1550,
+        status: 'Cerrada',
+        marginDiff: '+480 votos',
+        marginSub: 'Ganador definitivo proclamado',
+        hash: 'c891a2e73ac8910b6182e7a125b901a4817290cdf81a2b148c',
+        candidates: [
+          { rank: 1, name: 'Comparsa Son de Valledupar', song: 'Fantasía Macondo 2027', votes: 852, pct: '55.0%', photo: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&auto=format&fit=crop&q=80', isLeader: true, fillClass: 'fill-gold' },
+          { rank: 2, name: 'Ritmo y Tambores del Guatapurí', song: 'Aires del Río', votes: 450, pct: '29.0%', photo: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=300&auto=format&fit=crop&q=80', isLeader: false, fillClass: 'fill-second' },
+          { rank: 3, name: 'Fantasía Leyenda Dorada', song: 'Homenaje a Consuelo', votes: 248, pct: '16.0%', photo: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=300&auto=format&fit=crop&q=80', isLeader: false, fillClass: 'fill-third' }
+        ]
+      }
+    };
+
+    function switchEventData(eventId) {
+      const data = eventsData[eventId];
+      if (!data) return;
+
+      // Actualizar encabezados
+      document.getElementById('eventMetaCategoryText').textContent = `${data.category} · ${data.optionsCount} opciones`;
+      const pill = document.getElementById('eventStatusPill');
+      if (data.status === 'Activa') {
+        pill.className = 'badge-status-pill-gold';
+        pill.innerHTML = '<i class="bi bi-broadcast"></i> Activa';
+      } else {
+        pill.className = 'badge bg-secondary';
+        pill.innerHTML = '<i class="bi bi-lock-fill me-1"></i> Cerrada';
+      }
+      document.getElementById('eventVotesCount').textContent = `${data.totalVotes} votos`;
+      document.getElementById('kpiTotalVotes').textContent = data.totalVotes;
+      document.getElementById('badgeCategoryBadge').textContent = `Categoría: ${data.category}`;
+
+      // Líder
+      const leader = data.candidates[0];
+      document.getElementById('kpiLeaderName').textContent = leader.name;
+      document.getElementById('kpiLeaderSub').textContent = `${leader.votes.toLocaleString()} votos (${leader.pct})`;
+      document.getElementById('kpiLeaderImg').src = leader.photo;
+      document.getElementById('kpiMarginDiff').textContent = data.marginDiff;
+      document.getElementById('kpiMarginSub').textContent = data.marginSub;
+      document.getElementById('auditHashVal').textContent = data.hash;
+
+      // Renderizar barras de progreso
+      const barsContainer = document.getElementById('resultsBarsList');
+      barsContainer.innerHTML = '';
+      data.candidates.forEach(cand => {
+        const item = document.createElement('div');
+        item.className = `candidate-result-item ${cand.isLeader ? 'is-leader' : ''}`;
+        item.innerHTML = `
+          <div class="cand-header-row">
+            <div class="cand-identity-block">
+              <div class="cand-rank-badge ${cand.isLeader ? 'cand-rank-gold' : ''}">${cand.rank}</div>
+              <img src="${cand.photo}" alt="${cand.name}" class="cand-avatar-photo" />
+              <div>
+                <h3 class="cand-name-title">${cand.name}</h3>
+                <p class="cand-song-sub">${cand.song}</p>
+              </div>
+            </div>
+            <div class="cand-scores-block">
+              <span class="cand-votes-qty">${cand.votes.toLocaleString()} votos</span>
+              <span class="cand-pct-badge ${cand.isLeader ? 'cand-pct-gold' : ''}">${cand.pct}</span>
+            </div>
+          </div>
+          <div class="cand-progress-track">
+            <div class="cand-progress-fill ${cand.fillClass}" style="width: ${cand.pct};"></div>
+          </div>
+        `;
+        barsContainer.appendChild(item);
+      });
+
+      // Renderizar tabla formal
+      const tableBody = document.getElementById('tableScrutinyBody');
+      tableBody.innerHTML = '';
+      data.candidates.forEach(cand => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="table-pos-pill" style="${cand.isLeader ? 'color: var(--color-gold-text);' : ''}">#${cand.rank}</span></td>
+          <td>
+            <div class="cand-table-cell">
+              <img src="${cand.photo}" alt="${cand.name}" class="cand-table-photo" />
+              <div>
+                <div class="fw-bold text-dark">${cand.name}</div>
+                <div class="small text-muted">${cand.song}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-category-pill">${data.category}</span></td>
+          <td><strong class="text-dark">${cand.votes.toLocaleString()}</strong></td>
+          <td><strong style="${cand.isLeader ? 'color: var(--color-gold-text);' : ''}">${cand.pct}</strong></td>
+          <td><span class="${cand.isLeader ? 'trend-positive' : 'text-muted'}"><i class="${cand.isLeader ? 'bi bi-arrow-up-right' : 'bi bi-dash'}"></i> ${cand.isLeader ? 'En alza' : 'Estable'}</span></td>
+          <td><span class="badge-audit-ok"><i class="bi bi-shield-check"></i> Verificado</span></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      // Actualizar modal acta
+      document.getElementById('modalActaEventTitle').textContent = data.title;
+      document.getElementById('modalActaTotalVotes').textContent = `${data.totalVotes} votos verificados`;
+      const modalTable = document.getElementById('modalActaTableBody');
+      modalTable.innerHTML = '';
+      data.candidates.forEach(cand => {
+        const mtr = document.createElement('tr');
+        if (cand.isLeader) mtr.className = 'table-warning';
+        mtr.innerHTML = `
+          <td><strong>${cand.rank}° Lugar</strong></td>
+          <td><strong>${cand.name}</strong></td>
+          <td>${cand.song}</td>
+          <td>${cand.votes.toLocaleString()}</td>
+          <td><strong>${cand.pct}</strong></td>
+        `;
+        modalTable.appendChild(mtr);
+      });
+    }
+
+    function refreshScrutinyData() {
+      const icon = document.getElementById('refreshIcon');
+      icon.classList.add('spin-anim');
+      setTimeout(() => {
+        icon.classList.remove('spin-anim');
+        triggerToast('Datos de escrutinio sincronizados con la urna virtual.');
+      }, 600);
+    }
+
+    function triggerToast(msg) {
+      document.getElementById('toastResultsMsg').textContent = msg;
+      const toastEl = document.getElementById('adminResultsToast');
+      const toast = new bootstrap.Toast(toastEl, { delay: 3500 });
+      toast.show();
+    }
+  </script>
+
+  <style>
+    .spin-anim {
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+</body>
+</html>

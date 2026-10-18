@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Festival de la Leyenda Vallenata 2027 | Encuestas de Música</title>
+  <meta name="description" content="Encuestas activas de Música para el Festival de la Leyenda Vallenata 2027: Artista favorito del público y Canción favorita." />
+
+  <!-- Google Fonts: Poppins (Display/Titulares), Inter (Cuerpo), Playfair Display (Logo institucional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Estilos Responsive Compartidos para Escritorio y Móvil -->
+  <link rel="stylesheet" href="/css/responsive.css">
+
+  <style>
+    /* ============================================================
+       VARIABLES & ESTILOS INSTITUCIONALES (REPLICA EXACTA FIGMA)
+       Negro (#000000), Carbón (#222222), Oro (#D8A629)
+       ============================================================ */
+    :root {
+      --color-black: #000000;
+      --color-charcoal-card: #222222;
+      --color-gold: #D8A629;
+      --color-gold-hover: #c49420;
+      --color-white: #FFFFFF;
+      --color-canvas-bg: #F8F8F8;
+      --color-badge-bg: #F5EBD7;
+      --color-badge-closed-bg: #EBEBEB;
+      --color-text-dark: #111111;
+      --color-text-muted: #555555;
+      --color-text-subtle: #6B7280;
+      --font-display: 'Poppins', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-serif-logo: 'Playfair Display', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #121212; /* Fondo de presentación desktop */
+      font-family: var(--font-body);
+      color: var(--color-text-dark);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* CONTENEDOR PRINCIPAL RESPONSIVO
+       Centrado en PC a 440px y 100% fluido en móviles */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      background-color: var(--color-canvas-bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.45);
+      overflow-x: hidden;
+    }
+
+    @media (max-width: 576px) {
+      body {
+        background-color: var(--color-canvas-bg);
+      }
+      .app-viewport {
+        max-width: 100%;
+        box-shadow: none;
+      }
+    }
+
+    /* ------------------------------------------------------------
+       1. ENCABEZADO INSTITUCIONAL OFICIAL CON LÍNEA DORADA
+       ------------------------------------------------------------ */
+    .app-header {
+      background-color: var(--color-black);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1.5px solid var(--color-gold);
+    }
+
+    .header-brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--color-white);
+    }
+
+    .emblem-wrapper {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .emblem-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    .brand-typography {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .brand-title-line1 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .brand-title-line2 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .brand-title-sub {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-size: 0.62rem;
+      font-weight: 400;
+      color: #EDEDED;
+      margin-top: 1px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    /* Botón Hamburguesa con 3 líneas doradas */
+    .btn-hamburger {
+      background: transparent;
+      border: none;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger-line {
+      width: 24px;
+      height: 2px;
+      background-color: var(--color-gold);
+      border-radius: 2px;
+    }
+
+    /* ------------------------------------------------------------
+       2. CUERPO DE ENCUESTAS DE MÚSICA
+       ------------------------------------------------------------ */
+    .polls-body-content {
+      padding: 26px 20px 96px 20px;
+      flex: 1;
+      background-color: var(--color-canvas-bg);
+    }
+
+    .screen-kicker {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #71717A;
+      margin-bottom: 6px;
+    }
+
+    .screen-title {
+      font-family: var(--font-display);
+      font-size: 1.86rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--color-text-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .screen-description {
+      font-size: 0.88rem;
+      color: var(--color-text-muted);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    /* Barra de conteo de encuestas / filtro */
+    .polls-count-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .count-text {
+      font-size: 0.82rem;
+      color: var(--color-text-subtle);
+      font-weight: 500;
+    }
+
+    .filter-all-link {
+      font-size: 0.82rem;
+      color: var(--color-text-dark);
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Barra de selector interactivo de categorías */
+    .category-pills-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 18px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .category-pills-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-pill-btn {
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid #E5E7EB;
+      background: #FFFFFF;
+      color: #4B5563;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cat-pill-btn:hover {
+      border-color: #111111;
+      color: #111111;
+    }
+
+    .cat-pill-btn.active {
+      background: #111111;
+      color: #FFFFFF;
+      border-color: #111111;
+    }
+
+    /* ------------------------------------------------------------
+       3. TARJETA 1: DESTACADA OSCURA (ARTISTA FAVORITO DEL PÚBLICO)
+       ------------------------------------------------------------ */
+    .card-featured-dark {
+      background-color: var(--color-charcoal-card);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 16px;
+      color: var(--color-white);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      position: relative;
+    }
+
+    .card-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    /* Badge píldora Activa */
+    .badge-pill-light {
+      background-color: var(--color-badge-bg);
+      color: var(--color-text-dark);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    /* Corona Dorada */
+    .crown-icon-gold {
+      width: 22px;
+      height: 22px;
+      stroke: var(--color-gold);
+      fill: none;
+      stroke-width: 1.9;
+    }
+
+    .poll-dark-title {
+      font-family: var(--font-display);
+      font-size: 1.28rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .poll-dark-subtitle {
+      font-size: 0.78rem;
+      color: #D4D4D8;
+      margin-bottom: 18px;
+      font-weight: 400;
+    }
+
+    /* Botón dorado en tarjeta oscura */
+    .btn-gold-card {
+      background-color: var(--color-gold);
+      color: #000000;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 18px;
+      width: 100%;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-gold-card:hover {
+      background-color: var(--color-gold-hover);
+      color: #000000;
+      transform: translateY(-1px);
+    }
+
+    /* ------------------------------------------------------------
+       4. TARJETA 2: BLANCA ACTIVA (CANCIÓN FAVORITA DEL PÚBLICO)
+       ------------------------------------------------------------ */
+    .card-poll-white {
+      background-color: var(--color-white);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
+    }
+
+    .crown-icon-gray {
+      width: 22px;
+      height: 22px;
+      stroke: #71717A;
+      fill: none;
+      stroke-width: 1.9;
+    }
+
+    .poll-white-title {
+      font-family: var(--font-display);
+      font-size: 1.28rem;
+      font-weight: 800;
+      color: var(--color-text-dark);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .poll-white-subtitle {
+      font-size: 0.78rem;
+      color: var(--color-text-subtle);
+      margin-bottom: 18px;
+      font-weight: 400;
+    }
+
+    /* Botón blanco con borde negro fino */
+    .btn-outline-card {
+      background-color: #FFFFFF;
+      color: var(--color-text-dark);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: 1.5px solid #222222;
+      border-radius: 12px;
+      padding: 13px 18px;
+      width: 100%;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-outline-card:hover {
+      background-color: #F8F8F8;
+      border-color: #000000;
+      color: #000000;
+    }
+
+    /* ------------------------------------------------------------
+       5. TARJETA 3: CERRADA / FINALIZADA (CLÁSICO VALLENATO)
+       ------------------------------------------------------------ */
+    .card-poll-closed {
+      background-color: var(--color-white);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
+    }
+
+    .badge-pill-closed {
+      background-color: var(--color-badge-closed-bg);
+      color: #333333;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    .lock-icon-gray {
+      color: #71717A;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .closed-bottom-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 2px;
+    }
+
+    .closed-status-text {
+      font-size: 0.78rem;
+      color: var(--color-text-subtle);
+      font-weight: 500;
+    }
+
+    .closed-results-link {
+      font-size: 0.78rem;
+      color: var(--color-text-dark);
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .closed-results-link:hover {
+      color: var(--color-gold);
+    }
+
+    /* ------------------------------------------------------------
+       6. BARRA DE NAVEGACIÓN INFERIOR FIJA (CATEGORÍAS ACTIVO)
+       ------------------------------------------------------------ */
+    .bottom-tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      height: 64px;
+      background: var(--color-white);
+      border-top: 1px solid #ECECEC;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      z-index: 50;
+    }
+
+    @media (max-width: 576px) {
+      .bottom-tab-bar {
+        left: 0;
+        transform: none;
+        max-width: 100%;
+      }
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #9E9E9E;
+      font-size: 0.68rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .tab-item i {
+      font-size: 1.25rem;
+      margin-bottom: 2px;
+      line-height: 1;
+    }
+
+    /* En esta pantalla, "Categorías" permanece ACTIVO en dorado */
+    .tab-item.active-gold {
+      color: var(--color-gold);
+      font-weight: 700;
+    }
+
+    .tab-item.active-gold i {
+      color: var(--color-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       CONTENEDOR DE LA APLICACIÓN (RESPONSIVE EN PC & MÓVIL)
+       ============================================================ -->
+  <main class="app-viewport">
+
+    <!-- 1. ENCABEZADO INSTITUCIONAL OFICIAL (RESPONSIVE) -->
+    <header class="app-header">
+      <div class="header-inner-container">
+        <a href="index.html" class="header-brand-lockup">
+          <!-- Escudo con isotipo oficial del Festival -->
+          <div class="emblem-wrapper">
+            <img 
+              src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" 
+              alt="Escudo Fundación Festival de la Leyenda Vallenata" 
+              class="emblem-img"
+              referrerpolicy="no-referrer"
+              onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';"
+            />
+          </div>
+
+          <!-- Tipografía Institucional de la Fundación -->
+          <div class="brand-typography">
+            <span class="brand-title-line1">Fundación Festival de</span>
+            <span class="brand-title-line2">la Leyenda Vallenata</span>
+            <span class="brand-title-sub">Patrimonio Cultural de la Nación</span>
+          </div>
+        </a>
+
+        <!-- Enlaces superiores para PC -->
+        <ul class="desktop-nav-links d-none d-md-flex">
+          <li><a href="index.html" class="desktop-nav-link"><i class="bi bi-house"></i> Inicio</a></li>
+          <li><a href="categorias.html" class="desktop-nav-link active"><i class="bi bi-grid"></i> Categorías</a></li>
+          <li><a href="login.html" class="desktop-nav-link"><i class="bi bi-person"></i> Mi cuenta</a></li>
+          <li><a href="admin.html" class="desktop-nav-link"><i class="bi bi-speedometer2"></i> Administración</a></li>
+        </ul>
+
+        <!-- Acciones en desktop / Botón menú móvil -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="desktop-header-action d-none d-md-flex">
+            <a href="categorias.html" class="btn-desktop-account">
+              <i class="bi bi-arrow-left"></i> Categorías
+            </a>
+          </div>
+
+          <!-- Botón Hamburguesa con 3 líneas doradas -->
+          <button class="btn-hamburger d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#institutionalDrawer" aria-label="Abrir Menú">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. CUERPO DE ENCUESTAS DINÁMICO POR CATEGORÍA -->
+    <section class="polls-body-content">
+      <!-- Kicker dinámico -->
+      <div class="screen-kicker" id="pollCategoryKicker">03 / MÚSICA</div>
+
+      <!-- Titular principal dinámico -->
+      <h1 class="screen-title" id="pollCategoryTitle">La música nos une</h1>
+
+      <!-- Subtítulo explicativo dinámico -->
+      <p class="screen-description" id="pollCategoryDesc">
+        Elige una encuesta activa y haz escuchar tu voz en el Festival de la Leyenda Vallenata 2027.
+      </p>
+
+      <!-- Selector interactivo de categoría (Píldoras) -->
+      <div class="category-pills-bar" id="categoryPillsBar">
+        <button type="button" class="cat-pill-btn active" data-cat="musica">
+          <i class="bi bi-music-note-beamed"></i> Música
+        </button>
+        <button type="button" class="cat-pill-btn" data-cat="piloneras">
+          <i class="bi bi-flower1"></i> Piloneras
+        </button>
+        <button type="button" class="cat-pill-btn" data-cat="comparsas">
+          <i class="bi bi-mask"></i> Comparsas
+        </button>
+        <button type="button" class="cat-pill-btn" data-cat="all">
+          <i class="bi bi-grid-fill"></i> Todas
+        </button>
+      </div>
+
+      <!-- Fila de Conteo y Filtro -->
+      <div class="polls-count-bar">
+        <span class="count-text" id="pollCountText">3 encuestas disponibles</span>
+        <span class="filter-all-link" id="btnFilterToggle">Filtrar por estado</span>
+      </div>
+
+      <!-- CUADRÍCULA DE ENCUESTAS (1 columna en móvil, 2 columnas en desktop) -->
+      <div class="polls-grid-desktop" id="pollsContainer">
+
+        <!-- ================= MÚSICA ================= -->
+        <!-- TARJETA 1: DESTACADA OSCURA (ARTISTA FAVORITO - ACTIVA) -->
+        <div class="card-featured-dark poll-item-card" data-category="musica" data-status="activa">
+          <div class="card-top-header">
+            <span class="badge-pill-light">Activa</span>
+            <svg class="crown-icon-gold" viewBox="0 0 24 24">
+              <path d="M3 5l3 13h12l3-13-5 6-4-6-4 6-5-6zm2 15h14" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="poll-dark-title">Artista favorito del público</h2>
+          <p class="poll-dark-subtitle">4 participantes · Un voto por persona</p>
+          <a href="votacion.html" class="btn-gold-card" data-route="votacion.html">
+            <span>Elegir mi favorito</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- TARJETA 2: BLANCA ACTIVA (CANCIÓN FAVORITA) -->
+        <div class="card-poll-white poll-item-card" data-category="musica" data-status="activa">
+          <div class="card-top-header">
+            <span class="badge-pill-light">Activa</span>
+            <svg class="crown-icon-gray" viewBox="0 0 24 24">
+              <path d="M3 5l3 13h12l3-13-5 6-4-6-4 6-5-6zm2 15h14" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="poll-white-title">Canción favorita del público</h2>
+          <p class="poll-white-subtitle">6 canciones · Un voto por persona</p>
+          <a href="votacion.html" class="btn-outline-card" data-route="votacion.html">
+            <span>Ver opciones</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- TARJETA 3: BLANCA CERRADA (CLÁSICO VALLENATO) -->
+        <div class="card-poll-closed poll-item-card" data-category="musica" data-status="cerrada">
+          <div class="card-top-header">
+            <span class="badge-pill-closed">Cerrada</span>
+            <i class="bi bi-lock lock-icon-gray"></i>
+          </div>
+          <h2 class="poll-white-title">Clásico vallenato favorito</h2>
+          <p class="poll-white-subtitle mb-2">La consulta de esta edición ha finalizado.</p>
+          <div class="closed-bottom-status-row">
+            <span class="closed-status-text">Votación finalizada</span>
+            <span class="text-secondary small fw-medium">Resultados publicados en tarima</span>
+          </div>
+        </div>
+
+        <!-- ================= PILONERAS ================= -->
+        <!-- TARJETA 4: PILONERAS MAYOR (ACTIVA) -->
+        <div class="card-featured-dark poll-item-card" data-category="piloneras" data-status="activa" style="display: none;">
+          <div class="card-top-header">
+            <span class="badge-pill-light">Activa</span>
+            <i class="bi bi-flower1 fs-4" style="color: var(--color-gold);"></i>
+          </div>
+          <h2 class="poll-dark-title">Mejor grupo de piloneras mayor</h2>
+          <p class="poll-dark-subtitle">8 agrupaciones de danza · Un voto por persona</p>
+          <a href="votacion.html" class="btn-gold-card" data-route="votacion.html">
+            <span>Elegir agrupación</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- TARJETA 5: PILONERAS INFANTIL (CERRADA) -->
+        <div class="card-poll-closed poll-item-card" data-category="piloneras" data-status="cerrada" style="display: none;">
+          <div class="card-top-header">
+            <span class="badge-pill-closed">Cerrada</span>
+            <i class="bi bi-lock lock-icon-gray"></i>
+          </div>
+          <h2 class="poll-white-title">Desfile infantil de piloneras</h2>
+          <p class="poll-white-subtitle mb-2">El certamen de semilleros ha culminado.</p>
+          <div class="closed-bottom-status-row">
+            <span class="closed-status-text">Votación finalizada</span>
+            <span class="text-secondary small fw-medium">Reconocimientos entregados</span>
+          </div>
+        </div>
+
+        <!-- ================= COMPARSAS ================= -->
+        <!-- TARJETA 6: COMPARSAS FANTASÍA (ACTIVA) -->
+        <div class="card-featured-dark poll-item-card" data-category="comparsas" data-status="activa" style="display: none;">
+          <div class="card-top-header">
+            <span class="badge-pill-light">Activa</span>
+            <i class="bi bi-mask fs-4" style="color: var(--color-gold);"></i>
+          </div>
+          <h2 class="poll-dark-title">Comparsa de fantasía favorita</h2>
+          <p class="poll-dark-subtitle">6 comparsas participantes · Un voto por persona</p>
+          <a href="votacion.html" class="btn-gold-card" data-route="votacion.html">
+            <span>Elegir comparsa</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- TARJETA 7: COMPARSAS TRADICIONAL (CERRADA) -->
+        <div class="card-poll-closed poll-item-card" data-category="comparsas" data-status="cerrada" style="display: none;">
+          <div class="card-top-header">
+            <span class="badge-pill-closed">Cerrada</span>
+            <i class="bi bi-lock lock-icon-gray"></i>
+          </div>
+          <h2 class="poll-white-title">Comparsa tradicional 2027</h2>
+          <p class="poll-white-subtitle mb-2">La votación del recorrido oficial ha cerrado.</p>
+          <div class="closed-bottom-status-row">
+            <span class="closed-status-text">Votación finalizada</span>
+            <span class="text-secondary small fw-medium">Premiación en Parque de la Leyenda</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- 3. PIE DE PÁGINA INSTITUCIONAL PARA ESCRITORIO -->
+    <footer class="desktop-footer d-none d-md-block">
+      <div class="desktop-footer-container">
+        <div class="desktop-footer-brand">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" style="width: 38px; height: 38px; border-radius: 50%;" referrerpolicy="no-referrer" />
+            <div>
+              <div class="text-white fw-bold" style="font-family: var(--font-serif-logo); font-style: italic; font-size: 0.95rem;">Fundación Festival de la Leyenda Vallenata</div>
+              <div style="font-size: 0.68rem; color: #D8A629;">Patrimonio Cultural Inmaterial de la Humanidad</div>
+            </div>
+          </div>
+          <p>
+            Plataforma oficial de votación ciudadana para el Festival de la Leyenda Vallenata 2027. Transparencia, seguridad y participación para exaltar nuestro folclor.
+          </p>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Navegación</h4>
+          <ul class="desktop-footer-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="categorias.html">Categorías</a></li>
+            <li><a href="encuestas.html">Encuestas Activas</a></li>
+            <li><a href="login.html">Registro y Cuenta</a></li>
+          </ul>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Festival</h4>
+          <ul class="desktop-footer-links">
+            <li><a href="https://festivalvallenato.com/" target="_blank" rel="noopener">Sitio Oficial</a></li>
+            <li><a href="https://festivalvallenato.com/programacion/" target="_blank" rel="noopener">Programación</a></li>
+            <li><a href="https://festivalvallenato.com/historia/" target="_blank" rel="noopener">Historia del Festival</a></li>
+            <li><a href="https://festivalvallenato.com/galeria/" target="_blank" rel="noopener">Galería Fotográfica</a></li>
+          </ul>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Sede Oficial</h4>
+          <ul class="desktop-footer-links">
+            <li>Valledupar, Cesar · Colombia</li>
+            <li>Parque de la Leyenda Vallenata 'Consuelo Araujonoguera'</li>
+            <li>contacto@festivalvallenato.com</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="desktop-footer-bottom">
+        <div>© 2027 Fundación Festival de la Leyenda Vallenata. Todos los derechos reservados.</div>
+        <div class="d-flex gap-3">
+          <span>Votación Ciudadana Certificada</span>
+          <span>·</span>
+          <span>Términos y Privacidad</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 4. BARRA DE NAVEGACIÓN INFERIOR FIJA (MÓVIL) -->
+    <nav class="bottom-tab-bar d-md-none" aria-label="Navegación principal">
+      <!-- Tab 1: Inicio -->
+      <a href="index.html" class="tab-item" data-route="index.html">
+        <i class="bi bi-house"></i>
+        <span>Inicio</span>
+      </a>
+
+      <!-- Tab 2: Categorías (ACTIVO EN ESTA PANTALLA) -->
+      <a href="categorias.html" class="tab-item active-gold" data-route="categorias.html">
+        <i class="bi bi-grid"></i>
+        <span>Categorías</span>
+      </a>
+
+      <!-- Tab 3: Mi cuenta -->
+      <a href="login.html" class="tab-item" data-route="login.html">
+        <i class="bi bi-person"></i>
+        <span>Mi cuenta</span>
+      </a>
+    </nav>
+
+  </main>
+
+  <!-- ============================================================
+       MENÚ INSTITUCIONAL LATERAL (OFFCANVAS)
+       ============================================================ -->
+  <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="institutionalDrawer" aria-labelledby="drawerTitle">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <div class="d-flex align-items-center gap-2">
+        <div class="emblem-wrapper" style="width: 32px; height: 32px;">
+          <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" class="emblem-img" style="width: 32px; height: 32px;" referrerpolicy="no-referrer"/>
+        </div>
+        <div>
+          <h5 class="offcanvas-title fw-bold small text-white mb-0" id="drawerTitle">Festival Vallenato 2027</h5>
+          <span class="text-secondary" style="font-size: 0.65rem;">Votación Ciudadana</span>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <div class="list-group list-group-flush bg-transparent">
+        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-house text-warning"></i> <span>Inicio</span>
+        </a>
+        <a href="categorias.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-grid text-warning"></i> <span>Categorías de votación</span>
+        </a>
+        <a href="login.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-person text-warning"></i> <span>Registro / Iniciar sesión</span>
+        </a>
+        <a href="encuestas.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-check2-square text-warning"></i> <span>Encuestas y votaciones</span>
+        </a>
+        <a href="admin.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-speedometer2 text-warning"></i> <span>Panel administrativo</span>
+        </a>
+      </div>
+
+      <div class="p-3 text-secondary small mt-4 border-top border-secondary">
+        <div>Valledupar, Cesar · Colombia</div>
+        <div style="font-size: 0.68rem;">Fundación Festival de la Leyenda Vallenata</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS: BOOTSTRAP 5 & ARCHIVOS JS MODULARES -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="/js/navigation.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const categoryData = {
+        musica: {
+          kicker: '03 / MÚSICA',
+          title: 'La música nos une',
+          desc: 'Elige una encuesta activa y haz escuchar tu voz en el Festival de la Leyenda Vallenata 2027.',
+        },
+        piloneras: {
+          kicker: '03 / PILONERAS',
+          title: 'El baile de nuestras raíces',
+          desc: 'Apoya a las delegaciones tradicionales y semilleros que engalanan el desfile de piloneras 2027.',
+        },
+        comparsas: {
+          kicker: '03 / COMPARSAS',
+          title: 'Creatividad y fiesta en las calles',
+          desc: 'Celebra la fantasía, la alegría y la coreografía de las comparsas del Festival 2027.',
+        },
+        all: {
+          kicker: '03 / TODAS LAS ENCUESTAS',
+          title: 'Consultas del Festival 2027',
+          desc: 'Explora todas las encuestas activas y cerradas en las diferentes categorías del festival.',
+        }
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      let activeCategory = params.get('cat') || 'musica';
+      if (!categoryData[activeCategory]) activeCategory = 'musica';
+
+      const kickerEl = document.getElementById('pollCategoryKicker');
+      const titleEl = document.getElementById('pollCategoryTitle');
+      const descEl = document.getElementById('pollCategoryDesc');
+      const countEl = document.getElementById('pollCountText');
+      const pillButtons = document.querySelectorAll('.cat-pill-btn');
+      const cards = document.querySelectorAll('.poll-item-card');
+
+      function renderCategory(cat) {
+        activeCategory = cat;
+        const info = categoryData[cat] || categoryData.musica;
+
+        if (kickerEl) kickerEl.textContent = info.kicker;
+        if (titleEl) titleEl.textContent = info.title;
+        if (descEl) descEl.textContent = info.desc;
+
+        // Píldoras activas
+        pillButtons.forEach(btn => {
+          if (btn.getAttribute('data-cat') === cat) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+
+        // Filtrar tarjetas
+        let visibleCount = 0;
+        let activeCount = 0;
+        cards.forEach(card => {
+          const cardCat = card.getAttribute('data-category');
+          const isMatch = (cat === 'all' || cardCat === cat);
+          if (isMatch) {
+            card.style.display = '';
+            visibleCount++;
+            if (card.getAttribute('data-status') === 'activa') activeCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        if (countEl) {
+          countEl.textContent = `${visibleCount} encuestas disponibles (${activeCount} activas)`;
+        }
+      }
+
+      // Event listeners para botones de píldoras
+      pillButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cat = btn.getAttribute('data-cat');
+          renderCategory(cat);
+          // Actualizar URL sin recargar
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('cat', cat);
+          window.history.replaceState({}, '', newUrl);
+        });
+      });
+
+      // Render inicial
+      renderCategory(activeCategory);
+    });
+  </script>
+</body>
+</html>

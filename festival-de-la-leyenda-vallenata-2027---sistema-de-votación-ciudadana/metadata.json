@@ -1,0 +1,6 @@
+{
+  "name": "Festival de la Leyenda Vallenata 2027 - Sistema de Votación Ciudadana",
+  "description": "Prototipo interactivo Mobile UI Kit y Panel Administrativo para el Festival de la Leyenda Vallenata 2027 con diseño institucional en negro profundo y dorado ceremonial.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

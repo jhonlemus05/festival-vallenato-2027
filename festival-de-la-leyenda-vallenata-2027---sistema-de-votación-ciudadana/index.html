@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Festival de la Leyenda Vallenata 2027 | Inicio</title>
+  <meta name="description" content="Votación Ciudadana oficial del Festival de la Leyenda Vallenata 2027 en Valledupar, Colombia." />
+
+  <!-- Google Fonts: Poppins (Display/Titulares), Inter (Cuerpo), Playfair Display (Logo institucional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Estilos Responsive Compartidos para Escritorio y Móvil -->
+  <link rel="stylesheet" href="/css/responsive.css">
+
+  <style>
+    /* ============================================================
+       VARIABLES & ESTILOS INSTITUCIONALES (FIGMA REPLICA)
+       Negro profundo (#000000), Oro mostaza (#D8A629),
+       Blanco puro (#FFFFFF), Bordes sutiles (#E5E7EB)
+       ============================================================ */
+    :root {
+      --color-black: #000000;
+      --color-gold: #D8A629;
+      --color-gold-hover: #c49420;
+      --color-white: #FFFFFF;
+      --color-card-bg: #FFFFFF;
+      --color-border: #E5E7EB;
+      --color-text-dark: #111111;
+      --color-text-muted: #6B7280;
+      --font-display: 'Poppins', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-serif-logo: 'Playfair Display', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #121212; /* Fondo elegante para vista desktop */
+      font-family: var(--font-body);
+      color: var(--color-text-dark);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* CONTENEDOR PRINCIPAL RESPONSIVO
+       En PC se centra a ancho smartphone (430px),
+       en móviles ocupa el 100% de la pantalla nativa */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      background-color: var(--color-white);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.45);
+      overflow-x: hidden;
+    }
+
+    @media (max-width: 576px) {
+      body {
+        background-color: var(--color-white);
+      }
+      .app-viewport {
+        max-width: 100%;
+        box-shadow: none;
+      }
+    }
+
+    /* ------------------------------------------------------------
+       1. ENCABEZADO INSTITUCIONAL OFICIAL (TAL CUAL FIGMA)
+       ------------------------------------------------------------ */
+    .app-header {
+      background-color: var(--color-black);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .header-brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--color-white);
+    }
+
+    /* Escudo circular rojo con instrumentos vallenatos */
+    .emblem-wrapper {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .emblem-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    /* Tipografía institucional oficial del Festival */
+    .brand-typography {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .brand-title-line1 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .brand-title-line2 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .brand-title-sub {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-size: 0.62rem;
+      font-weight: 400;
+      color: #EDEDED;
+      margin-top: 1px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    /* Botón Hamburguesa (3 líneas doradas) */
+    .btn-hamburger {
+      background: transparent;
+      border: none;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger-line {
+      width: 24px;
+      height: 2px;
+      background-color: var(--color-gold);
+      border-radius: 2px;
+      transition: all 0.2s ease;
+    }
+
+    /* ------------------------------------------------------------
+       2. SECCIÓN HERO (FOTO ACORDEONERO + TITULARES DORADOS)
+       ------------------------------------------------------------ */
+    .hero-section {
+      background-color: var(--color-black);
+      position: relative;
+      padding: 34px 22px 30px 22px;
+      overflow: hidden;
+      min-height: 310px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    /* Imagen de fondo del acordeonero con desvanecido sutil hacia la izquierda */
+    .hero-bg-media {
+      position: absolute;
+      top: 0;
+      right: -10px;
+      bottom: 0;
+      width: 68%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0.78;
+      pointer-events: none;
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 20%, rgba(0, 0, 0, 0.95) 75%, black 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 20%, rgba(0, 0, 0, 0.95) 75%, black 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 310px;
+    }
+
+    /* Kicker: Corona dorada + VOTACIÓN CIUDADANA */
+    .hero-kicker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .crown-icon-svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--color-gold);
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .hero-kicker-text {
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* Titular: Festival de la Leyenda Vallenata */
+    .hero-title {
+      color: var(--color-white);
+      font-family: var(--font-display);
+      font-size: 1.88rem;
+      font-weight: 800;
+      line-height: 1.14;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    /* Año: 2027 en Oro Mostaza Gigante */
+    .hero-year {
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 3.35rem;
+      line-height: 0.95;
+      margin: 8px 0 6px 0;
+      letter-spacing: -0.03em;
+    }
+
+    /* Ubicación: Valledupar, Colombia */
+    .hero-location {
+      color: #E2E2E2;
+      font-size: 0.86rem;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    /* ------------------------------------------------------------
+       3. CONTENIDO INFERIOR BLANCO (CUENTA REGRESIVA Y ACCIÓN)
+       ------------------------------------------------------------ */
+    .body-content {
+      background-color: var(--color-white);
+      padding: 26px 20px 96px 20px; /* Padding inferior para navbar fija */
+      flex: 1;
+    }
+
+    .section-headline {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.08rem;
+      color: var(--color-text-dark);
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Cuadrícula de 4 cajas del contador */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .countdown-tile {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 10px 4px 8px 4px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .countdown-value {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-text-dark);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown-label {
+      font-size: 0.68rem;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .countdown-footnote {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      margin-bottom: 16px;
+    }
+
+    .promo-paragraph {
+      font-size: 0.88rem;
+      line-height: 1.48;
+      color: #222222;
+      margin-bottom: 22px;
+    }
+
+    /* Botón Dorado Mostaza (Ver Categorías →) */
+    .btn-gold-action {
+      background-color: var(--color-gold);
+      color: #000000;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 20px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(216, 166, 41, 0.25);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-gold-action:hover, .btn-gold-action:focus {
+      background-color: var(--color-gold-hover);
+      color: #000000;
+      transform: translateY(-1px);
+    }
+
+    .btn-gold-action i {
+      font-size: 1rem;
+      stroke-width: 1;
+    }
+
+    /* Insignia de Confianza / Registro */
+    .trust-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 14px;
+      color: var(--color-text-muted);
+      font-size: 0.74rem;
+    }
+
+    .trust-badge-wrap i {
+      font-size: 0.9rem;
+      color: #9CA3AF;
+    }
+
+    /* ------------------------------------------------------------
+       4. BARRA DE NAVEGACIÓN INFERIOR FIJA (ESTRICTA DE FIGMA)
+       ------------------------------------------------------------ */
+    .bottom-tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      height: 64px;
+      background: var(--color-white);
+      border-top: 1px solid #ECECEC;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      z-index: 50;
+    }
+
+    @media (max-width: 576px) {
+      .bottom-tab-bar {
+        left: 0;
+        transform: none;
+        max-width: 100%;
+      }
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #9E9E9E;
+      font-size: 0.68rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .tab-item i {
+      font-size: 1.25rem;
+      margin-bottom: 2px;
+      line-height: 1;
+    }
+
+    /* Tab Activo: Inicio */
+    .tab-item.active {
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .tab-item.active i {
+      color: #000000;
+    }
+
+    /* MENÚ LATERAL (OFFCANVAS) PARA NAVEGACIÓN ENTRE CAPAS */
+    .offcanvas.offcanvas-end {
+      max-width: 320px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       CONTENEDOR DE LA APLICACIÓN (MÓVIL NATIVO / RESPONSIVE EN PC)
+       ============================================================ -->
+  <main class="app-viewport">
+
+    <!-- 1. ENCABEZADO INSTITUCIONAL OFICIAL (RESPONSIVE) -->
+    <header class="app-header">
+      <div class="header-inner-container">
+        <a href="index.html" class="header-brand-lockup">
+          <!-- Escudo con isotipo oficial del Festival -->
+          <div class="emblem-wrapper">
+            <img 
+              src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" 
+              alt="Escudo Fundación Festival de la Leyenda Vallenata" 
+              class="emblem-img"
+              referrerpolicy="no-referrer"
+              onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';"
+            />
+          </div>
+
+          <!-- Tipografía Institucional de la Fundación -->
+          <div class="brand-typography">
+            <span class="brand-title-line1">Fundación Festival de</span>
+            <span class="brand-title-line2">la Leyenda Vallenata</span>
+            <span class="brand-title-sub">Patrimonio Cultural de la Nación</span>
+          </div>
+        </a>
+
+        <!-- Enlaces superiores visibles únicamente en pantallas grandes (Desktop / PC) -->
+        <ul class="desktop-nav-links d-none d-md-flex">
+          <li><a href="index.html" class="desktop-nav-link active"><i class="bi bi-house"></i> Inicio</a></li>
+          <li><a href="categorias.html" class="desktop-nav-link"><i class="bi bi-grid"></i> Categorías</a></li>
+          <li><a href="login.html" class="desktop-nav-link"><i class="bi bi-person"></i> Mi cuenta</a></li>
+          <li><a href="admin.html" class="desktop-nav-link"><i class="bi bi-speedometer2"></i> Administración</a></li>
+        </ul>
+
+        <!-- Acciones en desktop / Botón menú móvil -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="desktop-header-action d-none d-md-flex">
+            <a href="categorias.html" class="btn-desktop-account" style="background-color: var(--color-gold); color: #000000; border: none;">
+              <i class="bi bi-check2-circle"></i> Votar ahora
+            </a>
+          </div>
+
+          <!-- Botón Hamburguesa con 3 líneas doradas (Móvil) -->
+          <button class="btn-hamburger d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#institutionalDrawer" aria-label="Abrir Menú">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. SECCIÓN HERO (FOTO ACORDEONERO + TITULARES DORADOS) -->
+    <section class="hero-section">
+      <!-- Foto de fondo para móvil (idéntica a la maqueta Figma) -->
+      <img 
+        src="/src/assets/images/hero_accordionist_banner_1791518403166.jpg" 
+        alt="Acordeonero interpretando acordeón vallenato" 
+        class="hero-bg-media d-md-none"
+      />
+
+      <div class="hero-desktop-container">
+        <div class="hero-content">
+          <!-- Corona y Kicker VOTACIÓN CIUDADANA -->
+          <div class="hero-kicker-wrap">
+            <svg class="crown-icon-svg" viewBox="0 0 24 24">
+              <path d="M3 5l3 13h12l3-13-5 6-4-6-4 6-5-6zm2 15h14" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="hero-kicker-text">Votación Ciudadana</span>
+          </div>
+
+          <!-- Titulares Principales -->
+          <h1 class="hero-title">Festival de la<br>Leyenda Vallenata</h1>
+          <div class="hero-year">2027</div>
+          <p class="hero-location">Valledupar, Colombia · Patrimonio de la Humanidad</p>
+
+          <!-- Texto descriptivo enriquecido en desktop -->
+          <p class="text-secondary d-none d-md-block mb-4" style="font-size: 0.95rem; line-height: 1.6; max-width: 480px;">
+            Participa en la elección oficial de tus artistas y agrupaciones preferidas. Tu voto rinde homenaje a las raíces y juglares del folclor vallenato.
+          </p>
+
+          <!-- Botones de acción en desktop -->
+          <div class="d-none d-md-flex align-items-center gap-3">
+            <a href="categorias.html" class="btn btn-warning fw-bold px-4 py-2 text-dark rounded-3" style="background-color: var(--color-gold); border: none;">
+              Explorar Categorías <i class="bi bi-arrow-right"></i>
+            </a>
+            <a href="login.html" class="btn btn-outline-light px-3 py-2 rounded-3">
+              <i class="bi bi-shield-check text-warning"></i> Regístrate
+            </a>
+          </div>
+        </div>
+
+        <!-- Columna visual para pantallas de escritorio -->
+        <div class="hero-desktop-visual d-none d-md-block">
+          <img 
+            src="/src/assets/images/hero_accordionist_banner_1791518403166.jpg" 
+            alt="Maestro del acordeón vallenato en tarima" 
+          />
+          <div class="hero-desktop-visual-badge">
+            <i class="bi bi-award"></i>
+            <div>
+              <div class="fw-bold" style="font-size: 0.85rem;">Edición 60 Aniversario</div>
+              <div style="font-size: 0.72rem; color: #CCCCCC;">Homenaje a los grandes juglares de la música tradicional</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. CONTENIDO INFERIOR (CUENTA REGRESIVA Y LLAMADO A LA ACCIÓN) -->
+    <section class="body-content">
+      <div class="countdown-desktop-row">
+        <div class="countdown-desktop-left">
+          <!-- Título de sección -->
+          <h2 class="section-headline">La leyenda se acerca</h2>
+          <div class="countdown-footnote mt-0 mb-3">Fechas oficiales por anunciar.</div>
+          <!-- Texto descriptivo de la votación -->
+          <p class="promo-paragraph mb-0">
+            Tu voz también hace parte de la leyenda. Conoce las categorías y elige tus favoritos.
+          </p>
+        </div>
+
+        <!-- Cuadrícula de 4 tarjetas de cuenta regresiva (Días, Horas, Minutos, Segundos) -->
+        <div class="countdown-grid">
+          <div class="countdown-tile">
+            <div class="countdown-value" id="count-days">--</div>
+            <div class="countdown-label">Días</div>
+          </div>
+          <div class="countdown-tile">
+            <div class="countdown-value" id="count-hours">--</div>
+            <div class="countdown-label">Horas</div>
+          </div>
+          <div class="countdown-tile">
+            <div class="countdown-value" id="count-minutes">--</div>
+            <div class="countdown-label">Minutos</div>
+          </div>
+          <div class="countdown-tile">
+            <div class="countdown-value" id="count-seconds">--</div>
+            <div class="countdown-label">Segundos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón de llamado a la acción móvil: Ver Categorías → -->
+      <a href="categorias.html" class="btn-gold-action d-md-none" data-route="categorias.html">
+        <span>Ver Categorías</span>
+        <i class="bi bi-arrow-right"></i>
+      </a>
+
+      <!-- Insignia de seguridad / registro móvil -->
+      <a href="login.html" class="trust-badge-wrap text-decoration-none d-md-none" data-route="login.html">
+        <i class="bi bi-shield-check"></i>
+        <span>Crea tu cuenta para participar en la votación.</span>
+      </a>
+
+      <!-- Vista previa de categorías en desktop (Música, Piloneras, Comparsas) -->
+      <div class="categories-preview-desktop d-none d-md-block mt-5 pt-4 border-top">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-bold fs-4 mb-1" style="font-family: var(--font-display);">Categorías en Competencia</h3>
+            <p class="text-secondary small mb-0">Selecciona el rubro donde deseas votar por tus favoritos</p>
+          </div>
+          <a href="categorias.html" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+            Ver todas <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <a href="encuestas.html" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC; transition: transform 0.2s;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="p-3 rounded-3" style="background: #FDF5E1; color: var(--color-gold);">
+                    <i class="bi bi-music-note-beamed fs-4"></i>
+                  </div>
+                  <span class="badge bg-warning-subtle text-dark border border-warning-subtle">Votación Activa</span>
+                </div>
+                <h4 class="fw-bold fs-5 text-dark mb-2">Música Vallenata</h4>
+                <p class="text-secondary small mb-3">Acordeoneros profesionales, canción inédita y piqueria tradicional.</p>
+                <span class="text-dark fw-bold small">Ver encuestas →</span>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-md-4">
+            <a href="categorias.html" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">
+                    <i class="bi bi-people fs-4"></i>
+                  </div>
+                  <span class="badge bg-light text-secondary border">Próximamente</span>
+                </div>
+                <h4 class="fw-bold fs-5 text-dark mb-2">Danza de Piloneras</h4>
+                <p class="text-secondary small mb-3">Categorías infantil, juvenil y mayores en el tradicional desfile folclórico.</p>
+                <span class="text-secondary fw-semibold small">Ver información →</span>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-md-4">
+            <a href="categorias.html" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">
+                    <i class="bi bi-palette fs-4"></i>
+                  </div>
+                  <span class="badge bg-light text-secondary border">Próximamente</span>
+                </div>
+                <h4 class="fw-bold fs-5 text-dark mb-2">Comparsas y Tradición</h4>
+                <p class="text-secondary small mb-3">Expresiones artísticas y puestas en escena de las escuelas folclóricas.</p>
+                <span class="text-secondary fw-semibold small">Ver información →</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. PIE DE PÁGINA INSTITUCIONAL PARA ESCRITORIO -->
+    <footer class="desktop-footer d-none d-md-block">
+      <div class="desktop-footer-container">
+        <div class="desktop-footer-brand">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" style="width: 38px; height: 38px; border-radius: 50%;" referrerpolicy="no-referrer" />
+            <div>
+              <div class="text-white fw-bold" style="font-family: var(--font-serif-logo); font-style: italic; font-size: 0.95rem;">Fundación Festival de la Leyenda Vallenata</div>
+              <div style="font-size: 0.68rem; color: #D8A629;">Patrimonio Cultural Inmaterial de la Humanidad</div>
+            </div>
+          </div>
+          <p>
+            Plataforma oficial de votación ciudadana para el Festival de la Leyenda Vallenata 2027. Transparencia, seguridad y participación para exaltar nuestro folclor.
+          </p>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Navegación</h4>
+          <ul class="desktop-footer-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="categorias.html">Categorías</a></li>
+            <li><a href="encuestas.html">Encuestas Activas</a></li>
+            <li><a href="login.html">Registro y Cuenta</a></li>
+          </ul>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Festival</h4>
+          <ul class="desktop-footer-links">
+            <li><a href="https://festivalvallenato.com/" target="_blank" rel="noopener">Sitio Oficial</a></li>
+            <li><a href="https://festivalvallenato.com/programacion/" target="_blank" rel="noopener">Programación</a></li>
+            <li><a href="https://festivalvallenato.com/historia/" target="_blank" rel="noopener">Historia del Festival</a></li>
+            <li><a href="https://festivalvallenato.com/galeria/" target="_blank" rel="noopener">Galería Fotográfica</a></li>
+          </ul>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Sede Oficial</h4>
+          <ul class="desktop-footer-links">
+            <li>Valledupar, Cesar · Colombia</li>
+            <li>Parque de la Leyenda Vallenata 'Consuelo Araujonoguera'</li>
+            <li>contacto@festivalvallenato.com</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="desktop-footer-bottom">
+        <div>© 2027 Fundación Festival de la Leyenda Vallenata. Todos los derechos reservados.</div>
+        <div class="d-flex gap-3">
+          <span>Votación Ciudadana Certificada</span>
+          <span>·</span>
+          <span>Términos y Privacidad</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 5. BARRA DE NAVEGACIÓN INFERIOR FIJA (MÓVIL) -->
+    <nav class="bottom-tab-bar d-md-none" aria-label="Navegación principal">
+      <!-- Tab 1: Inicio (Activo) -->
+      <a href="index.html" class="tab-item active" data-route="index.html">
+        <i class="bi bi-house"></i>
+        <span>Inicio</span>
+      </a>
+
+      <!-- Tab 2: Categorías -->
+      <a href="categorias.html" class="tab-item" data-route="categorias.html">
+        <i class="bi bi-grid"></i>
+        <span>Categorías</span>
+      </a>
+
+      <!-- Tab 3: Mi cuenta -->
+      <a href="login.html" class="tab-item" data-route="login.html">
+        <i class="bi bi-person"></i>
+        <span>Mi cuenta</span>
+      </a>
+    </nav>
+
+  </main>
+
+
+  <!-- ============================================================
+       MENÚ INSTITUCIONAL LATERAL (OFFCANVAS)
+       Permite navegar por las diferentes capas de la app
+       ============================================================ -->
+  <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="institutionalDrawer" aria-labelledby="drawerTitle">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <div class="d-flex align-items-center gap-2">
+        <div class="emblem-wrapper" style="width: 32px; height: 32px;">
+          <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" class="emblem-img" style="width: 32px; height: 32px;" referrerpolicy="no-referrer"/>
+        </div>
+        <div>
+          <h5 class="offcanvas-title fw-bold small text-white mb-0" id="drawerTitle">Festival Vallenato 2027</h5>
+          <span class="text-secondary" style="font-size: 0.65rem;">Votación Ciudadana</span>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <div class="list-group list-group-flush bg-transparent">
+        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-house text-warning"></i> <span>Inicio</span>
+        </a>
+        <a href="categorias.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-grid text-warning"></i> <span>Categorías de votación</span>
+        </a>
+        <a href="login.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-person text-warning"></i> <span>Registro / Iniciar sesión</span>
+        </a>
+        <a href="encuestas.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-check2-square text-warning"></i> <span>Encuestas y votaciones</span>
+        </a>
+        <a href="admin.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-speedometer2 text-warning"></i> <span>Panel administrativo</span>
+        </a>
+      </div>
+
+      <div class="p-3 text-secondary small mt-4 border-top border-secondary">
+        <div>Valledupar, Cesar · Colombia</div>
+        <div style="font-size: 0.68rem;">Fundación Festival de la Leyenda Vallenata</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       SCRIPTS: BOOTSTRAP 5 & ARCHIVOS MODULARES JS
+       ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Módulos de JavaScript separados -->
+  <script src="/js/countdown.js"></script>
+  <script src="/js/navigation.js"></script>
+</body>
+</html>

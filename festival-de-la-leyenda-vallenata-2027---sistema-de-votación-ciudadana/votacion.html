@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Festival de la Leyenda Vallenata 2027 | Selección de Opción</title>
+  <meta name="description" content="Elige tu participante favorito para el Festival de la Leyenda Vallenata 2027: Mateo Díaz, Lucía Pineda, Samuel Rojas, Valentina López." />
+
+  <!-- Google Fonts: Poppins (Display/Titulares), Inter (Cuerpo), Playfair Display (Logo institucional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Estilos Responsive Compartidos para Escritorio y Móvil -->
+  <link rel="stylesheet" href="/css/responsive.css">
+
+  <style>
+    /* ============================================================
+       VARIABLES & ESTILOS INSTITUCIONALES (REPLICA EXACTA FIGMA)
+       Negro (#000000), Oro (#D8A629), Cuadrícula 2x2 Participantes
+       ============================================================ */
+    :root {
+      --color-black: #000000;
+      --color-gold: #D8A629;
+      --color-gold-hover: #c49420;
+      --color-white: #FFFFFF;
+      --color-canvas-bg: #F8F8F8;
+      --color-badge-bg: #F5EBD7;
+      --color-card-border: rgba(0, 0, 0, 0.08);
+      --color-text-dark: #111111;
+      --color-text-muted: #555555;
+      --color-text-subtle: #6B7280;
+      --font-display: 'Poppins', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-serif-logo: 'Playfair Display', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #121212; /* Fondo de presentación desktop */
+      font-family: var(--font-body);
+      color: var(--color-text-dark);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* CONTENEDOR PRINCIPAL RESPONSIVO
+       Centrado en PC a 440px y 100% fluido en móviles */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      background-color: var(--color-canvas-bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.45);
+      overflow-x: hidden;
+    }
+
+    @media (max-width: 576px) {
+      body {
+        background-color: var(--color-canvas-bg);
+      }
+      .app-viewport {
+        max-width: 100%;
+        box-shadow: none;
+      }
+    }
+
+    /* ------------------------------------------------------------
+       1. ENCABEZADO INSTITUCIONAL OFICIAL CON LÍNEA DORADA
+       ------------------------------------------------------------ */
+    .app-header {
+      background-color: var(--color-black);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1.5px solid var(--color-gold);
+    }
+
+    .header-brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--color-white);
+    }
+
+    .emblem-wrapper {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .emblem-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    .brand-typography {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .brand-title-line1 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .brand-title-line2 {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .brand-title-sub {
+      font-family: var(--font-serif-logo);
+      font-style: italic;
+      font-size: 0.62rem;
+      font-weight: 400;
+      color: #EDEDED;
+      margin-top: 1px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    /* Botón Hamburguesa con 3 líneas doradas */
+    .btn-hamburger {
+      background: transparent;
+      border: none;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger-line {
+      width: 24px;
+      height: 2px;
+      background-color: var(--color-gold);
+      border-radius: 2px;
+    }
+
+    /* ------------------------------------------------------------
+       2. CUERPO DE SELECCIÓN DE OPCIÓN
+       ------------------------------------------------------------ */
+    .voting-body-content {
+      padding: 26px 20px 96px 20px;
+      flex: 1;
+      background-color: var(--color-canvas-bg);
+    }
+
+    .screen-kicker {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #71717A;
+      margin-bottom: 6px;
+    }
+
+    .screen-title {
+      font-family: var(--font-display);
+      font-size: 1.86rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--color-text-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .screen-description {
+      font-size: 0.88rem;
+      color: var(--color-text-muted);
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+
+    /* Barra de Estado: Activa + 4 opciones · Elige una */
+    .status-selection-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .badge-pill-light {
+      background-color: var(--color-badge-bg);
+      color: var(--color-text-dark);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    .options-count-text {
+      font-size: 0.8rem;
+      color: var(--color-text-subtle);
+      font-weight: 500;
+    }
+
+    /* ------------------------------------------------------------
+       3. CUADRÍCULA 2x2 DE CANDIDATOS (REPLICA FIGMA)
+       ------------------------------------------------------------ */
+    .contestants-grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .option-contestant-card {
+      background-color: var(--color-white);
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1.5px solid var(--color-card-border);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.035);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .option-contestant-card:hover {
+      border-color: #C49420;
+      transform: translateY(-2px);
+    }
+
+    /* Tarjeta Seleccionada (Borde Dorado Intenso) */
+    .option-contestant-card.selected {
+      border: 2px solid var(--color-gold);
+      box-shadow: 0 6px 18px rgba(216, 166, 41, 0.22);
+    }
+
+    /* Contenedor de la foto del concursante */
+    .contestant-photo-container {
+      width: 100%;
+      aspect-ratio: 1 / 0.88;
+      position: relative;
+      background-color: #E5E7EB;
+      overflow: hidden;
+    }
+
+    .contestant-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Círculo indicador de selección en la esquina superior derecha */
+    .selection-indicator-circle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1.5px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    /* Círculo cuando la tarjeta está seleccionada (Dorado con check) */
+    .option-contestant-card.selected .selection-indicator-circle {
+      background-color: var(--color-gold);
+      border-color: var(--color-gold);
+      color: #000000;
+    }
+
+    .selection-indicator-circle i {
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    /* Detalles de texto dentro de la tarjeta */
+    .contestant-details {
+      padding: 12px 14px 14px 14px;
+      background-color: var(--color-white);
+    }
+
+    .contestant-name {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--color-text-dark);
+      margin: 0 0 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+    }
+
+    .contestant-song {
+      font-size: 0.74rem;
+      color: var(--color-text-subtle);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ------------------------------------------------------------
+       4. RESUMEN DE ELECCIÓN Y BOTÓN VOTAR
+       ------------------------------------------------------------ */
+    .selection-summary-text {
+      font-size: 0.84rem;
+      color: var(--color-text-dark);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .selection-summary-text strong {
+      font-weight: 700;
+      color: var(--color-text-dark);
+    }
+
+    /* Botón Dorado Mostaza (Votar ✓) */
+    .btn-gold-action {
+      background-color: var(--color-gold);
+      color: #000000;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 14px;
+      padding: 15px 20px;
+      width: 100%;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(216, 166, 41, 0.25);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .btn-gold-action:hover, .btn-gold-action:focus {
+      background-color: var(--color-gold-hover);
+      color: #000000;
+      transform: translateY(-1px);
+    }
+
+    .btn-gold-action i {
+      font-size: 1.15rem;
+      stroke-width: 1.5;
+    }
+
+    /* Insignia de seguridad al pie */
+    .trust-footnote {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--color-text-subtle);
+      font-size: 0.74rem;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .trust-footnote i {
+      font-size: 0.92rem;
+      color: #9CA3AF;
+      flex-shrink: 0;
+    }
+
+    /* ------------------------------------------------------------
+       5. BARRA DE NAVEGACIÓN INFERIOR FIJA (CATEGORÍAS ACTIVO)
+       ------------------------------------------------------------ */
+    .bottom-tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      height: 64px;
+      background: var(--color-white);
+      border-top: 1px solid #ECECEC;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      z-index: 50;
+    }
+
+    @media (max-width: 576px) {
+      .bottom-tab-bar {
+        left: 0;
+        transform: none;
+        max-width: 100%;
+      }
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #9E9E9E;
+      font-size: 0.68rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .tab-item i {
+      font-size: 1.25rem;
+      margin-bottom: 2px;
+      line-height: 1;
+    }
+
+    /* En esta pantalla, "Categorías" permanece ACTIVO en dorado */
+    .tab-item.active-gold {
+      color: var(--color-gold);
+      font-weight: 700;
+    }
+
+    .tab-item.active-gold i {
+      color: var(--color-gold);
+    }
+
+    /* ------------------------------------------------------------
+       6. MODAL DE CONFIRMACIÓN OFICIAL (REPLICA FIGMA)
+       ------------------------------------------------------------ */
+    .modal-backdrop.show {
+      opacity: 0.65;
+      background-color: #000000;
+    }
+
+    .modal-vallenato-dialog {
+      max-width: 380px;
+      margin: 1.75rem auto;
+    }
+
+    @media (max-width: 576px) {
+      .modal-vallenato-dialog {
+        max-width: calc(100% - 32px);
+        margin: auto;
+      }
+    }
+
+    .modal-vallenato-card {
+      background-color: var(--color-white);
+      border-radius: 26px;
+      border: none;
+      padding: 26px 22px 24px 22px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .modal-kicker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .modal-kicker-text {
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #71717A;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #333333;
+      font-size: 1.15rem;
+      line-height: 1;
+      padding: 2px;
+      cursor: pointer;
+    }
+
+    /* Foto circular con anillo dorado del participante */
+    .modal-avatar-ring {
+      width: 94px;
+      height: 94px;
+      border-radius: 50%;
+      border: 2px solid var(--color-gold);
+      margin: 12px auto 16px auto;
+      overflow: hidden;
+      background-color: #E5E7EB;
+      box-shadow: 0 4px 14px rgba(216, 166, 41, 0.22);
+    }
+
+    .modal-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-question-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.55rem;
+      line-height: 1.2;
+      color: var(--color-text-dark);
+      text-align: center;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-category-subtitle {
+      font-size: 0.78rem;
+      color: var(--color-text-subtle);
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    /* Caja de Advertencia en tono crema/dorado suave */
+    .modal-caution-card {
+      background-color: #FDF5E1;
+      border-radius: 14px;
+      padding: 13px 18px;
+      color: #262626;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      text-align: center;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    /* Botón Dorado de Confirmar Voto */
+    .btn-gold-confirm {
+      background-color: var(--color-gold);
+      color: #000000;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 14px;
+      height: 52px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(216, 166, 41, 0.25);
+      transition: all 0.2s ease;
+      margin-bottom: 10px;
+    }
+
+    .btn-gold-confirm:hover {
+      background-color: var(--color-gold-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Botón Oscuro de Cancelar */
+    .btn-dark-cancel {
+      background-color: #222222;
+      color: #FFFFFF;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 14px;
+      height: 52px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-dark-cancel:hover {
+      background-color: #111111;
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       CONTENEDOR DE LA APLICACIÓN (RESPONSIVE EN PC & MÓVIL)
+       ============================================================ -->
+  <main class="app-viewport">
+
+    <!-- 1. ENCABEZADO INSTITUCIONAL OFICIAL (RESPONSIVE) -->
+    <header class="app-header">
+      <div class="header-inner-container">
+        <a href="index.html" class="header-brand-lockup">
+          <!-- Escudo con isotipo oficial del Festival -->
+          <div class="emblem-wrapper">
+            <img 
+              src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" 
+              alt="Escudo Fundación Festival de la Leyenda Vallenata" 
+              class="emblem-img"
+              referrerpolicy="no-referrer"
+              onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';"
+            />
+          </div>
+
+          <!-- Tipografía Institucional de la Fundación -->
+          <div class="brand-typography">
+            <span class="brand-title-line1">Fundación Festival de</span>
+            <span class="brand-title-line2">la Leyenda Vallenata</span>
+            <span class="brand-title-sub">Patrimonio Cultural de la Nación</span>
+          </div>
+        </a>
+
+        <!-- Enlaces superiores para PC -->
+        <ul class="desktop-nav-links d-none d-md-flex">
+          <li><a href="index.html" class="desktop-nav-link"><i class="bi bi-house"></i> Inicio</a></li>
+          <li><a href="categorias.html" class="desktop-nav-link active"><i class="bi bi-grid"></i> Categorías</a></li>
+          <li><a href="login.html" class="desktop-nav-link"><i class="bi bi-person"></i> Mi cuenta</a></li>
+          <li><a href="admin.html" class="desktop-nav-link"><i class="bi bi-speedometer2"></i> Administración</a></li>
+        </ul>
+
+        <!-- Acciones en desktop / Botón menú móvil -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="desktop-header-action d-none d-md-flex">
+            <a href="encuestas.html" class="btn-desktop-account">
+              <i class="bi bi-arrow-left"></i> Volver a Encuestas
+            </a>
+          </div>
+
+          <!-- Botón Hamburguesa con 3 líneas doradas -->
+          <button class="btn-hamburger d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#institutionalDrawer" aria-label="Abrir Menú">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. CUERPO DE SELECCIÓN DE PARTICIPANTE -->
+    <section class="voting-body-content">
+      <!-- Kicker numérico -->
+      <div class="screen-kicker">04 / MÚSICA</div>
+
+      <!-- Titular principal -->
+      <h1 class="screen-title">Artista favorito del público</h1>
+
+      <!-- Subtítulo explicativo -->
+      <p class="screen-description">
+        Selecciona a quien quieres darle tu voto. Haz clic sobre su tarjeta para seleccionarlo.
+      </p>
+
+      <!-- Barra de Estado: Activa y conteo de opciones -->
+      <div class="status-selection-bar">
+        <span class="badge-pill-light">Activa</span>
+        <span class="options-count-text">4 opciones · Elige una</span>
+      </div>
+
+      <!-- CUADRÍCULA DE PARTICIPANTES (2x2 en móvil, 4 en 1 fila en desktop) -->
+      <div class="contestants-grid-2x2">
+
+        <!-- 1. MATEO DÍAZ (SELECCIONADO POR DEFECTO) -->
+        <div class="option-contestant-card selected" data-id="mateo">
+          <div class="contestant-photo-container">
+            <img 
+              src="/src/assets/images/contestant_mateo_diaz_1791516984186.jpg" 
+              alt="Mateo Díaz - Acordeón vallenato" 
+              class="contestant-img"
+            />
+            <div class="selection-indicator-circle">
+              <i class="bi bi-check2"></i>
+            </div>
+          </div>
+          <div class="contestant-details">
+            <h2 class="contestant-name">Mateo Díaz</h2>
+            <p class="contestant-song">Mi tierra canta</p>
+          </div>
+        </div>
+
+        <!-- 2. LUCÍA PINEDA -->
+        <div class="option-contestant-card" data-id="lucia">
+          <div class="contestant-photo-container">
+            <img 
+              src="/src/assets/images/contestant_lucia_pineda_1791516993941.jpg" 
+              alt="Lucía Pineda - Cantante vallenata" 
+              class="contestant-img"
+            />
+            <div class="selection-indicator-circle"></div>
+          </div>
+          <div class="contestant-details">
+            <h2 class="contestant-name">Lucía Pineda</h2>
+            <p class="contestant-song">Raíces del alma</p>
+          </div>
+        </div>
+
+        <!-- 3. SAMUEL ROJAS -->
+        <div class="option-contestant-card" data-id="samuel">
+          <div class="contestant-photo-container">
+            <img 
+              src="/src/assets/images/contestant_samuel_rojas_1791517002103.jpg" 
+              alt="Samuel Rojas - Acordeonero tradicional" 
+              class="contestant-img"
+            />
+            <div class="selection-indicator-circle"></div>
+          </div>
+          <div class="contestant-details">
+            <h2 class="contestant-name">Samuel Rojas</h2>
+            <p class="contestant-song">Aires de mi pueblo</p>
+          </div>
+        </div>
+
+        <!-- 4. VALENTINA LÓPEZ -->
+        <div class="option-contestant-card" data-id="valentina">
+          <div class="contestant-photo-container">
+            <img 
+              src="/src/assets/images/contestant_valentina_lopez_1791517011267.jpg" 
+              alt="Valentina López - Intérprete folclórica" 
+              class="contestant-img"
+            />
+            <div class="selection-indicator-circle"></div>
+          </div>
+          <div class="contestant-details">
+            <h2 class="contestant-name">Valentina López</h2>
+            <p class="contestant-song">Corazón del Valle</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Barra de Acción y Votación en Desktop (>=768px) -->
+      <div class="voting-desktop-action-bar d-none d-md-flex">
+        <div>
+          <div class="text-secondary small fw-semibold">Tu selección actual:</div>
+          <div class="fs-4 fw-bold text-dark" id="selectedContestantNameDesktop">Mateo Díaz</div>
+          <div class="text-muted small mt-1"><i class="bi bi-shield-check text-warning"></i> Un voto por encuesta. Tu elección es definitiva.</div>
+        </div>
+
+        <button type="button" id="btnSubmitVoteDesktop" class="btn-gold-action btn-trigger-vote mb-0" style="width: auto; min-width: 220px;">
+          <span>Votar por este artista</span>
+          <i class="bi bi-check2 fs-5"></i>
+        </button>
+      </div>
+
+      <!-- Controles móviles (<768px, Idénticos a Figma) -->
+      <div class="d-md-none">
+        <!-- Resumen de selección actual -->
+        <div class="selection-summary-text">
+          Tu elección: <strong id="selectedContestantName">Mateo Díaz</strong>
+        </div>
+
+        <!-- Botón Dorado: Votar ✓ -->
+        <button type="button" id="btnSubmitVote" class="btn-gold-action btn-trigger-vote">
+          <span>Votar</span>
+          <i class="bi bi-check2 fs-5"></i>
+        </button>
+
+        <!-- Nota de seguridad al pie -->
+        <div class="trust-footnote">
+          <i class="bi bi-shield-check"></i>
+          <span>Un voto por encuesta. Tu elección es definitiva.</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 3. PIE DE PÁGINA INSTITUCIONAL PARA ESCRITORIO -->
+    <footer class="desktop-footer d-none d-md-block">
+      <div class="desktop-footer-container">
+        <div class="desktop-footer-brand">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" style="width: 38px; height: 38px; border-radius: 50%;" referrerpolicy="no-referrer" />
+            <div>
+              <div class="text-white fw-bold" style="font-family: var(--font-serif-logo); font-style: italic; font-size: 0.95rem;">Fundación Festival de la Leyenda Vallenata</div>
+              <div style="font-size: 0.68rem; color: #D8A629;">Patrimonio Cultural Inmaterial de la Humanidad</div>
+            </div>
+          </div>
+          <p>
+            Plataforma oficial de votación ciudadana para el Festival de la Leyenda Vallenata 2027. Transparencia, seguridad y participación para exaltar nuestro folclor.
+          </p>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Navegación</h4>
+          <ul class="desktop-footer-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="categorias.html">Categorías</a></li>
+            <li><a href="encuestas.html">Encuestas Activas</a></li>
+            <li><a href="login.html">Registro y Cuenta</a></li>
+          </ul>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Festival</h4>
+          <ul class="desktop-footer-links">
+            <li><a href="https://festivalvallenato.com/" target="_blank" rel="noopener">Sitio Oficial</a></li>
+            <li><a href="https://festivalvallenato.com/programacion/" target="_blank" rel="noopener">Programación</a></li>
+            <li><a href="https://festivalvallenato.com/historia/" target="_blank" rel="noopener">Historia del Festival</a></li>
+            <li><a href="https://festivalvallenato.com/galeria/" target="_blank" rel="noopener">Galería Fotográfica</a></li>
+          </ul>
+        </div>
+
+        <div class="desktop-footer-column">
+          <h4>Sede Oficial</h4>
+          <ul class="desktop-footer-links">
+            <li>Valledupar, Cesar · Colombia</li>
+            <li>Parque de la Leyenda Vallenata 'Consuelo Araujonoguera'</li>
+            <li>contacto@festivalvallenato.com</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="desktop-footer-bottom">
+        <div>© 2027 Fundación Festival de la Leyenda Vallenata. Todos los derechos reservados.</div>
+        <div class="d-flex gap-3">
+          <span>Votación Ciudadana Certificada</span>
+          <span>·</span>
+          <span>Términos y Privacidad</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 4. BARRA DE NAVEGACIÓN INFERIOR FIJA (MÓVIL) -->
+    <nav class="bottom-tab-bar d-md-none" aria-label="Navegación principal">
+      <!-- Tab 1: Inicio -->
+      <a href="index.html" class="tab-item" data-route="index.html">
+        <i class="bi bi-house"></i>
+        <span>Inicio</span>
+      </a>
+
+      <!-- Tab 2: Categorías (ACTIVO EN ESTA PANTALLA) -->
+      <a href="categorias.html" class="tab-item active-gold" data-route="categorias.html">
+        <i class="bi bi-grid"></i>
+        <span>Categorías</span>
+      </a>
+
+      <!-- Tab 3: Mi cuenta -->
+      <a href="login.html" class="tab-item" data-route="login.html">
+        <i class="bi bi-person"></i>
+        <span>Mi cuenta</span>
+      </a>
+    </nav>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL DE CONFIRMACIÓN DE VOTO (REPLICA FIGMA)
+       ============================================================ -->
+  <div class="modal fade" id="voteConfirmModal" tabindex="-1" aria-labelledby="voteConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-vallenato-dialog">
+      <div class="modal-content modal-vallenato-card">
+        <!-- Fila superior: Kicker + Botón Cerrar (X) -->
+        <div class="modal-kicker-header">
+          <span class="modal-kicker-text" id="voteConfirmLabel">05 / CONFIRMA TU ELECCIÓN</span>
+          <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Cerrar">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <!-- Foto circular con borde dorado del candidato -->
+        <div class="modal-avatar-ring">
+          <img 
+            id="modalCandidateImg" 
+            src="/src/assets/images/contestant_mateo_diaz_1791516984186.jpg" 
+            alt="Candidato a votar" 
+            class="modal-avatar-img"
+          />
+        </div>
+
+        <!-- Pregunta de Confirmación -->
+        <h2 class="modal-question-title">
+          ¿Confirmas tu voto por <span id="modalCandidateName">Mateo Díaz</span>?
+        </h2>
+
+        <!-- Subtítulo de Categoría -->
+        <p class="modal-category-subtitle">
+          Música · Artista favorito del público
+        </p>
+
+        <!-- Caja de Advertencia en tono crema -->
+        <div class="modal-caution-card">
+          Una vez registrado, no podrás cambiar tu voto en esta encuesta.
+        </div>
+
+        <!-- Botón Dorado: Confirmar voto ✓ -->
+        <button type="button" id="btnConfirmVoteFinal" class="btn-gold-confirm">
+          <span>Confirmar voto</span>
+          <i class="bi bi-check2 fs-5"></i>
+        </button>
+
+        <!-- Botón Oscuro: Cancelar -->
+        <button type="button" class="btn-dark-cancel" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MENÚ INSTITUCIONAL LATERAL (OFFCANVAS)
+       ============================================================ -->
+  <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="institutionalDrawer" aria-labelledby="drawerTitle">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <div class="d-flex align-items-center gap-2">
+        <div class="emblem-wrapper" style="width: 32px; height: 32px;">
+          <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" class="emblem-img" style="width: 32px; height: 32px;" referrerpolicy="no-referrer"/>
+        </div>
+        <div>
+          <h5 class="offcanvas-title fw-bold small text-white mb-0" id="drawerTitle">Festival Vallenato 2027</h5>
+          <span class="text-secondary" style="font-size: 0.65rem;">Votación Ciudadana</span>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <div class="list-group list-group-flush bg-transparent">
+        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-house text-warning"></i> <span>Inicio</span>
+        </a>
+        <a href="categorias.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-grid text-warning"></i> <span>Categorías de votación</span>
+        </a>
+        <a href="login.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-person text-warning"></i> <span>Registro / Iniciar sesión</span>
+        </a>
+        <a href="encuestas.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-check2-square text-warning"></i> <span>Encuestas y votaciones</span>
+        </a>
+        <a href="admin.html" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+          <i class="bi bi-speedometer2 text-warning"></i> <span>Panel administrativo</span>
+        </a>
+      </div>
+
+      <div class="p-3 text-secondary small mt-4 border-top border-secondary">
+        <div>Valledupar, Cesar · Colombia</div>
+        <div style="font-size: 0.68rem;">Fundación Festival de la Leyenda Vallenata</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS: BOOTSTRAP 5 & ARCHIVOS JS MODULARES -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="/js/voting.js"></script>
+  <script src="/js/navigation.js"></script>
+</body>
+</html>
