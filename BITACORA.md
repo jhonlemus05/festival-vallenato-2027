@@ -29,6 +29,7 @@ D:\no_borrar\programacion\Python\Django\
 │   ├── css\responsive.css
 │   ├── js\countdown.js
 │   ├── js\navigation.js
+│   ├── js\admin.js
 │   └── images\hero_accordionist_banner_1791518403166.jpg
 ├── usuarios\                       # APP 1: autenticación (aún sin vistas)
 │   ├── templates\usuarios\         # (vacío)
@@ -40,9 +41,12 @@ D:\no_borrar\programacion\Python\Django\
 │   │   └── index.html              # Página de Inicio (ex inicio.html)
 │   ├── urls.py                     # '' -> views.index (name='index')
 │   └── views.py                    # def index(...)
-├── administracion\                 # APP 3: panel privado (aún sin vistas)
-│   ├── templates\administracion\   # (vacío)
-│   ├── urls.py                     # urlpatterns = [] (pendiente)
+├── administracion\                 # APP 3: panel privado (MIGRANDO)
+│   ├── templates\administracion\
+│   │   ├── admin_base.html             # Layout privado (sidebar, topbar, offcanvas, scripts)
+│   │   ├── _admin_sidebar_nav.html     # Menú lateral reutilizable (sidebar + offcanvas)
+│   │   └── panel_principal.html        # Dashboard principal (ex admin.html)
+│   ├── urls.py                     # '' -> views.panel_principal (name='panel_principal')
 │   └── views.py
 └── festival-de-la-leyenda-vallenata-2027---...-ciudadana\   # Prototipo fuente (referencia)
 ```
@@ -56,9 +60,15 @@ D:\no_borrar\programacion\Python\Django\
 - **Estáticos:** referenciar con `{% static '...' %}`. `settings.py` tiene `STATICFILES_DIRS = [BASE_DIR / 'static']`.
 - **Plantillas:** cada página hereda de la base de su app:
   - Público: `votaciones/base.html` (bloques `titulo`, `descripcion`, `contenido`, `extra_css`, `extra_js`).
-  - Admin (futuro): `administracion/admin_base.html`.
-- **Navegación activa:** el base usa la variable de contexto `seccion_activa` (valores: `inicio`,
-  `categorias`, `cuenta`, `admin`). La vista debe pasarla.
+  - Admin: `administracion/admin_base.html` (bloques `titulo`, `descripcion`, `breadcrumb`,
+    `contenido`, `modales`, `extra_css`, `extra_js`). Incluye el partial `_admin_sidebar_nav.html`.
+- **Navegación activa:**
+  - Público: variable de contexto `seccion_activa` (valores: `inicio`, `categorias`, `cuenta`, `admin`).
+  - Admin: variable de contexto `seccion_admin` (valores: `panel`, `categorias`, `votaciones`,
+    `opciones`, `resultados`). La vista debe pasarla.
+- **Admin (diseño propio):** usa `--color-gold: #D4AF37` (distinto al dorado público `#D8A629`) y NO
+  carga `responsive.css`; la responsividad del panel está en `admin_base.html` (breakpoint 991px).
+  Pendiente: proteger las vistas admin con login/staff (ver `ESTRUCTURA.md`).
 - **Enlaces a vistas no migradas:** quedaron como `href="#"` (placeholders) y se reemplazarán
   por `{% url '...' %}` cuando exista cada vista.
 - **Idioma:** contenido en español. NO agregar comentarios al código salvo lo ya presente.
@@ -100,6 +110,25 @@ D:\no_borrar\programacion\Python\Django\
 - **App `home` eliminada** por completo (carpeta borrada).
 - **Verificación:** `manage.py check` OK; la vista Inicio responde **200** en `/` y renderiza estáticos.
 
+### [4] Panel de administración: base + Panel principal
+- **Rama Git:** `feature/migracion-administracion` (remota en origin; se hizo `fetch` + `checkout`).
+- **`static/js/admin.js`**: copiado del prototipo (`js/admin.js`), sin cambios.
+- **`administracion/templates/administracion/admin_base.html`**: layout privado. Contiene el sistema
+  de diseño del panel (variables `--color-gold: #D4AF37`, sidebar, topbar/breadcrumb, offcanvas móvil,
+  KPIs, badges y barras de progreso genéricas, responsive 991px) y bloques `titulo`, `descripcion`,
+  `breadcrumb`, `contenido`, `modales`, `extra_css`, `extra_js`.
+- **`administracion/templates/administracion/_admin_sidebar_nav.html`**: partial con el menú lateral
+  (se reutiliza en sidebar desktop y en el offcanvas móvil; recibe `offcanvas=True`).
+- **`administracion/templates/administracion/panel_principal.html`**: migración de `admin.html`.
+  El contenido (header de página, KPIs, tabla de actividad, votaciones de la edición, resumen de
+  categorías) va en `{% block contenido %}`; los modales y el toast en `{% block modales %}`; el CSS
+  específico de la página en `{% block extra_css %}`.
+- **`administracion/views.py`**: `def panel_principal(request)` -> render con `{'seccion_admin': 'panel'}`.
+- **`administracion/urls.py`**: `path('', views.panel_principal, name='panel_principal')` (ruta `/admin-panel/`).
+- **Enlaces:** "Volver a vista pública" -> `{% url 'index' %}`. Los ítems Categorías/Votaciones/Opciones/
+  Resultados del menú quedaron como `href="#"` hasta migrarlos.
+- **Verificación:** `manage.py check` OK; `/` y `/admin-panel/` responden **200**.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):
@@ -112,11 +141,11 @@ Autenticación (app `usuarios`):
 - [ ] `login.html` -> vista Login / Registro
 
 Admin (app `administracion`, usar `admin_base.html`):
-- [ ] `admin.html` -> panel principal
-- [ ] `admin-categorias.html` -> gestión de categorías
-- [ ] `admin-opciones.html` -> gestión de opciones
-- [ ] `admin-resultados.html` -> estadísticas
-- [ ] `admin-votaciones.html` -> gestión de votaciones
+- [x] `admin.html` -> `panel_principal.html` (vista `panel_principal`, `/admin-panel/`)
+- [ ] `admin-categorias.html` -> gestión de categorías (`seccion_admin='categorias'`)
+- [ ] `admin-votaciones.html` -> gestión de votaciones (`seccion_admin='votaciones'`)
+- [ ] `admin-opciones.html` -> gestión de opciones (`seccion_admin='opciones'`)
+- [ ] `admin-resultados.html` -> estadísticas (`seccion_admin='resultados'`)
 
 > Nota: `admin.html` del prototipo NO comparte las mismas variables CSS institucionales
 > (`--color-gold: #D8A629`) que el resto; revisar al migrarlo.

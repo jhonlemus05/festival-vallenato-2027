@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def panel_principal(request):
+    return render(request, 'administracion/panel_principal.html', {'seccion_admin': 'panel'})
