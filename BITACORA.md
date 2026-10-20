@@ -51,8 +51,9 @@ D:\no_borrar\programacion\Python\Django\
 │   ├── templates\administracion\
 │   │   ├── admin_base.html             # Layout privado (sidebar, topbar, offcanvas, scripts)
 │   │   ├── _admin_sidebar_nav.html     # Menú lateral reutilizable (sidebar + offcanvas)
-│   │   └── panel_principal.html        # Dashboard principal (ex admin.html)
-│   ├── urls.py                     # '' -> views.panel_principal (name='panel_principal')
+│   │   ├── panel_principal.html        # Dashboard principal (ex admin.html)
+│   │   └── categorias.html             # Gestión de categorías (ex admin-categorias.html)
+│   ├── urls.py                     # '' -> panel_principal ; 'categorias/' -> categorias
 │   └── views.py
 └── festival-de-la-leyenda-vallenata-2027---...-ciudadana\   # Prototipo fuente (referencia)
 ```
@@ -135,6 +136,21 @@ D:\no_borrar\programacion\Python\Django\
   Resultados del menú quedaron como `href="#"` hasta migrarlos.
 - **Verificación:** `manage.py check` OK; `/` y `/admin-panel/` responden **200**.
 
+### [5] Admin: Gestión de Categorías
+- **`administracion/templates/administracion/categorias.html`**: migración de `admin-categorias.html`. Hereda de
+  `admin_base.html`. El contenido (header, 3 KPIs simples, catálogo con búsqueda/filtro, tabla de categorías,
+  paginación, tarjetas informativas y nota al pie) va en `{% block contenido %}`; los modales (nueva/editar
+  categoría) y el toast en `{% block modales %}`; el bloque `breadcrumb` muestra "Administración > Categorías".
+  El CSS específico (botón oscuro, métricas simples, catálogo/tabla, tarjetas informativas y su responsive)
+  está en `{% block extra_css %}`; el JS propio de la página (búsqueda en vivo, apertura de modales,
+  envío de formularios y toast) en `{% block extra_js %}`.
+- **`administracion/views.py`**: `def categorias(request)` -> render con `{'seccion_admin': 'categorias'}`.
+- **`administracion/urls.py`**: `path('categorias/', views.categorias, name='categorias')` (ruta `/admin-panel/categorias/`).
+- **`_admin_sidebar_nav.html`**: el ítem "Categorías" ahora apunta a `{% url 'categorias' %}`.
+- **Convenio:** `admin_base.html` no define `--color-gold-text`; en `categorias.html` se usó `#B48216` directo.
+- **Verificación:** `manage.py check` OK; `/admin-panel/categorias/` y `/admin-panel/` responden **200**.
+
+
 ### [5] Módulo de Usuarios: migración de login/registro y seguridad avanzada (PBKDF2-SHA256)
 - **Rama Git:** `feature/migracion-usuarios` (actualizada con `main`).
 - **`pr_festivalVallenato/settings.py`**: configurado `PASSWORD_HASHERS` con `PBKDF2PasswordHasher` (`PBKDF2-HMAC-SHA256`), validadores de contraseñas (`AUTH_PASSWORD_VALIDATORS`), idioma `es-co` y banderas de seguridad de sesión/cookies (`HttpOnly`, `SameSite=Lax`, `X_FRAME_OPTIONS='DENY'`, `NOSNIFF`).
@@ -160,7 +176,7 @@ Autenticación (app `usuarios`):
 
 Admin (app `administracion`, usar `admin_base.html`):
 - [x] `admin.html` -> `panel_principal.html` (vista `panel_principal`, `/admin-panel/`)
-- [ ] `admin-categorias.html` -> gestión de categorías (`seccion_admin='categorias'`)
+- [x] `admin-categorias.html` -> `categorias.html` (vista `categorias`, `/admin-panel/categorias/`)
 - [ ] `admin-votaciones.html` -> gestión de votaciones (`seccion_admin='votaciones'`)
 - [ ] `admin-opciones.html` -> gestión de opciones (`seccion_admin='opciones'`)
 - [ ] `admin-resultados.html` -> estadísticas (`seccion_admin='resultados'`)
