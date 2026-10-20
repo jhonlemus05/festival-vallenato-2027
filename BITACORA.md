@@ -30,11 +30,17 @@ D:\no_borrar\programacion\Python\Django\
 │   ├── js\countdown.js
 │   ├── js\navigation.js
 │   ├── js\admin.js
+│   ├── js\auth.js
 │   └── images\hero_accordionist_banner_1791518403166.jpg
-├── usuarios\                       # APP 1: autenticación (aún sin vistas)
-│   ├── templates\usuarios\         # (vacío)
-│   ├── urls.py                     # urlpatterns = [] (pendiente)
-│   └── views.py
+├── usuarios\                       # APP 1: autenticación (MIGRADA + FUNCIONAL)
+│   ├── migrations\0001_initial.py  # Modelos Usuario y Bitacora
+│   ├── templates\usuarios\
+│   │   └── login.html              # Registro, Inicio de sesión y Mi cuenta
+│   ├── models.py                   # Usuario (tabla 'usuario') y Bitacora (tabla 'bitacora')
+│   ├── admin.py                    # Registro en Django Admin
+│   ├── urls.py                     # '' , 'login/', 'registro/', 'logout/'
+│   ├── views.py                    # login_view, registro_view, logout_view
+│   └── tests.py                    # Pruebas unitarias de registro, login, logout y bitácora
 ├── votaciones\                     # APP 2: experiencia pública (MIGRANDO)
 │   ├── templates\votaciones\
 │   │   ├── base.html               # Layout público (navbar, footer, offcanvas, scripts)
@@ -57,7 +63,7 @@ D:\no_borrar\programacion\Python\Django\
 - **Python/pip:** usar `env_django\Scripts\python.exe` (ej: `& "env_django\Scripts\python.exe" manage.py check`).
 - **Rutas Django:**
   - `votaciones` montada en **`/`** (raíz). Inicio: `http://127.0.0.1:8000/` (nombre de URL `index`).
-  - `usuarios` en `/usuarios/` y `administracion` en `/admin-panel/` (aún sin rutas internas).
+  - `usuarios` en `/usuarios/` (`login`, `registro`, `logout`) y `administracion` en `/admin-panel/` (`panel_principal`).
 - **Estáticos:** referenciar con `{% static '...' %}`. `settings.py` tiene `STATICFILES_DIRS = [BASE_DIR / 'static']`.
 - **Plantillas:** cada página hereda de la base de su app:
   - Público: `votaciones/base.html` (bloques `titulo`, `descripcion`, `contenido`, `extra_css`, `extra_js`).
@@ -144,6 +150,19 @@ D:\no_borrar\programacion\Python\Django\
 - **Convenio:** `admin_base.html` no define `--color-gold-text`; en `categorias.html` se usó `#B48216` directo.
 - **Verificación:** `manage.py check` OK; `/admin-panel/categorias/` y `/admin-panel/` responden **200**.
 
+
+### [5] Módulo de Usuarios: migración de login/registro y seguridad avanzada (PBKDF2-SHA256)
+- **Rama Git:** `feature/migracion-usuarios` (actualizada con `main`).
+- **`pr_festivalVallenato/settings.py`**: configurado `PASSWORD_HASHERS` con `PBKDF2PasswordHasher` (`PBKDF2-HMAC-SHA256`), validadores de contraseñas (`AUTH_PASSWORD_VALIDATORS`), idioma `es-co` y banderas de seguridad de sesión/cookies (`HttpOnly`, `SameSite=Lax`, `X_FRAME_OPTIONS='DENY'`, `NOSNIFF`).
+- **`usuarios/models.py`**: creados los modelos `Usuario` (`db_table='usuario'`, con `identificacion`, `correo`, `password_hash` en formato `pbkdf2_sha256$...`, `rol`, `acepta_terminos`, `intentos_fallidos`, `bloqueado_hasta`, `fecha_registro`) y `Bitacora` (`db_table='bitacora'`, con `usuario`, `accion`, `detalles`, `ip_origen`, `hash_sha256` calculado con `hashlib.sha256` e inmutable, `fecha_hora`).
+- **`usuarios/admin.py`**: registrados `Usuario` y `Bitacora` en Django Admin mostrando el estado de bloqueo, intentos fallidos, IP de origen y la firma de integridad `hash_sha256`.
+- **`usuarios/migrations/0001_initial.py`**: migración inicial generada y verificada.
+- **`static/js/auth.js`**: adaptado del prototipo (`js/auth.js`) con medidor visual de fortaleza de contraseña en tiempo real, sanitización numérica del documento y alternancia entre "Registrarse" e "Iniciar sesión".
+- **`usuarios/templates/usuarios/login.html`**: migrado desde `login.html` heredando de `votaciones/base.html` (`seccion_activa='cuenta'`). Incluye barra de nivel de seguridad de contraseña, insignia de protección activa y tarjeta de "Sesión activa" que exhibe el algoritmo `PBKDF2-HMAC-SHA256`, el hash almacenado y la firma `SHA-256` de la bitácora.
+- **`usuarios/views.py`** y **`usuarios/urls.py`**: implementadas `login_view`, `registro_view` y `logout_view` con `@sensitive_post_parameters`, `@never_cache`, bloqueo preventivo de 15 minutos tras 5 intentos fallidos (CU-03 4c), mitigación de ataques de tiempo (anti-enumeración) y validación OWASP de claves.
+- **`votaciones/templates/votaciones/base.html`** e **`index.html`**: actualizados los enlaces de "Mi cuenta", "Regístrate", "Registro y Cuenta" y "Administración" a `{% url 'login' %}` y `{% url 'panel_principal' %}`.
+- **`usuarios/tests.py`**: 6 pruebas automatizadas de seguridad (renderizado, cifrado PBKDF2-SHA256 + firma SHA-256 en bitácora, prevención de duplicados, login/logout, bloqueo tras 5 intentos fallidos y rechazo de inyecciones/claves débiles).
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):
@@ -153,7 +172,7 @@ Públicas (app `votaciones`):
 - [ ] `exito.html` -> vista Éxito
 
 Autenticación (app `usuarios`):
-- [ ] `login.html` -> vista Login / Registro
+- [x] `login.html` -> `usuarios/templates/usuarios/login.html` (vistas `login`, `registro`, `logout` en `/usuarios/login/`)
 
 Admin (app `administracion`, usar `admin_base.html`):
 - [x] `admin.html` -> `panel_principal.html` (vista `panel_principal`, `/admin-panel/`)
@@ -164,3 +183,4 @@ Admin (app `administracion`, usar `admin_base.html`):
 
 > Nota: `admin.html` del prototipo NO comparte las mismas variables CSS institucionales
 > (`--color-gold: #D8A629`) que el resto; revisar al migrarlo.
+

@@ -245,8 +245,8 @@
             <a href="#" class="btn btn-warning fw-bold px-4 py-2 text-dark rounded-3" style="background-color: var(--color-gold); border: none;">
               Explorar Categorías <i class="bi bi-arrow-right"></i>
             </a>
-            <a href="#" class="btn btn-outline-light px-3 py-2 rounded-3">
-              <i class="bi bi-shield-check text-warning"></i> Regístrate
+            <a href="{% url 'login' %}" class="btn btn-outline-light px-3 py-2 rounded-3">
+              <i class="bi bi-shield-check text-warning"></i> {% if request.user.is_authenticated %}Mi cuenta{% else %}Regístrate{% endif %}
             </a>
           </div>
         </div>
@@ -309,9 +309,9 @@
       </a>
 
       <!-- Insignia de seguridad / registro móvil -->
-      <a href="#" class="trust-badge-wrap text-decoration-none d-md-none">
+      <a href="{% url 'login' %}" class="trust-badge-wrap text-decoration-none d-md-none">
         <i class="bi bi-shield-check"></i>
-        <span>Crea tu cuenta para participar en la votación.</span>
+        <span>{% if request.user.is_authenticated %}Sesión iniciada como {{ request.user.username }}{% else %}Crea tu cuenta para participar en la votación.{% endif %}</span>
       </a>
 
       <!-- Vista previa de categorías en desktop (Música, Piloneras, Comparsas) -->

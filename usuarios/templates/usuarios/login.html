@@ -1,0 +1,665 @@
+{% extends 'votaciones/base.html' %}
+{% load static %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | Registro e Inicio de Sesión{% endblock %}
+{% block descripcion %}Regístrate o inicia sesión para participar con tu voto oficial en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+
+{% block extra_css %}
+  <style>
+    :root {
+      --color-input-border: #2B2B2B;
+      --color-pill-bg: #EAE6DF;
+      --color-text-muted: #555555;
+    }
+
+    .app-header {
+      border-bottom: 1.5px solid var(--color-gold);
+    }
+
+    .auth-body-content {
+      padding: 26px 20px 96px 20px;
+      flex: 1;
+      background-color: var(--color-white);
+    }
+
+    .screen-kicker {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #71717A;
+      margin-bottom: 6px;
+    }
+
+    .screen-title {
+      font-family: var(--font-display);
+      font-size: 1.86rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--color-text-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .screen-description {
+      font-size: 0.88rem;
+      color: var(--color-text-muted);
+      line-height: 1.45;
+      margin-bottom: 22px;
+    }
+
+    .auth-toggle-pill {
+      background-color: var(--color-pill-bg);
+      border-radius: 12px;
+      padding: 4px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-bottom: 24px;
+    }
+
+    .toggle-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 11px 10px;
+      border-radius: 9px;
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #555555;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .toggle-tab-btn.active {
+      background-color: var(--color-black);
+      color: var(--color-gold);
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-group-minimal {
+      margin-bottom: 18px;
+    }
+
+    .field-label {
+      font-family: var(--font-display);
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--color-text-dark);
+      margin-bottom: 7px;
+      display: block;
+    }
+
+    .input-box-minimal {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 52px;
+      padding: 0 16px;
+      border: 1.5px solid var(--color-input-border);
+      border-radius: 12px;
+      background-color: var(--color-white);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-box-minimal:focus-within {
+      border-color: var(--color-black);
+      box-shadow: 0 0 0 2px rgba(216, 166, 41, 0.25);
+    }
+
+    .input-icon-svg {
+      color: #555555;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .native-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      width: 100%;
+      font-size: 0.9rem;
+      color: var(--color-text-dark);
+      font-family: var(--font-body);
+    }
+
+    .native-input::placeholder {
+      color: #555555;
+      font-size: 0.88rem;
+    }
+
+    .btn-toggle-eye {
+      background: transparent;
+      border: none;
+      color: #6B7280;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+    }
+
+    .field-hint-text {
+      color: #6B7280;
+      font-size: 0.72rem;
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+
+    .password-strength-meter {
+      margin-top: 8px;
+      margin-bottom: 16px;
+    }
+
+    .strength-bars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .strength-bar-segment {
+      height: 4px;
+      border-radius: 999px;
+      background-color: #E5E7EB;
+      transition: background-color 0.2s ease;
+    }
+
+    .strength-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: #6B7280;
+    }
+
+    .security-shield-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #F8F8F8;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.7rem;
+      color: #374151;
+      margin-bottom: 18px;
+      width: 100%;
+    }
+
+    .security-shield-pill i {
+      color: var(--color-gold);
+      font-size: 0.9rem;
+    }
+
+    .terms-checkbox-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 24px;
+      cursor: pointer;
+    }
+
+    .custom-checkbox-square {
+      width: 20px;
+      height: 20px;
+      background-color: var(--color-gold);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      border: 1px solid #C49420;
+    }
+
+    .custom-checkbox-square i {
+      color: #000000;
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .terms-text {
+      font-size: 0.74rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+      user-select: none;
+    }
+
+    .btn-gold-submit {
+      background-color: var(--color-gold);
+      color: #000000;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 20px;
+      width: 100%;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(216, 166, 41, 0.25);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      margin-top: 24px;
+      margin-bottom: 20px;
+    }
+
+    .btn-gold-submit:hover, .btn-gold-submit:focus {
+      background-color: var(--color-gold-hover);
+      color: #000000;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline-logout {
+      background-color: var(--color-white);
+      color: var(--color-black);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 1.5px solid var(--color-input-border);
+      border-radius: 12px;
+      padding: 13px 20px;
+      width: 100%;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-outline-logout:hover {
+      background-color: #111111;
+      color: var(--color-gold);
+      border-color: #111111;
+    }
+
+    .auth-footer-link-text {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #333333;
+      margin-bottom: 20px;
+    }
+
+    .auth-alert {
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.4;
+    }
+
+    .auth-alert-error {
+      background-color: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #991B1B;
+    }
+
+    .auth-alert-success {
+      background-color: #FDF8EA;
+      border: 1px solid var(--color-gold);
+      color: #111111;
+    }
+
+    .auth-alert-info {
+      background-color: #F4F4F5;
+      border: 1px solid #E4E4E7;
+      color: #27272A;
+    }
+
+    .account-summary-card {
+      background-color: #FAFAFA;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .account-badge-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-black);
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .account-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ECECEC;
+      font-size: 0.85rem;
+      gap: 12px;
+    }
+
+    .account-detail-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .account-detail-label {
+      color: #6B7280;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .account-detail-value {
+      color: #111111;
+      font-weight: 700;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .hash-code-pill {
+      font-family: monospace;
+      font-size: 0.72rem;
+      background-color: #111111;
+      color: var(--color-gold);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .bottom-tab-bar .tab-item.active,
+    .bottom-tab-bar .tab-item.active i {
+      color: var(--color-gold);
+      font-weight: 700;
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+    <section class="auth-body-content">
+      <div class="auth-desktop-wrapper">
+
+        <div class="auth-desktop-hero-side d-none d-md-flex">
+          <div class="auth-desktop-hero-content">
+            <div class="d-flex align-items-center gap-2 mb-4">
+              <div class="emblem-wrapper" style="width: 40px; height: 40px;">
+                <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" class="emblem-img" style="width: 40px; height: 40px;" referrerpolicy="no-referrer"/>
+              </div>
+              <span class="fw-bold fs-6 text-white" style="font-family: var(--font-serif-logo); font-style: italic;">Festival Vallenato 2027</span>
+            </div>
+
+            <h2 class="fw-bold fs-3 text-white mb-3" style="font-family: var(--font-display);">Sé parte viva del folclor</h2>
+            <p class="text-secondary small mb-4" style="line-height: 1.6;">
+              Tu cuenta oficial te permite votar por tus acordeoneros, agrupaciones y piloneras favoritas en una plataforma segura y transparente.
+            </p>
+
+            <div class="d-flex flex-column gap-3 mt-2">
+              <div class="d-flex align-items-start gap-2 small text-light">
+                <i class="bi bi-check-circle-fill text-warning mt-1"></i>
+                <span>Un voto único garantizado por categoría</span>
+              </div>
+              <div class="d-flex align-items-start gap-2 small text-light">
+                <i class="bi bi-check-circle-fill text-warning mt-1"></i>
+                <span>Cifrado criptográfico PBKDF2-SHA256</span>
+              </div>
+              <div class="d-flex align-items-start gap-2 small text-light">
+                <i class="bi bi-check-circle-fill text-warning mt-1"></i>
+                <span>Bitácora de auditoría con firma SHA-256</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="small text-secondary mt-5 pt-4 border-top border-secondary">
+            Valledupar, Cesar · Patrimonio Inmaterial
+          </div>
+        </div>
+
+        <div class="auth-desktop-form-side">
+          <div class="screen-kicker">01 / TU CUENTA</div>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="auth-alert {% if message.tags == 'error' %}auth-alert-error{% elif message.tags == 'success' %}auth-alert-success{% else %}auth-alert-info{% endif %}" role="alert">
+                <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle-fill{% elif message.tags == 'success' %}bi-check-circle-fill text-warning{% else %}bi-info-circle-fill{% endif %}"></i>
+                <div>{{ message }}</div>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          {# Dos estados en la misma pantalla: con sesión -> tarjeta "Sesión activa"; sin sesión (else más abajo) -> formulario de registro/login. #}
+          {% if request.user.is_authenticated %}
+            <h1 class="screen-title">Sesión activa</h1>
+            <p class="screen-description">
+              Tu identidad está verificada y protegida con estándares criptográficos SHA-256 en la plataforma oficial del Festival.
+            </p>
+
+            {# Tarjeta de cuenta: `perfil` y `ultima_bitacora` vienen de login_view. Se muestra un extracto truncado del hash a propósito (para evidencias del informe); nunca el hash completo. #}
+            <div class="account-summary-card">
+              <div class="account-badge-verified">
+                <i class="bi bi-shield-lock-fill"></i> Cuenta Verificada · SHA-256
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Correo electrónico</span>
+                <span class="account-detail-value">{{ perfil.correo|default:request.user.email|default:request.user.username }}</span>
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Documento</span>
+                <span class="account-detail-value">{{ perfil.identificacion|default:"Registrado" }}</span>
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Rol asignado</span>
+                <span class="account-detail-value">{{ perfil.get_rol_display|default:"Votante" }}</span>
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Algoritmo de clave</span>
+                <span class="account-detail-value"><span class="hash-code-pill">PBKDF2-HMAC-SHA256</span></span>
+              </div>
+
+              {% if perfil.password_hash %}
+              <div class="account-detail-row">
+                <span class="account-detail-label">Hash almacenado</span>
+                <span class="account-detail-value"><span class="hash-code-pill">{{ perfil.password_hash|truncatechars:28 }}</span></span>
+              </div>
+              {% endif %}
+
+              {% if ultima_bitacora and ultima_bitacora.hash_sha256 %}
+              <div class="account-detail-row">
+                <span class="account-detail-label">Firma Bitácora SHA-256</span>
+                <span class="account-detail-value"><span class="hash-code-pill">{{ ultima_bitacora.hash_sha256|truncatechars:24 }}</span></span>
+              </div>
+              {% endif %}
+
+              {% if perfil.fecha_registro %}
+              <div class="account-detail-row">
+                <span class="account-detail-label">Fecha de registro</span>
+                <span class="account-detail-value">{{ perfil.fecha_registro|date:"d/m/Y H:i" }}</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <a href="{% url 'index' %}" class="btn-gold-submit" style="margin-top: 12px; margin-bottom: 12px;">
+              <span>Ir a las votaciones</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+
+            {% if request.user.is_staff or perfil.rol == 'administrador' %}
+            <a href="{% url 'panel_principal' %}" class="btn-outline-logout mb-3">
+              <i class="bi bi-speedometer2"></i>
+              <span>Ir al Panel Administrativo</span>
+            </a>
+            {% endif %}
+
+            {# Logout por POST + CSRF (no por enlace GET): evita que un <img src="/logout"> ajeno cierre la sesión del usuario. #}
+            <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+              {% csrf_token %}
+              <button type="submit" class="btn-outline-logout">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Cerrar sesión segura</span>
+              </button>
+            </form>
+
+          {% else %}
+            <h1 class="screen-title">Sé parte de la leyenda</h1>
+
+            <p class="screen-description">
+              Regístrate para elegir tus favoritos y participar con un voto único por encuesta.
+            </p>
+
+            <div class="auth-toggle-pill">
+              <button type="button" id="tabRegister" class="toggle-tab-btn {% if modo_activo != 'login' %}active{% endif %}">
+                Registrarse
+              </button>
+              <button type="button" id="tabLogin" class="toggle-tab-btn {% if modo_activo == 'login' %}active{% endif %}">
+                Iniciar sesión
+              </button>
+            </div>
+
+            {# Un único form para registro y login: el hidden `modo` le dice a login_view qué flujo ejecutar. `novalidate` deja que el servidor sea la autoridad y muestre sus mensajes en español; {% csrf_token %} es obligatorio (CsrfViewMiddleware). #}
+            <form id="authForm" method="post" action="{% url 'login' %}" novalidate>
+              {% csrf_token %}
+              <input type="hidden" name="modo" id="authModeInput" value="{{ modo_activo|default:'register' }}" />
+
+              <div class="form-group-minimal">
+                <label class="field-label" for="emailInput">Correo electrónico</label>
+                <div class="input-box-minimal">
+                  <span class="input-icon-svg">
+                    <i class="bi bi-envelope"></i>
+                  </span>
+                  <input
+                    type="email"
+                    id="emailInput"
+                    name="correo"
+                    value="{{ correo_val }}"
+                    class="native-input"
+                    placeholder="tu@correo.com"
+                    autocomplete="email"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group-minimal" id="docNumberGroup" {% if modo_activo == 'login' %}style="display: none;"{% endif %}>
+                <label class="field-label" for="docInput">Número de documento</label>
+                <div class="input-box-minimal">
+                  <span class="input-icon-svg">
+                    <i class="bi bi-person-vcard"></i>
+                  </span>
+                  <input
+                    type="text"
+                    id="docInput"
+                    name="identificacion"
+                    value="{{ identificacion_val }}"
+                    class="native-input"
+                    placeholder="Ingresa tu documento de identidad"
+                    inputmode="numeric"
+                    pattern="[0-9]{5,15}"
+                    maxlength="15"
+                    {% if modo_activo != 'login' %}required{% endif %}
+                  />
+                </div>
+              </div>
+
+              <div class="form-group-minimal" style="margin-bottom: 0;">
+                <label class="field-label" for="passwordInput">Contraseña</label>
+                <div class="input-box-minimal">
+                  <span class="input-icon-svg">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                  <input
+                    type="password"
+                    id="passwordInput"
+                    name="password"
+                    class="native-input"
+                    placeholder="Ingresa tu contraseña"
+                    autocomplete="{% if modo_activo == 'login' %}current-password{% else %}new-password{% endif %}"
+                    required
+                  />
+                  <button type="button" id="togglePasswordVisibility" class="btn-toggle-eye" aria-label="Mostrar u ocultar contraseña">
+                    <i id="passwordEyeIcon" class="bi bi-eye-slash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div id="forgotPasswordWrap" style="{% if modo_activo == 'login' %}display: block;{% else %}display: none;{% endif %} text-align: right; margin-top: 8px; margin-bottom: 8px;">
+                <span class="text-secondary small" style="font-size: 0.75rem;">¿Olvidaste tu contraseña? Solicítala con tu correo oficial</span>
+              </div>
+
+              <div class="field-hint-text" id="passwordHint" {% if modo_activo == 'login' %}style="display: none;"{% endif %}>
+                Usa al menos 8 caracteres, letras y números.
+              </div>
+
+              {# Medidor de fortaleza: lo pinta auth.js (updatePasswordStrength) en cada tecla; solo visible en modo registro. #}
+              <div class="password-strength-meter" id="passwordStrengthWrap" {% if modo_activo == 'login' %}style="display: none;"{% endif %}>
+                <div class="strength-bars">
+                  <div class="strength-bar-segment" id="strengthSeg1"></div>
+                  <div class="strength-bar-segment" id="strengthSeg2"></div>
+                  <div class="strength-bar-segment" id="strengthSeg3"></div>
+                  <div class="strength-bar-segment" id="strengthSeg4"></div>
+                </div>
+                <div class="strength-meta">
+                  <span id="strengthLabelText">Nivel de seguridad: Pendiente</span>
+                  <span><i class="bi bi-shield-lock text-warning"></i> PBKDF2-SHA256</span>
+                </div>
+              </div>
+
+              {# Aviso informativo de las protecciones activas en el backend (PBKDF2, CSRF, bloqueo). Es solo texto: la seguridad real está en views.py/settings.py. #}
+              <div class="security-shield-pill">
+                <i class="bi bi-shield-fill-check"></i>
+                <span>Protección activa: cifrado <strong>PBKDF2-SHA256</strong>, token CSRF y bloqueo tras 5 intentos fallidos.</span>
+              </div>
+
+              <div class="terms-checkbox-wrap" id="termsGroup" onclick="toggleTerms()" {% if modo_activo == 'login' %}style="display: none;"{% endif %}>
+                <div class="custom-checkbox-square" id="termsBox">
+                  <i class="bi bi-check" id="termsCheckIcon"></i>
+                </div>
+                <span class="terms-text">
+                  Acepto los términos de participación y la política de tratamiento de datos personales (Ley 1581 de 2012).
+                </span>
+                <input type="checkbox" id="termsHiddenInput" name="terminos" checked style="display:none;" {% if modo_activo != 'login' %}required{% endif %} />
+              </div>
+
+              <button type="submit" id="btnAuthSubmit" class="btn-gold-submit">
+                <span id="authSubmitText">{% if modo_activo == 'login' %}Iniciar sesión{% else %}Crear cuenta{% endif %}</span>
+                <i class="bi bi-arrow-right"></i>
+              </button>
+
+              <div class="auth-footer-link-text" id="authFooterToggle">
+                {% if modo_activo == 'login' %}
+                  ¿No tienes una cuenta? <span class="fw-semibold text-dark text-decoration-underline" style="cursor:pointer;" onclick="setAuthModeExternal('register')">Registrarse</span>
+                {% else %}
+                  ¿Ya tienes una cuenta? <span class="fw-semibold text-dark text-decoration-underline" style="cursor:pointer;" onclick="setAuthModeExternal('login')">Iniciar sesión</span>
+                {% endif %}
+              </div>
+            </form>
+          {% endif %}
+        </div>
+
+      </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}
