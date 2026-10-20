@@ -136,7 +136,19 @@ D:\no_borrar\programacion\Python\Django\
   Resultados del menú quedaron como `href="#"` hasta migrarlos.
 - **Verificación:** `manage.py check` OK; `/` y `/admin-panel/` responden **200**.
 
-### [5] Admin: Gestión de Categorías
+### [5] Módulo de Usuarios: migración de login/registro y seguridad avanzada (PBKDF2-SHA256)
+- **Rama Git:** `feature/migracion-usuarios` (actualizada con `main`).
+- **`pr_festivalVallenato/settings.py`**: configurado `PASSWORD_HASHERS` con `PBKDF2PasswordHasher` (`PBKDF2-HMAC-SHA256`), validadores de contraseñas (`AUTH_PASSWORD_VALIDATORS`), idioma `es-co` y banderas de seguridad de sesión/cookies (`HttpOnly`, `SameSite=Lax`, `X_FRAME_OPTIONS='DENY'`, `NOSNIFF`).
+- **`usuarios/models.py`**: creados los modelos `Usuario` (`db_table='usuario'`, con `identificacion`, `correo`, `password_hash` en formato `pbkdf2_sha256$...`, `rol`, `acepta_terminos`, `intentos_fallidos`, `bloqueado_hasta`, `fecha_registro`) y `Bitacora` (`db_table='bitacora'`, con `usuario`, `accion`, `detalles`, `ip_origen`, `hash_sha256` calculado con `hashlib.sha256` e inmutable, `fecha_hora`).
+- **`usuarios/admin.py`**: registrados `Usuario` y `Bitacora` en Django Admin mostrando el estado de bloqueo, intentos fallidos, IP de origen y la firma de integridad `hash_sha256`.
+- **`usuarios/migrations/0001_initial.py`**: migración inicial generada y verificada.
+- **`static/js/auth.js`**: adaptado del prototipo (`js/auth.js`) con medidor visual de fortaleza de contraseña en tiempo real, sanitización numérica del documento y alternancia entre "Registrarse" e "Iniciar sesión".
+- **`usuarios/templates/usuarios/login.html`**: migrado desde `login.html` heredando de `votaciones/base.html` (`seccion_activa='cuenta'`). Incluye barra de nivel de seguridad de contraseña, insignia de protección activa y tarjeta de "Sesión activa" que exhibe el algoritmo `PBKDF2-HMAC-SHA256`, el hash almacenado y la firma `SHA-256` de la bitácora.
+- **`usuarios/views.py`** y **`usuarios/urls.py`**: implementadas `login_view`, `registro_view` y `logout_view` con `@sensitive_post_parameters`, `@never_cache`, bloqueo preventivo de 15 minutos tras 5 intentos fallidos (CU-03 4c), mitigación de ataques de tiempo (anti-enumeración) y validación OWASP de claves.
+- **`votaciones/templates/votaciones/base.html`** e **`index.html`**: actualizados los enlaces de "Mi cuenta", "Regístrate", "Registro y Cuenta" y "Administración" a `{% url 'login' %}` y `{% url 'panel_principal' %}`.
+- **`usuarios/tests.py`**: 6 pruebas automatizadas de seguridad (renderizado, cifrado PBKDF2-SHA256 + firma SHA-256 en bitácora, prevención de duplicados, login/logout, bloqueo tras 5 intentos fallidos y rechazo de inyecciones/claves débiles).
+
+### [6] Admin: Gestión de Categorías
 - **`administracion/templates/administracion/categorias.html`**: migración de `admin-categorias.html`. Hereda de
   `admin_base.html`. El contenido (header, 3 KPIs simples, catálogo con búsqueda/filtro, tabla de categorías,
   paginación, tarjetas informativas y nota al pie) va en `{% block contenido %}`; los modales (nueva/editar
@@ -149,19 +161,6 @@ D:\no_borrar\programacion\Python\Django\
 - **`_admin_sidebar_nav.html`**: el ítem "Categorías" ahora apunta a `{% url 'categorias' %}`.
 - **Convenio:** `admin_base.html` no define `--color-gold-text`; en `categorias.html` se usó `#B48216` directo.
 - **Verificación:** `manage.py check` OK; `/admin-panel/categorias/` y `/admin-panel/` responden **200**.
-
-
-### [5] Módulo de Usuarios: migración de login/registro y seguridad avanzada (PBKDF2-SHA256)
-- **Rama Git:** `feature/migracion-usuarios` (actualizada con `main`).
-- **`pr_festivalVallenato/settings.py`**: configurado `PASSWORD_HASHERS` con `PBKDF2PasswordHasher` (`PBKDF2-HMAC-SHA256`), validadores de contraseñas (`AUTH_PASSWORD_VALIDATORS`), idioma `es-co` y banderas de seguridad de sesión/cookies (`HttpOnly`, `SameSite=Lax`, `X_FRAME_OPTIONS='DENY'`, `NOSNIFF`).
-- **`usuarios/models.py`**: creados los modelos `Usuario` (`db_table='usuario'`, con `identificacion`, `correo`, `password_hash` en formato `pbkdf2_sha256$...`, `rol`, `acepta_terminos`, `intentos_fallidos`, `bloqueado_hasta`, `fecha_registro`) y `Bitacora` (`db_table='bitacora'`, con `usuario`, `accion`, `detalles`, `ip_origen`, `hash_sha256` calculado con `hashlib.sha256` e inmutable, `fecha_hora`).
-- **`usuarios/admin.py`**: registrados `Usuario` y `Bitacora` en Django Admin mostrando el estado de bloqueo, intentos fallidos, IP de origen y la firma de integridad `hash_sha256`.
-- **`usuarios/migrations/0001_initial.py`**: migración inicial generada y verificada.
-- **`static/js/auth.js`**: adaptado del prototipo (`js/auth.js`) con medidor visual de fortaleza de contraseña en tiempo real, sanitización numérica del documento y alternancia entre "Registrarse" e "Iniciar sesión".
-- **`usuarios/templates/usuarios/login.html`**: migrado desde `login.html` heredando de `votaciones/base.html` (`seccion_activa='cuenta'`). Incluye barra de nivel de seguridad de contraseña, insignia de protección activa y tarjeta de "Sesión activa" que exhibe el algoritmo `PBKDF2-HMAC-SHA256`, el hash almacenado y la firma `SHA-256` de la bitácora.
-- **`usuarios/views.py`** y **`usuarios/urls.py`**: implementadas `login_view`, `registro_view` y `logout_view` con `@sensitive_post_parameters`, `@never_cache`, bloqueo preventivo de 15 minutos tras 5 intentos fallidos (CU-03 4c), mitigación de ataques de tiempo (anti-enumeración) y validación OWASP de claves.
-- **`votaciones/templates/votaciones/base.html`** e **`index.html`**: actualizados los enlaces de "Mi cuenta", "Regístrate", "Registro y Cuenta" y "Administración" a `{% url 'login' %}` y `{% url 'panel_principal' %}`.
-- **`usuarios/tests.py`**: 6 pruebas automatizadas de seguridad (renderizado, cifrado PBKDF2-SHA256 + firma SHA-256 en bitácora, prevención de duplicados, login/logout, bloqueo tras 5 intentos fallidos y rechazo de inyecciones/claves débiles).
 
 ## 5. Vistas pendientes (por migrar del prototipo)
 
