@@ -88,27 +88,59 @@ DATABASES = {
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
+    # Rechaza claves parecidas al correo/documento (se alimenta con el `user` que pasamos en la vista).
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
+    # Largo mínimo explícito en 8 (coincide con la regla de la UI y el texto de ayuda del formulario).
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        },
     },
+    # Bloquea las ~20k contraseñas más comunes ("password", "12345678"...).
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
+    # Impide claves compuestas solo por números.
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
+# El PRIMER hasher de la lista es el que se usa para hashear claves nuevas: PBKDF2-HMAC-SHA256
+# (con salt aleatorio y miles de iteraciones, el estándar recomendado por Django/OWASP).
+# El segundo (PBKDF2-SHA1) solo está para poder VERIFICAR hashes viejos; cuando alguien inicie
+# sesión con uno de esos, Django lo re-hashea solo al algoritmo principal.
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+]
+
+# HttpOnly: JavaScript no puede leer la cookie de sesión (mitiga robo de sesión vía XSS).
+SESSION_COOKIE_HTTPONLY = True
+# Lax: la cookie no viaja en peticiones cross-site "peligrosas" (POST de otro dominio), frena CSRF.
+SESSION_COOKIE_SAMESITE = 'Lax'
+# La sesión expira a la hora (en segundos).
+SESSION_COOKIE_AGE = 3600
+# Ojo: con CSRF_COOKIE_HTTPONLY el JS no puede leer el token. Está bien porque usamos
+# {% csrf_token %} en los forms; si algún día hacemos fetch/AJAX habrá que leerlo del DOM.
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+# Evita que el navegador "adivine" el tipo MIME (MIME sniffing).
+SECURE_CONTENT_TYPE_NOSNIFF = True
+# Prohíbe que el sitio se cargue dentro de un iframe (anti clickjacking).
+# TODO producción (con HTTPS): activar SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE y SECURE_SSL_REDIRECT.
+X_FRAME_OPTIONS = 'DENY'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-co'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
