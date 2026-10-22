@@ -266,7 +266,7 @@ class PerfilUsuarioTests(TestCase):
 
     def cambiar_password(self, actual, nueva, confirmacion=None):
         return self.client.post(
-            reverse('perfil'),
+            reverse('perfil_contrasena'),
             {
                 'password_actual': actual,
                 'password_nueva': nueva,
@@ -300,14 +300,39 @@ class PerfilUsuarioTests(TestCase):
         response = self.client.get(reverse('login'))
         self.assertRedirects(response, reverse('perfil'), fetch_redirect_response=False)
 
-    def test_perfil_muestra_datos_y_actividad_firmada(self):
+    def test_secciones_del_perfil_requieren_sesion(self):
+        for nombre in ('perfil', 'perfil_contrasena', 'perfil_actividad'):
+            with self.subTest(seccion=nombre):
+                response = self.client.get(reverse(nombre))
+                self.assertRedirects(response, f"{reverse('login')}?next={reverse(nombre)}", fetch_redirect_response=False)
+
+    def test_menu_lateral_marca_la_seccion_activa(self):
+        self.registrar('menu@correo.com', '1065707070')
+        secciones = [
+            ('perfil', 'datos', 'usuarios/perfil_datos.html'),
+            ('perfil_contrasena', 'contrasena', 'usuarios/perfil_contrasena.html'),
+            ('perfil_actividad', 'actividad', 'usuarios/perfil_actividad.html'),
+        ]
+        for nombre, seccion, template in secciones:
+            with self.subTest(seccion=seccion):
+                response = self.client.get(reverse(nombre))
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(response, 'usuarios/perfil_base.html')
+                self.assertTemplateUsed(response, template)
+                self.assertEqual(response.context['seccion_perfil'], seccion)
+                # Solo el enlace de la sección actual lleva aria-current.
+                self.assertContains(response, 'aria-current="page"', count=1)
+
+    def test_perfil_muestra_datos(self):
         self.registrar('datos@correo.com', '1065303030')
         response = self.client.get(reverse('perfil'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'usuarios/perfil.html')
         self.assertEqual(response.context['perfil'].identificacion, '1065303030')
         self.assertIsNotNone(response.context['iteraciones'])
+        self.assertContains(response, '1065303030')
 
+    def test_actividad_muestra_eventos_con_firma_verificada(self):
+        self.registrar('actividad@correo.com', '1065808080')
+        response = self.client.get(reverse('perfil_actividad'))
         # El registro aparece en "Mi actividad" con su firma verificada.
         actividad = response.context['actividad']
         self.assertEqual(actividad[0].accion, 'Registro de cuenta')
@@ -322,7 +347,7 @@ class PerfilUsuarioTests(TestCase):
         self.assertEqual(otra_sesion.get(reverse('perfil')).status_code, 200)
 
         response = self.cambiar_password(self.PASSWORD, 'Acordeon2027Nueva')
-        self.assertRedirects(response, reverse('perfil'), fetch_redirect_response=False)
+        self.assertRedirects(response, reverse('perfil_contrasena'), fetch_redirect_response=False)
 
         perfil = Usuario.objects.get(correo='cambio@correo.com')
         self.assertTrue(perfil.user.check_password('Acordeon2027Nueva'))

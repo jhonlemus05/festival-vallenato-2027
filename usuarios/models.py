@@ -140,6 +140,11 @@ class Usuario(models.Model):
             self.bloqueado_hasta = None
             self.save(update_fields=['intentos_fallidos', 'bloqueado_hasta'])
 
+    @property
+    def nombre_visible(self):
+        """Parte del correo antes de la @. El modelo no guarda nombre, así que es lo que se muestra en el perfil."""
+        return self.correo.split('@')[0]
+
     def __str__(self):
         return f"{self.correo} ({self.identificacion})"
 

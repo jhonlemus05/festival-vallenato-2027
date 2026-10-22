@@ -1,0 +1,458 @@
+{% extends 'votaciones/base.html' %}
+{% load static %}
+
+{# Base de las pantallas del perfil (Mis datos, Cambiar contraseña, Mi actividad): avatar + menú lateral a la izquierda y la sección elegida a la derecha. `seccion_perfil` (lo pone cada vista) marca la opción activa, igual que `seccion_admin` en admin_base.html. #}
+
+{% block extra_css %}
+  {# Estilos compartidos con login.html (campos, botones, alertas, medidor). Aquí solo va lo propio del perfil. #}
+  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
+  <style>
+    .app-header {
+      border-bottom: 1.5px solid var(--color-gold);
+    }
+
+    .perfil-wrapper {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .perfil-layout {
+      display: grid;
+      gap: 20px;
+    }
+
+    /* --- Menú lateral (en celular va arriba, con las opciones en fila) --- */
+
+    .perfil-sidebar {
+      background-color: var(--color-black);
+      border-radius: 20px;
+      padding: 18px;
+      color: #FFFFFF;
+    }
+
+    .perfil-identidad {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .perfil-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--color-gold);
+      color: #000000;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      /* Doble anillo (negro + dorado) para separarlo del fondo negro del menú. */
+      box-shadow: 0 0 0 3px var(--color-black), 0 0 0 5px var(--color-gold);
+    }
+
+    .perfil-identidad-texto {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .perfil-nombre {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    /* Correo completo en una línea; si no cabe, termina en "…" (el title lo muestra entero). */
+    .perfil-correo {
+      font-size: 0.74rem;
+      color: #9CA3AF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .perfil-rol-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid rgba(216, 166, 41, 0.45);
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-top: 6px;
+    }
+
+    .perfil-miembro {
+      font-size: 0.72rem;
+      color: #9CA3AF;
+      margin-top: 4px;
+    }
+
+    .perfil-menu-label {
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6B7280;
+      margin: 24px 0 8px 6px;
+    }
+
+    .perfil-menu {
+      list-style: none;
+      margin: 18px 0 0 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .perfil-menu-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      color: #9CA3AF;
+      text-decoration: none;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .perfil-menu-link i {
+      font-size: 1.15rem;
+    }
+
+    .perfil-menu-link:hover {
+      color: #FFFFFF;
+      background-color: #121214;
+    }
+
+    .perfil-menu-link.active {
+      background-color: #18181A;
+      border-color: rgba(216, 166, 41, 0.25);
+      color: var(--color-gold);
+      font-weight: 700;
+    }
+
+    /* Accesos secundarios (votaciones, panel, cerrar sesión). En celular ya están en el menú hamburguesa. */
+    .perfil-sidebar-pie {
+      border-top: 1px solid #1F1F23;
+      margin-top: 18px;
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .perfil-sidebar-pie .perfil-menu-link {
+      width: 100%;
+      background: none;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .perfil-sidebar-pie .perfil-menu-salir:hover {
+      color: #FCA5A5;
+    }
+
+    /* --- Contenido de cada sección --- */
+
+    .perfil-card {
+      background-color: var(--color-white);
+      border: 1.5px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .account-badge-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-black);
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .account-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ECECEC;
+      font-size: 0.85rem;
+      gap: 12px;
+    }
+
+    .account-detail-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .account-detail-label {
+      color: #6B7280;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .account-detail-value {
+      color: #111111;
+      font-weight: 700;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .hash-code-pill {
+      font-family: monospace;
+      font-size: 0.72rem;
+      background-color: #111111;
+      color: var(--color-gold);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .actividad-resumen {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #F8F8F8;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.74rem;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .actividad-resumen i {
+      color: var(--color-gold);
+    }
+
+    .actividad-lista {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .actividad-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #ECECEC;
+    }
+
+    .actividad-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .actividad-icono {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background-color: #111111;
+      color: var(--color-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .actividad-icono.riesgo {
+      background-color: #FEF2F2;
+      color: #B91C1C;
+    }
+
+    .actividad-cuerpo {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .actividad-accion {
+      font-family: var(--font-display);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--color-text-dark);
+    }
+
+    .actividad-detalles {
+      font-size: 0.76rem;
+      color: #4B5563;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .actividad-meta {
+      font-size: 0.72rem;
+      color: #6B7280;
+      margin-top: 2px;
+    }
+
+    .firma-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .firma-ok {
+      background-color: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #047857;
+    }
+
+    .firma-mal {
+      background-color: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #B91C1C;
+    }
+
+    /* --- Escritorio: menú en columna a la izquierda --- */
+
+    @media (min-width: 768px) {
+      .perfil-wrapper {
+        margin: 40px auto 20px auto;
+      }
+
+      .perfil-layout {
+        grid-template-columns: 270px 1fr;
+        align-items: start;
+        gap: 28px;
+      }
+
+      .perfil-sidebar {
+        padding: 28px 18px 18px 18px;
+      }
+
+      .perfil-identidad {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+
+      .perfil-avatar {
+        width: 88px;
+        height: 88px;
+        font-size: 2.2rem;
+        margin-bottom: 4px;
+      }
+
+      .perfil-menu {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        margin-top: 0;
+      }
+
+      .perfil-menu-link {
+        flex-direction: row;
+        gap: 12px;
+        padding: 10px 14px;
+        font-size: 0.88rem;
+        font-weight: 500;
+        text-align: left;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+    <section class="auth-body-content">
+      <div class="perfil-wrapper">
+        <div class="perfil-layout">
+
+          <aside class="perfil-sidebar" aria-label="Menú de mi perfil">
+            <div class="perfil-identidad">
+              {# No hay foto en el modelo: el avatar es la inicial del correo. #}
+              <div class="perfil-avatar" aria-hidden="true">{{ perfil.nombre_visible|first|upper }}</div>
+              <div class="perfil-identidad-texto">
+                <div class="perfil-nombre">{{ perfil.nombre_visible }}</div>
+                <div class="perfil-correo" title="{{ perfil.correo }}">{{ perfil.correo }}</div>
+                <span class="perfil-rol-badge"><i class="bi bi-shield-lock-fill"></i> {{ perfil.get_rol_display }}</span>
+                <div class="perfil-miembro">Miembro desde {{ perfil.fecha_registro|date:"d/m/Y" }}</div>
+              </div>
+            </div>
+
+            <div class="perfil-menu-label d-none d-md-block">Mi cuenta</div>
+            {# En celular se ve el texto corto (las 3 opciones van en una fila); en escritorio, el largo. #}
+            <ul class="perfil-menu">
+              <li>
+                <a href="{% url 'perfil' %}" class="perfil-menu-link {% if seccion_perfil == 'datos' %}active{% endif %}" {% if seccion_perfil == 'datos' %}aria-current="page"{% endif %}>
+                  <i class="bi bi-person-vcard"></i>
+                  <span>Mis datos</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'perfil_contrasena' %}" class="perfil-menu-link {% if seccion_perfil == 'contrasena' %}active{% endif %}" {% if seccion_perfil == 'contrasena' %}aria-current="page"{% endif %}>
+                  <i class="bi bi-key"></i>
+                  <span class="d-md-none">Contraseña</span>
+                  <span class="d-none d-md-inline">Cambiar contraseña</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'perfil_actividad' %}" class="perfil-menu-link {% if seccion_perfil == 'actividad' %}active{% endif %}" {% if seccion_perfil == 'actividad' %}aria-current="page"{% endif %}>
+                  <i class="bi bi-clock-history"></i>
+                  <span class="d-md-none">Actividad</span>
+                  <span class="d-none d-md-inline">Mi actividad</span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="perfil-sidebar-pie d-none d-md-flex">
+              <a href="{% url 'index' %}" class="perfil-menu-link">
+                <i class="bi bi-check2-circle"></i>
+                <span>Ir a las votaciones</span>
+              </a>
+              {% if request.user.is_staff or perfil.rol == 'administrador' %}
+              <a href="{% url 'panel_principal' %}" class="perfil-menu-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Panel administrativo</span>
+              </a>
+              {% endif %}
+              {# Logout por POST + CSRF (logout_view tiene @require_POST). #}
+              <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="perfil-menu-link perfil-menu-salir">
+                  <i class="bi bi-box-arrow-right"></i>
+                  <span>Cerrar sesión</span>
+                </button>
+              </form>
+            </div>
+          </aside>
+
+          <div class="perfil-contenido">
+            <div class="screen-kicker">02 / MI PERFIL</div>
+
+            {% include 'usuarios/_mensajes.html' %}
+
+            <h1 class="screen-title">{% block perfil_titulo %}{% endblock %}</h1>
+            <p class="screen-description">{% block perfil_descripcion %}{% endblock %}</p>
+
+            {% block perfil_contenido %}{% endblock %}
+          </div>
+
+        </div>
+      </div>
+    </section>
+{% endblock %}

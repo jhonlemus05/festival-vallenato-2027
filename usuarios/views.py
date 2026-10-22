@@ -319,15 +319,41 @@ def registro_view(request):
     return login_view(request, modo_inicial='register')
 
 
-# login_required: sin sesión redirige a settings.LOGIN_URL con ?next=/usuarios/perfil/.
-@sensitive_post_parameters('password_actual', 'password_nueva', 'password_confirmacion')
+# Las tres pantallas del perfil comparten perfil_base.html (avatar + menú lateral).
+# `seccion_perfil` marca la opción activa del menú, igual que `seccion_admin` en el panel.
+# login_required: sin sesión redirige a settings.LOGIN_URL con ?next=<la URL pedida>.
 @login_required
 @never_cache
 def perfil_view(request):
+    """Perfil > Mis datos: datos del votante y del hash de su contraseña."""
+    perfil = obtener_perfil(request.user)
+
+    # El hash de Django tiene la forma algoritmo$iteraciones$salt$hash. Las iteraciones se
+    # muestran como evidencia del costo de PBKDF2 (formato colombiano: 1.500.000).
+    partes_hash = perfil.password_hash.split('$')
+    iteraciones = None
+    if len(partes_hash) == 4 and partes_hash[1].isdigit():
+        iteraciones = f'{int(partes_hash[1]):,}'.replace(',', '.')
+
+    return render(
+        request,
+        'usuarios/perfil_datos.html',
+        {
+            'seccion_activa': 'cuenta',
+            'seccion_perfil': 'datos',
+            'perfil': perfil,
+            'iteraciones': iteraciones,
+        },
+    )
+
+
+@sensitive_post_parameters('password_actual', 'password_nueva', 'password_confirmacion')
+@login_required
+@never_cache
+def perfil_contrasena_view(request):
     """
-    Perfil del votante: sus datos, el cambio de contraseña y su actividad en la bitácora.
-    El único POST que procesa es el cambio de contraseña; si sale bien redirige (patrón
-    PRG) para que recargar la página no reenvíe el formulario.
+    Perfil > Cambiar contraseña. Si sale bien redirige (patrón PRG) para que recargar
+    la página no reenvíe el formulario.
     """
     perfil = obtener_perfil(request.user)
 
@@ -394,14 +420,24 @@ def perfil_view(request):
                     'Contraseña actualizada con cifrado PBKDF2-SHA256; se cerraron las demás sesiones abiertas',
                 )
                 messages.success(request, 'Tu contraseña se actualizó con cifrado PBKDF2-SHA256. Las demás sesiones abiertas se cerraron.')
-                return redirect('perfil')
+                return redirect('perfil_contrasena')
 
-    # El hash de Django tiene la forma algoritmo$iteraciones$salt$hash. Las iteraciones se
-    # muestran como evidencia del costo de PBKDF2 (formato colombiano: 1.500.000).
-    partes_hash = perfil.password_hash.split('$')
-    iteraciones = None
-    if len(partes_hash) == 4 and partes_hash[1].isdigit():
-        iteraciones = f'{int(partes_hash[1]):,}'.replace(',', '.')
+    return render(
+        request,
+        'usuarios/perfil_contrasena.html',
+        {
+            'seccion_activa': 'cuenta',
+            'seccion_perfil': 'contrasena',
+            'perfil': perfil,
+        },
+    )
+
+
+@login_required
+@never_cache
+def perfil_actividad_view(request):
+    """Perfil > Mi actividad: últimos eventos de la bitácora con su firma verificada."""
+    perfil = obtener_perfil(request.user)
 
     # Bitacora.Meta.ordering es -fecha_hora: los más recientes primero. Se verifica la firma
     # de cada evento aquí para no recalcularla dos veces en el template.
@@ -411,11 +447,11 @@ def perfil_view(request):
 
     return render(
         request,
-        'usuarios/perfil.html',
+        'usuarios/perfil_actividad.html',
         {
             'seccion_activa': 'cuenta',
+            'seccion_perfil': 'actividad',
             'perfil': perfil,
-            'iteraciones': iteraciones,
             'actividad': actividad,
             'firmas_validas': sum(1 for evento in actividad if evento.firma_ok),
         },

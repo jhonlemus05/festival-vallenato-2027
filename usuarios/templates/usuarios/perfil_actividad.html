@@ -1,0 +1,51 @@
+{% extends 'usuarios/perfil_base.html' %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | Mi actividad{% endblock %}
+{% block descripcion %}Revisa la actividad reciente de tu cuenta en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+
+{% block perfil_titulo %}Mi actividad{% endblock %}
+{% block perfil_descripcion %}Últimos eventos de tu cuenta en la bitácora de auditoría. Cada uno lleva una firma SHA-256: si alguien altera el registro, la firma deja de coincidir.{% endblock %}
+
+{% block perfil_contenido %}
+  <div class="perfil-card">
+    {% if actividad %}
+      <div class="actividad-resumen">
+        <i class="bi bi-patch-check-fill"></i>
+        <span><strong>{{ firmas_validas }} de {{ actividad|length }}</strong> firmas verificadas</span>
+      </div>
+
+      <ul class="actividad-lista">
+        {% for evento in actividad %}
+        <li class="actividad-item">
+          {# Intentos fallidos y bloqueos se marcan en rojo para que salten a la vista. #}
+          <div class="actividad-icono {% if 'Intento' in evento.accion or 'Bloqueo' in evento.accion %}riesgo{% endif %}">
+            {% if 'Intento' in evento.accion or 'Bloqueo' in evento.accion %}
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            {% elif 'Cierre' in evento.accion %}
+              <i class="bi bi-box-arrow-right"></i>
+            {% elif 'Cambio' in evento.accion %}
+              <i class="bi bi-key-fill"></i>
+            {% elif 'Registro' in evento.accion %}
+              <i class="bi bi-person-plus-fill"></i>
+            {% else %}
+              <i class="bi bi-box-arrow-in-right"></i>
+            {% endif %}
+          </div>
+          <div class="actividad-cuerpo">
+            <div class="actividad-accion">{{ evento.accion }}</div>
+            {% if evento.detalles %}<div class="actividad-detalles">{{ evento.detalles }}</div>{% endif %}
+            <div class="actividad-meta">{{ evento.fecha_hora|date:"d/m/Y H:i:s" }} · IP {{ evento.ip_origen|default:"desconocida" }}</div>
+          </div>
+          {% if evento.firma_ok %}
+            <span class="firma-badge firma-ok" title="Firma {{ evento.hash_sha256|truncatechars:20 }}"><i class="bi bi-check-lg"></i> Firma válida</span>
+          {% else %}
+            <span class="firma-badge firma-mal" title="La firma guardada no coincide con los datos del evento"><i class="bi bi-x-lg"></i> No coincide</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-secondary small mb-0">Aún no hay actividad registrada en tu cuenta.</p>
+    {% endif %}
+  </div>
+{% endblock %}

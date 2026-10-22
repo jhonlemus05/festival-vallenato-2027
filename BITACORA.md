@@ -27,7 +27,7 @@ D:\no_borrar\programacion\Python\Django\
 │   └── wsgi.py / asgi.py
 ├── static\                         # Estáticos globales (STATICFILES_DIRS)
 │   ├── css\responsive.css
-│   ├── css\usuarios.css             # Estilos compartidos de login.html y perfil.html
+│   ├── css\usuarios.css             # Estilos compartidos de login.html y del perfil
 │   ├── js\countdown.js
 │   ├── js\navigation.js
 │   ├── js\admin.js
@@ -38,12 +38,15 @@ D:\no_borrar\programacion\Python\Django\
 │   ├── migrations\0002_alter_bitacora_fecha_hora.py  # fecha_hora con default (firma verificable)
 │   ├── templates\usuarios\
 │   │   ├── login.html              # Registro e Inicio de sesión
-│   │   ├── perfil.html             # Mi perfil: datos, cambio de contraseña y actividad
+│   │   ├── perfil_base.html        # Base del perfil: avatar + menú lateral (seccion_perfil)
+│   │   ├── perfil_datos.html       # Perfil > Mis datos
+│   │   ├── perfil_contrasena.html  # Perfil > Cambiar contraseña
+│   │   ├── perfil_actividad.html   # Perfil > Mi actividad
 │   │   └── _mensajes.html          # Parcial de alertas (django.contrib.messages)
 │   ├── models.py                   # Usuario (tabla 'usuario') y Bitacora (tabla 'bitacora')
 │   ├── admin.py                    # Registro en Django Admin
-│   ├── urls.py                     # '' , 'login/', 'registro/', 'perfil/', 'logout/'
-│   ├── views.py                    # login_view, registro_view, perfil_view, logout_view
+│   ├── urls.py                     # '' , 'login/', 'registro/', 'perfil/' (+ contrasena/, actividad/), 'logout/'
+│   ├── views.py                    # login_view, registro_view, perfil_*_view, logout_view
 │   └── tests.py                    # Pruebas de registro, login, logout, bitácora y perfil
 ├── votaciones\                     # APP 2: experiencia pública (MIGRANDO)
 │   ├── templates\votaciones\
@@ -67,7 +70,7 @@ D:\no_borrar\programacion\Python\Django\
 - **Python/pip:** usar `env_django\Scripts\python.exe` (ej: `& "env_django\Scripts\python.exe" manage.py check`).
 - **Rutas Django:**
   - `votaciones` montada en **`/`** (raíz). Inicio: `http://127.0.0.1:8000/` (nombre de URL `index`).
-  - `usuarios` en `/usuarios/` (`login`, `registro`, `perfil`, `logout`) y `administracion` en `/admin-panel/` (`panel_principal`).
+  - `usuarios` en `/usuarios/` (`login`, `registro`, `perfil`, `perfil_contrasena`, `perfil_actividad`, `logout`) y `administracion` en `/admin-panel/` (`panel_principal`).
 - **Estáticos:** referenciar con `{% static '...' %}`. `settings.py` tiene `STATICFILES_DIRS = [BASE_DIR / 'static']`.
 - **Plantillas:** cada página hereda de la base de su app:
   - Público: `votaciones/base.html` (bloques `titulo`, `descripcion`, `contenido`, `extra_css`, `extra_js`).
@@ -205,6 +208,24 @@ D:\no_borrar\programacion\Python\Django\
 - **Verificación:** probado en navegador (escritorio y móvil): `/usuarios/perfil/` sin sesión → login → perfil;
   cambio de contraseña con clave actual errónea y correcta; "Mi actividad" con firmas válidas/no válidas.
 
+### [9] Usuarios: perfil organizado con menú lateral
+- **Rama Git:** `feature/migracion-usuarios`.
+- **Plantillas**: `perfil.html` se dividió en **`perfil_base.html`** (avatar con la inicial, nombre, correo, rol,
+  "Miembro desde" y menú lateral: Mis datos, Cambiar contraseña, Mi actividad; abajo "Ir a las votaciones",
+  "Panel administrativo" para admins y "Cerrar sesión") y una plantilla por opción: **`perfil_datos.html`**,
+  **`perfil_contrasena.html`** y **`perfil_actividad.html`**. Igual que `admin_base.html`, la opción activa la
+  marca la variable `seccion_perfil`.
+- **Responsive**: en escritorio el menú es una columna de 270px a la izquierda; en celular va arriba con las 3
+  opciones en fila (los accesos de abajo se ocultan porque ya están en el menú hamburguesa).
+- **`usuarios/views.py`**: `perfil_view` (Mis datos), `perfil_contrasena_view` (el POST del cambio de clave,
+  redirige a sí misma) y `perfil_actividad_view`.
+- **`usuarios/urls.py`**: `perfil/`, `perfil/contrasena/` (`perfil_contrasena`) y `perfil/actividad/` (`perfil_actividad`).
+- **`usuarios/models.py`**: propiedad `Usuario.nombre_visible` (parte del correo antes de la @) para el menú.
+- **Nota:** el menú no queda fijo al hacer scroll (`position: sticky`) porque `main.app-viewport` de
+  `votaciones/base.html` tiene `overflow` y lo impide.
+- **`usuarios/tests.py`**: 3 pruebas nuevas (las 3 secciones piden sesión, el menú marca la sección activa,
+  Mi actividad por separado). Total: **18 pruebas OK**.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):
@@ -215,7 +236,8 @@ Públicas (app `votaciones`):
 
 Autenticación (app `usuarios`):
 - [x] `login.html` -> `usuarios/templates/usuarios/login.html` (vistas `login`, `registro`, `logout` en `/usuarios/login/`)
-- [x] (nueva, sin prototipo) `usuarios/templates/usuarios/perfil.html` (vista `perfil` en `/usuarios/perfil/`)
+- [x] (nueva, sin prototipo) perfil: `perfil_base.html` + `perfil_datos.html`, `perfil_contrasena.html`,
+  `perfil_actividad.html` (en `/usuarios/perfil/`, `/usuarios/perfil/contrasena/`, `/usuarios/perfil/actividad/`)
 
 Admin (app `administracion`, usar `admin_base.html`):
 - [x] `admin.html` -> `panel_principal.html` (vista `panel_principal`, `/admin-panel/`)

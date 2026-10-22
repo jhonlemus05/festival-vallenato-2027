@@ -1,0 +1,102 @@
+{% extends 'usuarios/perfil_base.html' %}
+{% load static %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | Cambiar contraseña{% endblock %}
+{% block descripcion %}Cambia la contraseña de tu cuenta en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+
+{% block perfil_titulo %}Cambiar contraseña{% endblock %}
+{% block perfil_descripcion %}Confirma tu contraseña actual. Al cambiarla se cierran las demás sesiones abiertas de tu cuenta.{% endblock %}
+
+{% block perfil_contenido %}
+  <div class="perfil-card">
+    {# novalidate: el servidor (perfil_contrasena_view) es la autoridad y responde con mensajes en español. Las contraseñas nunca se devuelven al template. #}
+    <form method="post" action="{% url 'perfil_contrasena' %}" novalidate>
+      {% csrf_token %}
+
+      <div class="form-group-minimal">
+        <label class="field-label" for="passwordActualInput">Contraseña actual</label>
+        <div class="input-box-minimal">
+          <span class="input-icon-svg">
+            <i class="bi bi-lock"></i>
+          </span>
+          <input
+            type="password"
+            id="passwordActualInput"
+            name="password_actual"
+            class="native-input"
+            placeholder="Ingresa tu contraseña actual"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+      </div>
+
+      {# Los id passwordInput / togglePasswordVisibility / strengthSeg* son los que busca auth.js: así se reutilizan el ojo y el medidor del registro sin JS nuevo. #}
+      <div class="form-group-minimal" style="margin-bottom: 0;">
+        <label class="field-label" for="passwordInput">Nueva contraseña</label>
+        <div class="input-box-minimal">
+          <span class="input-icon-svg">
+            <i class="bi bi-shield-lock"></i>
+          </span>
+          <input
+            type="password"
+            id="passwordInput"
+            name="password_nueva"
+            class="native-input"
+            placeholder="Ingresa la nueva contraseña"
+            autocomplete="new-password"
+            required
+          />
+          <button type="button" id="togglePasswordVisibility" class="btn-toggle-eye" aria-label="Mostrar u ocultar contraseña">
+            <i id="passwordEyeIcon" class="bi bi-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="field-hint-text">
+        Usa al menos 8 caracteres, letras y números.
+      </div>
+
+      <div class="password-strength-meter">
+        <div class="strength-bars">
+          <div class="strength-bar-segment" id="strengthSeg1"></div>
+          <div class="strength-bar-segment" id="strengthSeg2"></div>
+          <div class="strength-bar-segment" id="strengthSeg3"></div>
+          <div class="strength-bar-segment" id="strengthSeg4"></div>
+        </div>
+        <div class="strength-meta">
+          <span id="strengthLabelText">Nivel de seguridad: Pendiente</span>
+          <span><i class="bi bi-shield-lock text-warning"></i> PBKDF2-SHA256</span>
+        </div>
+      </div>
+
+      <div class="form-group-minimal" style="margin-bottom: 0;">
+        <label class="field-label" for="passwordConfirmInput">Confirmar nueva contraseña</label>
+        <div class="input-box-minimal">
+          <span class="input-icon-svg">
+            <i class="bi bi-shield-check"></i>
+          </span>
+          <input
+            type="password"
+            id="passwordConfirmInput"
+            name="password_confirmacion"
+            class="native-input"
+            placeholder="Repite la nueva contraseña"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+      </div>
+
+      <button type="submit" class="btn-gold-submit" style="margin-bottom: 0;">
+        <span>Actualizar contraseña</span>
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </form>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {# Solo para el ojo y el medidor de fortaleza de la nueva contraseña (ver comentario del formulario). #}
+  <script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}
