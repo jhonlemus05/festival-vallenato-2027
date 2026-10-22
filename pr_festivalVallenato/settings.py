@@ -134,6 +134,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 # TODO producción (con HTTPS): activar SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE y SECURE_SSL_REDIRECT.
 X_FRAME_OPTIONS = 'DENY'
 
+# A dónde manda @login_required a quien no tiene sesión (nombre de URL de usuarios/urls.py).
+LOGIN_URL = 'login'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/

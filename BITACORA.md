@@ -27,6 +27,7 @@ D:\no_borrar\programacion\Python\Django\
 │   └── wsgi.py / asgi.py
 ├── static\                         # Estáticos globales (STATICFILES_DIRS)
 │   ├── css\responsive.css
+│   ├── css\usuarios.css             # Estilos compartidos de login.html y perfil.html
 │   ├── js\countdown.js
 │   ├── js\navigation.js
 │   ├── js\admin.js
@@ -34,13 +35,16 @@ D:\no_borrar\programacion\Python\Django\
 │   └── images\hero_accordionist_banner_1791518403166.jpg
 ├── usuarios\                       # APP 1: autenticación (MIGRADA + FUNCIONAL)
 │   ├── migrations\0001_initial.py  # Modelos Usuario y Bitacora
+│   ├── migrations\0002_alter_bitacora_fecha_hora.py  # fecha_hora con default (firma verificable)
 │   ├── templates\usuarios\
-│   │   └── login.html              # Registro, Inicio de sesión y Mi cuenta
+│   │   ├── login.html              # Registro e Inicio de sesión
+│   │   ├── perfil.html             # Mi perfil: datos, cambio de contraseña y actividad
+│   │   └── _mensajes.html          # Parcial de alertas (django.contrib.messages)
 │   ├── models.py                   # Usuario (tabla 'usuario') y Bitacora (tabla 'bitacora')
 │   ├── admin.py                    # Registro en Django Admin
-│   ├── urls.py                     # '' , 'login/', 'registro/', 'logout/'
-│   ├── views.py                    # login_view, registro_view, logout_view
-│   └── tests.py                    # Pruebas unitarias de registro, login, logout y bitácora
+│   ├── urls.py                     # '' , 'login/', 'registro/', 'perfil/', 'logout/'
+│   ├── views.py                    # login_view, registro_view, perfil_view, logout_view
+│   └── tests.py                    # Pruebas de registro, login, logout, bitácora y perfil
 ├── votaciones\                     # APP 2: experiencia pública (MIGRANDO)
 │   ├── templates\votaciones\
 │   │   ├── base.html               # Layout público (navbar, footer, offcanvas, scripts)
@@ -63,7 +67,7 @@ D:\no_borrar\programacion\Python\Django\
 - **Python/pip:** usar `env_django\Scripts\python.exe` (ej: `& "env_django\Scripts\python.exe" manage.py check`).
 - **Rutas Django:**
   - `votaciones` montada en **`/`** (raíz). Inicio: `http://127.0.0.1:8000/` (nombre de URL `index`).
-  - `usuarios` en `/usuarios/` (`login`, `registro`, `logout`) y `administracion` en `/admin-panel/` (`panel_principal`).
+  - `usuarios` en `/usuarios/` (`login`, `registro`, `perfil`, `logout`) y `administracion` en `/admin-panel/` (`panel_principal`).
 - **Estáticos:** referenciar con `{% static '...' %}`. `settings.py` tiene `STATICFILES_DIRS = [BASE_DIR / 'static']`.
 - **Plantillas:** cada página hereda de la base de su app:
   - Público: `votaciones/base.html` (bloques `titulo`, `descripcion`, `contenido`, `extra_css`, `extra_js`).
@@ -162,6 +166,45 @@ D:\no_borrar\programacion\Python\Django\
 - **Convenio:** `admin_base.html` no define `--color-gold-text`; en `categorias.html` se usó `#B48216` directo.
 - **Verificación:** `manage.py check` OK; `/admin-panel/categorias/` y `/admin-panel/` responden **200**.
 
+### [7] Usuarios: correcciones tras pruebas funcionales
+- **Rama Git:** `feature/migracion-usuarios` (actualizada con `main`).
+- **`usuarios/models.py`**: `Bitacora.fecha_hora` pasó de `auto_now_add=True` a `default=timezone.now`
+  (`editable=False`). Con `auto_now_add` Django pisaba la fecha en el INSERT después de firmar, así que
+  ninguna firma `hash_sha256` coincidía al recalcularla. Se separó `calcular_firma()` y se agregó
+  `firma_valida()` para verificar la integridad de una fila.
+- **`usuarios/migrations/0002_alter_bitacora_fecha_hora.py`**: migración del cambio anterior
+  (hay que correr `manage.py migrate`). Las filas creadas antes de este cambio quedan con firma inválida.
+- **`usuarios/views.py`**: `logout_view` ahora tiene `@require_POST` (un GET responde **405**), y el
+  parámetro `next` solo se respeta si apunta al mismo sitio (`obtener_next_seguro`, anti open redirect).
+- **`votaciones/templates/votaciones/base.html`**: los botones "Cerrar sesión" (navbar y menú móvil)
+  pasaron de enlaces GET a botones que envían el formulario oculto `logoutForm` (POST + CSRF).
+- **`usuarios/tests.py`**: 3 pruebas nuevas (firma verificable y que detecta alteración, logout por GET
+  rechazado, `next` externo ignorado). Total: **9 pruebas OK**.
+- **Verificación:** probado en navegador: registro, login con correo y documento, bloqueo tras 5 intentos,
+  logout desde la tarjeta, el navbar y el menú móvil; firmas nuevas de la bitácora válidas.
+
+### [8] Usuarios: perfil de usuario (`/usuarios/perfil/`)
+- **Rama Git:** `feature/migracion-usuarios`. Pantalla nueva (no existía en el prototipo).
+- **`usuarios/views.py`**: `perfil_view` con `@login_required`, `@sensitive_post_parameters` y `@never_cache`.
+  Muestra los datos del votante (incluye algoritmo e iteraciones del hash PBKDF2), permite **cambiar la
+  contraseña** (pide la actual, mismas reglas y validadores del registro, `update_session_auth_hash` para
+  mantener esta sesión y cerrar las demás) y lista **Mi actividad**: los últimos 15 eventos de la bitácora
+  con su firma verificada (`firma_valida()`). Una clave actual errónea cuenta para el bloqueo de 5 intentos;
+  al bloquear se cierra la sesión.
+- **`usuarios/views.py`**: `login_view` redirige al perfil si ya hay sesión; tras login/registro el destino
+  por defecto es el perfil; si llega `?next=` abre la pestaña "login" y lo guarda en un hidden. Se extrajeron
+  `obtener_perfil()` y `clave_cumple_formato()` para reutilizarlas.
+- **`pr_festivalVallenato/settings.py`**: `LOGIN_URL = 'login'` (destino de `@login_required`).
+- **`usuarios/templates/usuarios/perfil.html`**: hereda de `votaciones/base.html` (`seccion_activa='cuenta'`).
+  Reutiliza el ojo y el medidor de fortaleza de `auth.js` (mismos `id`).
+- **`usuarios/templates/usuarios/login.html`**: la tarjeta "Sesión activa" pasó al perfil; sus estilos
+  comunes se movieron a **`static/css/usuarios.css`** y las alertas al parcial **`_mensajes.html`**.
+- **`usuarios/tests.py`**: clase `PerfilUsuarioTests` con 6 pruebas (acceso sin sesión + `next`, redirección
+  del login, datos y actividad, cambio exitoso que cierra las otras sesiones, rechazos, bloqueo tras 5 fallos).
+  Total: **15 pruebas OK**.
+- **Verificación:** probado en navegador (escritorio y móvil): `/usuarios/perfil/` sin sesión → login → perfil;
+  cambio de contraseña con clave actual errónea y correcta; "Mi actividad" con firmas válidas/no válidas.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):
@@ -172,6 +215,7 @@ Públicas (app `votaciones`):
 
 Autenticación (app `usuarios`):
 - [x] `login.html` -> `usuarios/templates/usuarios/login.html` (vistas `login`, `registro`, `logout` en `/usuarios/login/`)
+- [x] (nueva, sin prototipo) `usuarios/templates/usuarios/perfil.html` (vista `perfil` en `/usuarios/perfil/`)
 
 Admin (app `administracion`, usar `admin_base.html`):
 - [x] `admin.html` -> `panel_principal.html` (vista `panel_principal`, `/admin-panel/`)

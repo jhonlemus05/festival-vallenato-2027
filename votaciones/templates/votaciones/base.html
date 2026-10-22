@@ -285,9 +285,9 @@
         <div class="d-flex align-items-center gap-3">
           <div class="desktop-header-action d-none d-md-flex">
             {% if request.user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="btn-desktop-account">
+            <button type="submit" form="logoutForm" class="btn-desktop-account" style="cursor: pointer;">
               <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-            </a>
+            </button>
             {% endif %}
             <a href="#" class="btn-desktop-account" style="background-color: var(--color-gold); color: #000000; border: none;">
               <i class="bi bi-check2-circle"></i> Votar ahora
@@ -421,9 +421,9 @@
           <i class="bi bi-speedometer2 text-warning"></i> <span>Panel administrativo</span>
         </a>
         {% if request.user.is_authenticated %}
-        <a href="{% url 'logout' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+        <button type="submit" form="logoutForm" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-box-arrow-right text-warning"></i> <span>Cerrar sesión</span>
-        </a>
+        </button>
         {% endif %}
       </div>
 
@@ -433,6 +433,13 @@
       </div>
     </div>
   </div>
+
+  {% if request.user.is_authenticated %}
+  {# Logout por POST + CSRF (logout_view tiene @require_POST). Los botones "Cerrar sesión" del navbar y del menú móvil lo envían con form="logoutForm". #}
+  <form id="logoutForm" method="post" action="{% url 'logout' %}" class="d-none">
+    {% csrf_token %}
+  </form>
+  {% endif %}
 
 
   <!-- ============================================================

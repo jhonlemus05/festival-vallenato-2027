@@ -1,0 +1,9 @@
+{# Mensajes de django.contrib.messages con el estilo del módulo (clases .auth-alert en static/css/usuarios.css). Lo incluyen login.html y perfil.html. #}
+{% if messages %}
+  {% for message in messages %}
+    <div class="auth-alert {% if message.tags == 'error' %}auth-alert-error{% elif message.tags == 'success' %}auth-alert-success{% else %}auth-alert-info{% endif %}" role="alert">
+      <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle-fill{% elif message.tags == 'success' %}bi-check-circle-fill text-warning{% else %}bi-info-circle-fill{% endif %}"></i>
+      <div>{{ message }}</div>
+    </div>
+  {% endfor %}
+{% endif %}

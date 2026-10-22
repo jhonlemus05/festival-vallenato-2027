@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from .models import Usuario, Bitacora
@@ -183,3 +183,188 @@ class UsuariosAuthSecurityTests(TestCase):
         )
         self.assertEqual(Usuario.objects.count(), 0)
         self.assertEqual(resp_sim.status_code, 200)
+
+    def test_firma_bitacora_verificable_y_detecta_alteracion(self):
+        self.client.post(
+            reverse('login'),
+            {
+                'modo': 'register',
+                'correo': 'auditoria@correo.com',
+                'identificacion': '1065222333',
+                'password': 'Vallenato2027Segura',
+                'terminos': 'on',
+            },
+        )
+        # Se lee de la BD (no del objeto en memoria): así se prueba que la fecha guardada
+        # es la misma con la que se firmó. Con auto_now_add esto fallaba.
+        registro = Bitacora.objects.get(usuario__correo='auditoria@correo.com', accion='Registro de cuenta')
+        self.assertTrue(registro.firma_valida())
+
+        # Si alguien edita la fila "por debajo", la firma deja de coincidir.
+        Bitacora.objects.filter(pk=registro.pk).update(detalles='Registro alterado a mano')
+        registro.refresh_from_db()
+        self.assertFalse(registro.firma_valida())
+
+    def test_logout_por_get_no_cierra_sesion(self):
+        # El registro deja la sesión iniciada.
+        self.client.post(
+            reverse('login'),
+            {
+                'modo': 'register',
+                'correo': 'sesion@correo.com',
+                'identificacion': '1065444555',
+                'password': 'Vallenato2027Segura',
+                'terminos': 'on',
+            },
+        )
+        # Un GET (p. ej. un <img src="/usuarios/logout/"> en otra página) debe rechazarse con 405.
+        response = self.client.get(reverse('logout'))
+        self.assertEqual(response.status_code, 405)
+        self.assertIn('_auth_user_id', self.client.session)
+
+    def test_next_externo_no_redirige_fuera_del_sitio(self):
+        self.client.post(
+            reverse('login'),
+            {
+                'modo': 'register',
+                'correo': 'redireccion@correo.com',
+                'identificacion': '1065666777',
+                'password': 'Vallenato2027Segura',
+                'terminos': 'on',
+            },
+        )
+        self.client.post(reverse('logout'))
+        credenciales = {'modo': 'login', 'correo': 'redireccion@correo.com', 'password': 'Vallenato2027Segura'}
+
+        # `next` hacia otro dominio: se ignora y se cae al destino por defecto (el perfil).
+        response = self.client.post(reverse('login'), {**credenciales, 'next': 'https://sitio-falso.com/'})
+        self.assertRedirects(response, reverse('perfil'), fetch_redirect_response=False)
+
+        # `next` interno: se respeta.
+        self.client.post(reverse('logout'))
+        response = self.client.post(reverse('login'), {**credenciales, 'next': '/'})
+        self.assertRedirects(response, '/', fetch_redirect_response=False)
+
+
+class PerfilUsuarioTests(TestCase):
+    """Pruebas de /usuarios/perfil/: acceso con sesión, datos, actividad y cambio de contraseña."""
+
+    PASSWORD = 'Vallenato2027Segura'
+
+    def registrar(self, correo, identificacion):
+        """Registra por el flujo real (no con create_user); el registro deja la sesión iniciada."""
+        return self.client.post(
+            reverse('login'),
+            {
+                'modo': 'register',
+                'correo': correo,
+                'identificacion': identificacion,
+                'password': self.PASSWORD,
+                'terminos': 'on',
+            },
+        )
+
+    def cambiar_password(self, actual, nueva, confirmacion=None):
+        return self.client.post(
+            reverse('perfil'),
+            {
+                'password_actual': actual,
+                'password_nueva': nueva,
+                'password_confirmacion': nueva if confirmacion is None else confirmacion,
+            },
+        )
+
+    def test_perfil_requiere_sesion_y_vuelve_tras_login(self):
+        self.registrar('perfil@correo.com', '1065101010')
+        self.client.post(reverse('logout'))
+
+        # Sin sesión, @login_required manda al login con ?next=/usuarios/perfil/ ...
+        response = self.client.get(reverse('perfil'))
+        url_login = f"{reverse('login')}?next={reverse('perfil')}"
+        self.assertRedirects(response, url_login, fetch_redirect_response=False)
+
+        # ... esa pantalla abre la pestaña "login" y guarda el `next` en un campo oculto ...
+        pantalla = self.client.get(url_login)
+        self.assertEqual(pantalla.context['modo_activo'], 'login')
+        self.assertContains(pantalla, 'name="next" value="/usuarios/perfil/"')
+
+        # ... y al entrar se vuelve al perfil.
+        response = self.client.post(
+            reverse('login'),
+            {'modo': 'login', 'correo': 'perfil@correo.com', 'password': self.PASSWORD, 'next': reverse('perfil')},
+        )
+        self.assertRedirects(response, reverse('perfil'), fetch_redirect_response=False)
+
+    def test_login_con_sesion_iniciada_redirige_al_perfil(self):
+        self.registrar('ya.dentro@correo.com', '1065202020')
+        response = self.client.get(reverse('login'))
+        self.assertRedirects(response, reverse('perfil'), fetch_redirect_response=False)
+
+    def test_perfil_muestra_datos_y_actividad_firmada(self):
+        self.registrar('datos@correo.com', '1065303030')
+        response = self.client.get(reverse('perfil'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'usuarios/perfil.html')
+        self.assertEqual(response.context['perfil'].identificacion, '1065303030')
+        self.assertIsNotNone(response.context['iteraciones'])
+
+        # El registro aparece en "Mi actividad" con su firma verificada.
+        actividad = response.context['actividad']
+        self.assertEqual(actividad[0].accion, 'Registro de cuenta')
+        self.assertTrue(actividad[0].firma_ok)
+        self.assertEqual(response.context['firmas_validas'], len(actividad))
+
+    def test_cambio_password_exitoso_mantiene_esta_sesion_y_cierra_las_demas(self):
+        self.registrar('cambio@correo.com', '1065404040')
+        # Segunda sesión de la misma cuenta (p. ej. otro computador).
+        otra_sesion = Client()
+        otra_sesion.post(reverse('login'), {'modo': 'login', 'correo': 'cambio@correo.com', 'password': self.PASSWORD})
+        self.assertEqual(otra_sesion.get(reverse('perfil')).status_code, 200)
+
+        response = self.cambiar_password(self.PASSWORD, 'Acordeon2027Nueva')
+        self.assertRedirects(response, reverse('perfil'), fetch_redirect_response=False)
+
+        perfil = Usuario.objects.get(correo='cambio@correo.com')
+        self.assertTrue(perfil.user.check_password('Acordeon2027Nueva'))
+        self.assertFalse(perfil.user.check_password(self.PASSWORD))
+        # El espejo `password_hash` quedó con el hash nuevo.
+        self.assertEqual(perfil.password_hash, perfil.user.password)
+        self.assertTrue(perfil.password_hash.startswith('pbkdf2_sha256$'))
+        self.assertTrue(Bitacora.objects.filter(usuario=perfil, accion='Cambio de contraseña').exists())
+
+        # Esta sesión sigue viva (update_session_auth_hash); la otra quedó cerrada.
+        self.assertEqual(self.client.get(reverse('perfil')).status_code, 200)
+        self.assertEqual(otra_sesion.get(reverse('perfil')).status_code, 302)
+
+    def test_cambio_password_rechazos(self):
+        self.registrar('rechazos@correo.com', '1065505050')
+        casos = [
+            (('ClaveEquivocada1', 'Acordeon2027Nueva', None), 'La contraseña actual no es correcta.'),
+            ((self.PASSWORD, 'Acordeon2027Nueva', 'Acordeon2027Otra'), 'no coinciden'),
+            ((self.PASSWORD, self.PASSWORD, None), 'distinta de la actual'),
+            ((self.PASSWORD, 'corta1', None), 'al menos 8 caracteres'),
+            # Pasa la regla básica, pero la frena CommonPasswordValidator.
+            ((self.PASSWORD, 'password1', None), 'demasiado común'),
+        ]
+        for argumentos, mensaje in casos:
+            with self.subTest(mensaje=mensaje):
+                response = self.cambiar_password(*argumentos)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, mensaje)
+
+        # Ningún intento cambió la clave, y el de clave actual errónea quedó auditado.
+        perfil = Usuario.objects.get(correo='rechazos@correo.com')
+        self.assertTrue(perfil.user.check_password(self.PASSWORD))
+        self.assertTrue(Bitacora.objects.filter(usuario=perfil, accion='Intento fallido de cambio de contraseña').exists())
+
+    def test_cambio_password_bloquea_y_cierra_sesion_tras_5_fallos(self):
+        self.registrar('robo@correo.com', '1065606060')
+        for _ in range(5):
+            response = self.cambiar_password('NoEsLaClave99', 'Acordeon2027Nueva')
+
+        # El quinto fallo bloquea la cuenta y cierra la sesión.
+        self.assertRedirects(response, '/usuarios/login/?modo=login', fetch_redirect_response=False)
+        self.assertNotIn('_auth_user_id', self.client.session)
+        perfil = Usuario.objects.get(correo='robo@correo.com')
+        self.assertTrue(perfil.esta_bloqueado())
+        self.assertTrue(perfil.user.check_password(self.PASSWORD))

@@ -1,6 +1,8 @@
 /**
  * auth.js
  * Lógica de cliente de la pantalla de registro / inicio de sesión (/usuarios/login/).
+ * También la carga /usuarios/perfil/ para el ojo y el medidor de la nueva contraseña:
+ * como todo se usa con guardas `if (el)`, allá solo se activa lo que existe en el DOM.
  *
  * Ojo: esto es solo UX. Ninguna validación de acá es una barrera de seguridad; el
  * servidor (usuarios/views.py) revalida todo. El JS únicamente alterna pestañas,

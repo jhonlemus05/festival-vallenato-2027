@@ -1,20 +1,31 @@
 import re
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.http import require_POST
 from .models import Usuario, Bitacora
 
 
 # Documento: solo dígitos, 5 a 15. Se valida en servidor aunque el HTML ya tenga `pattern`,
 # porque el cliente se puede saltar con cualquier herramienta (curl, devtools...).
 DOCUMENTO_REGEX = re.compile(r'^[0-9]{5,15}$')
+
+# Cuántos eventos de la bitácora se muestran en "Mi actividad" del perfil.
+EVENTOS_ACTIVIDAD = 15
+
+
+def clave_cumple_formato(password):
+    """Regla básica de la UI (8+ caracteres, letras y números). Los validadores de Django se aplican aparte."""
+    return len(password) >= 8 and any(c.isalpha() for c in password) and any(c.isdigit() for c in password)
 
 
 def obtener_ip_cliente(request):
@@ -41,6 +52,43 @@ def registrar_evento_bitacora(request, usuario, accion, detalles):
     )
 
 
+def obtener_next_seguro(request):
+    """
+    Devuelve el `next` (POST o GET) solo si apunta a este mismo sitio; si no, None.
+
+    Sin esta validación, un `?next=https://sitio-falso.com` mandaría al votante, recién
+    autenticado, a una página externa (open redirect, típico en phishing).
+    """
+    next_url = request.POST.get('next') or request.GET.get('next')
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return None
+
+
+def obtener_perfil(user):
+    """
+    Devuelve el perfil `Usuario` de un `auth.User`, creándolo si no existe.
+
+    Las cuentas creadas fuera del registro (Admin/createsuperuser) no tienen perfil:
+    se les genera uno al vuelo para que el login y la pantalla de perfil no fallen.
+    """
+    perfil, _ = Usuario.objects.get_or_create(
+        user=user,
+        defaults={
+            'identificacion': f'DOC-{user.id}',
+            'correo': user.email or f'{user.username}@festivalvallenato.com',
+            'password_hash': user.password,
+            'rol': 'administrador' if user.is_staff else 'votante',
+            'acepta_terminos': True,
+        },
+    )
+    return perfil
+
+
 # sensitive_post_parameters: oculta el campo `password` en los reportes de error de Django
 # (página de debug y mails de excepciones), así no se filtra una clave en un traceback.
 # never_cache: evita que el navegador guarde en caché esta pantalla (botón "atrás" tras logout).
@@ -51,9 +99,16 @@ def login_view(request, modo_inicial=None):
     Vista única para registro e inicio de sesión (el prototipo tiene ambos en una sola
     pantalla con pestañas). El campo oculto `modo` indica cuál de los dos flujos procesar.
     """
-    # Prioridad del modo: argumento de la vista > campo POST > query string > 'register'.
+    # Con sesión ya iniciada no tiene sentido mostrar registro/login: se va al perfil (o al
+    # `next` si venía de una página protegida). Solo en GET, para no cortar un POST en curso.
+    if request.method == 'GET' and request.user.is_authenticated:
+        return redirect(obtener_next_seguro(request) or 'perfil')
+
+    # Prioridad del modo: argumento de la vista > campo POST > query string > por defecto.
+    # Si llega un `next` (lo pone @login_required) se abre "login": esa persona quiere entrar, no registrarse.
     # Cualquier valor raro se normaliza para no renderizar estados inválidos.
-    modo_activo = modo_inicial or request.POST.get('modo') or request.GET.get('modo', 'register')
+    modo_por_defecto = 'login' if request.GET.get('next') else 'register'
+    modo_activo = modo_inicial or request.POST.get('modo') or request.GET.get('modo', modo_por_defecto)
     if modo_activo not in ('register', 'login'):
         modo_activo = 'register'
 
@@ -89,7 +144,7 @@ def login_view(request, modo_inicial=None):
                     messages.error(request, 'Ingresa una dirección de correo electrónico válida.')
                 elif not DOCUMENTO_REGEX.fullmatch(identificacion_val):
                     messages.error(request, 'El número de documento debe contener únicamente entre 5 y 15 dígitos numéricos.')
-                elif len(password) < 8 or not any(c.isalpha() for c in password) or not any(c.isdigit() for c in password):
+                elif not clave_cumple_formato(password):
                     messages.error(request, 'La contraseña debe tener al menos 8 caracteres e incluir letras y números.')
                 # Unicidad de correo: se revisa en User.email, User.username y Usuario.correo
                 # porque hay cuentas (p. ej. creadas desde el Admin) que podrían existir solo en uno.
@@ -141,10 +196,7 @@ def login_view(request, modo_inicial=None):
                         # Login automático tras registrarse: menos fricción para el votante.
                         login(request, user)
                         messages.success(request, '¡Cuenta creada exitosamente con cifrado PBKDF2-SHA256! Tu sesión ha sido iniciada.')
-                        next_url = request.POST.get('next') or request.GET.get('next')
-                        # TODO(seguridad): validar `next_url` con url_has_allowed_host_and_scheme
-                        # antes de redirigir, para cerrar el vector de open redirect.
-                        return redirect(next_url if next_url else 'login')
+                        return redirect(obtener_next_seguro(request) or 'perfil')
 
         # ------------------------------------------------------------------
         # FLUJO DE INICIO DE SESIÓN
@@ -203,18 +255,7 @@ def login_view(request, modo_inicial=None):
                             user.password = make_password(password, hasher='pbkdf2_sha256')
                             user.save(update_fields=['password'])
 
-                        # Cuentas creadas fuera del flujo de registro (Admin/createsuperuser) no
-                        # tienen perfil: se les genera uno al vuelo para que el sistema no falle.
-                        perfil, _ = Usuario.objects.get_or_create(
-                            user=user,
-                            defaults={
-                                'identificacion': f'DOC-{user.id}',
-                                'correo': user.email or f'{user.username}@festivalvallenato.com',
-                                'password_hash': user.password,
-                                'rol': 'administrador' if user.is_staff else 'votante',
-                                'acepta_terminos': True,
-                            },
-                        )
+                        perfil = obtener_perfil(user)
                         perfil.password_hash = user.password
                         perfil.save(update_fields=['password_hash'])
                         perfil.reiniciar_intentos()
@@ -228,10 +269,7 @@ def login_view(request, modo_inicial=None):
                             'Autenticación exitosa verificada con PBKDF2-SHA256',
                         )
                         messages.success(request, 'Has iniciado sesión de forma segura.')
-                        next_url = request.POST.get('next') or request.GET.get('next')
-                        if next_url:
-                            return redirect(next_url)
-                        return redirect('login')
+                        return redirect(obtener_next_seguro(request) or 'perfil')
                     else:
                         # Credenciales inválidas. Solo contamos intentos si la cuenta existe;
                         # para correos inexistentes no hay a quién bloquear.
@@ -260,15 +298,6 @@ def login_view(request, modo_inicial=None):
                             # Mensaje genérico a propósito: no revela si falló el correo o la clave.
                             messages.error(request, 'Credenciales inválidas. Verifica tu correo y contraseña.')
 
-    # Datos para la tarjeta "Sesión activa" del template (solo si hay sesión).
-    perfil = None
-    ultima_bitacora = None
-    if request.user.is_authenticated:
-        perfil = Usuario.objects.filter(user=request.user).first()
-        if perfil:
-            # Bitacora.Meta.ordering es -fecha_hora, así que .first() es el evento más reciente.
-            ultima_bitacora = perfil.bitacoras.first()
-
     return render(
         request,
         'usuarios/login.html',
@@ -277,8 +306,8 @@ def login_view(request, modo_inicial=None):
             'modo_activo': modo_activo,
             'correo_val': correo_val,
             'identificacion_val': identificacion_val,
-            'perfil': perfil,
-            'ultima_bitacora': ultima_bitacora,
+            # Viaja como hidden en el form para no perder el destino al hacer POST.
+            'next': obtener_next_seguro(request) or '',
         },
     )
 
@@ -290,6 +319,112 @@ def registro_view(request):
     return login_view(request, modo_inicial='register')
 
 
+# login_required: sin sesión redirige a settings.LOGIN_URL con ?next=/usuarios/perfil/.
+@sensitive_post_parameters('password_actual', 'password_nueva', 'password_confirmacion')
+@login_required
+@never_cache
+def perfil_view(request):
+    """
+    Perfil del votante: sus datos, el cambio de contraseña y su actividad en la bitácora.
+    El único POST que procesa es el cambio de contraseña; si sale bien redirige (patrón
+    PRG) para que recargar la página no reenvíe el formulario.
+    """
+    perfil = obtener_perfil(request.user)
+
+    if request.method == 'POST':
+        password_actual = request.POST.get('password_actual', '')
+        password_nueva = request.POST.get('password_nueva', '')
+        password_confirmacion = request.POST.get('password_confirmacion', '')
+
+        # Misma idea que el registro: se corta en la primera validación que falle.
+        if not password_actual or not password_nueva or not password_confirmacion:
+            messages.error(request, 'Completa los tres campos para cambiar tu contraseña.')
+        elif not request.user.check_password(password_actual):
+            # Cuenta para el mismo bloqueo que el login: con una sesión robada no se puede
+            # adivinar la clave actual sin límite. Al bloquear se cierra también la sesión.
+            if perfil.registrar_intento_fallido():
+                registrar_evento_bitacora(
+                    request,
+                    perfil,
+                    'Bloqueo temporal de cuenta',
+                    f'Cuenta bloqueada por {Usuario.MINUTOS_BLOQUEO} minutos tras {Usuario.MAX_INTENTOS_FALLIDOS} intentos fallidos (cambio de contraseña)',
+                )
+                logout(request)
+                messages.error(
+                    request,
+                    f'Has superado el límite de {Usuario.MAX_INTENTOS_FALLIDOS} intentos fallidos. Tu cuenta ha sido bloqueada preventivamente por {Usuario.MINUTOS_BLOQUEO} minutos y se cerró tu sesión.',
+                )
+                return redirect('/usuarios/login/?modo=login')
+            registrar_evento_bitacora(
+                request,
+                perfil,
+                'Intento fallido de cambio de contraseña',
+                'La contraseña actual ingresada no coincide',
+            )
+            messages.error(request, 'La contraseña actual no es correcta.')
+        elif password_nueva != password_confirmacion:
+            messages.error(request, 'La nueva contraseña y su confirmación no coinciden.')
+        elif password_nueva == password_actual:
+            messages.error(request, 'La nueva contraseña debe ser distinta de la actual.')
+        elif not clave_cumple_formato(password_nueva):
+            messages.error(request, 'La nueva contraseña debe tener al menos 8 caracteres e incluir letras y números.')
+        else:
+            try:
+                validate_password(password_nueva, user=request.user)
+                password_segura = True
+            except ValidationError as exc:
+                password_segura = False
+                for err in exc.messages:
+                    messages.error(request, err)
+
+            if password_segura:
+                user = request.user
+                user.password = make_password(password_nueva, hasher='pbkdf2_sha256')
+                user.save(update_fields=['password'])
+                perfil.password_hash = user.password
+                perfil.save(update_fields=['password_hash'])
+                perfil.reiniciar_intentos()
+                # Al cambiar la clave Django invalida todas las sesiones de la cuenta (guardan un
+                # hash de la clave). Esto renueva solo la actual: las demás quedan cerradas.
+                update_session_auth_hash(request, user)
+                registrar_evento_bitacora(
+                    request,
+                    perfil,
+                    'Cambio de contraseña',
+                    'Contraseña actualizada con cifrado PBKDF2-SHA256; se cerraron las demás sesiones abiertas',
+                )
+                messages.success(request, 'Tu contraseña se actualizó con cifrado PBKDF2-SHA256. Las demás sesiones abiertas se cerraron.')
+                return redirect('perfil')
+
+    # El hash de Django tiene la forma algoritmo$iteraciones$salt$hash. Las iteraciones se
+    # muestran como evidencia del costo de PBKDF2 (formato colombiano: 1.500.000).
+    partes_hash = perfil.password_hash.split('$')
+    iteraciones = None
+    if len(partes_hash) == 4 and partes_hash[1].isdigit():
+        iteraciones = f'{int(partes_hash[1]):,}'.replace(',', '.')
+
+    # Bitacora.Meta.ordering es -fecha_hora: los más recientes primero. Se verifica la firma
+    # de cada evento aquí para no recalcularla dos veces en el template.
+    actividad = list(perfil.bitacoras.all()[:EVENTOS_ACTIVIDAD])
+    for evento in actividad:
+        evento.firma_ok = evento.firma_valida()
+
+    return render(
+        request,
+        'usuarios/perfil.html',
+        {
+            'seccion_activa': 'cuenta',
+            'perfil': perfil,
+            'iteraciones': iteraciones,
+            'actividad': actividad,
+            'firmas_validas': sum(1 for evento in actividad if evento.firma_ok),
+        },
+    )
+
+
+# require_POST: con GET, cualquier página ajena podría cerrar la sesión del votante con
+# un simple <img src="/usuarios/logout/">. Por POST además exige el token CSRF.
+@require_POST
 @never_cache
 def logout_view(request):
     """

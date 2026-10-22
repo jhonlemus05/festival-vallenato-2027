@@ -1,0 +1,243 @@
+/* ============================================================
+   ESTILOS COMPARTIDOS DEL MÓDULO USUARIOS
+   Los usan login.html y perfil.html (títulos, alertas, campos,
+   botones y medidor de fortaleza de contraseña). Lo propio de cada
+   pantalla sigue en su {% block extra_css %}.
+   ============================================================ */
+
+:root {
+  --color-input-border: #2B2B2B;
+  --color-pill-bg: #EAE6DF;
+  --color-text-muted: #555555;
+}
+
+.auth-body-content {
+  padding: 26px 20px 96px 20px;
+  flex: 1;
+  background-color: var(--color-white);
+}
+
+.screen-kicker {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #71717A;
+  margin-bottom: 6px;
+}
+
+.screen-title {
+  font-family: var(--font-display);
+  font-size: 1.86rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-text-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.screen-description {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+  margin-bottom: 22px;
+}
+
+/* --- Campos de formulario --- */
+
+.form-group-minimal {
+  margin-bottom: 18px;
+}
+
+.field-label {
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: 7px;
+  display: block;
+}
+
+.input-box-minimal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding: 0 16px;
+  border: 1.5px solid var(--color-input-border);
+  border-radius: 12px;
+  background-color: var(--color-white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-box-minimal:focus-within {
+  border-color: var(--color-black);
+  box-shadow: 0 0 0 2px rgba(216, 166, 41, 0.25);
+}
+
+.input-icon-svg {
+  color: #555555;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.native-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 0.9rem;
+  color: var(--color-text-dark);
+  font-family: var(--font-body);
+}
+
+.native-input::placeholder {
+  color: #555555;
+  font-size: 0.88rem;
+}
+
+.btn-toggle-eye {
+  background: transparent;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+
+.field-hint-text {
+  color: #6B7280;
+  font-size: 0.72rem;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+/* --- Medidor de fortaleza (lo pinta auth.js) --- */
+
+.password-strength-meter {
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.strength-bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.strength-bar-segment {
+  height: 4px;
+  border-radius: 999px;
+  background-color: #E5E7EB;
+  transition: background-color 0.2s ease;
+}
+
+.strength-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  color: #6B7280;
+}
+
+/* --- Botones --- */
+
+.btn-gold-submit {
+  background-color: var(--color-gold);
+  color: #000000;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 20px;
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(216, 166, 41, 0.25);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-top: 24px;
+  margin-bottom: 20px;
+}
+
+.btn-gold-submit:hover, .btn-gold-submit:focus {
+  background-color: var(--color-gold-hover);
+  color: #000000;
+  transform: translateY(-1px);
+}
+
+.btn-outline-logout {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1.5px solid var(--color-input-border);
+  border-radius: 12px;
+  padding: 13px 20px;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-outline-logout:hover {
+  background-color: #111111;
+  color: var(--color-gold);
+  border-color: #111111;
+}
+
+/* --- Mensajes (django.contrib.messages) --- */
+
+.auth-alert {
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.auth-alert-error {
+  background-color: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+.auth-alert-success {
+  background-color: #FDF8EA;
+  border: 1px solid var(--color-gold);
+  color: #111111;
+}
+
+.auth-alert-info {
+  background-color: #F4F4F5;
+  border: 1px solid #E4E4E7;
+  color: #27272A;
+}
+
+/* Pestaña "Mi cuenta" activa en la barra inferior móvil. */
+.bottom-tab-bar .tab-item.active,
+.bottom-tab-bar .tab-item.active i {
+  color: var(--color-gold);
+  font-weight: 700;
+}

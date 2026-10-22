@@ -1,0 +1,465 @@
+{% extends 'votaciones/base.html' %}
+{% load static %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | Mi perfil{% endblock %}
+{% block descripcion %}Consulta tus datos, cambia tu contraseña y revisa la actividad de tu cuenta en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+
+{% block extra_css %}
+  {# Estilos compartidos con login.html (campos, botones, alertas, medidor). Aquí solo va lo propio del perfil. #}
+  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
+  <style>
+    .app-header {
+      border-bottom: 1.5px solid var(--color-gold);
+    }
+
+    .perfil-wrapper {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .perfil-grid {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .perfil-card {
+      background-color: var(--color-white);
+      border: 1.5px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .perfil-card-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--color-text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .perfil-card-title i {
+      color: var(--color-gold);
+    }
+
+    .perfil-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    /* --- Tarjeta "Mis datos" (antes era la tarjeta "Sesión activa" del login) --- */
+
+    .account-summary-card {
+      background-color: #FAFAFA;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 8px;
+    }
+
+    .account-badge-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-black);
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .account-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ECECEC;
+      font-size: 0.85rem;
+      gap: 12px;
+    }
+
+    .account-detail-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .account-detail-label {
+      color: #6B7280;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .account-detail-value {
+      color: #111111;
+      font-weight: 700;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .hash-code-pill {
+      font-family: monospace;
+      font-size: 0.72rem;
+      background-color: #111111;
+      color: var(--color-gold);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    /* --- Mi actividad --- */
+
+    .actividad-resumen {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #F8F8F8;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.74rem;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .actividad-resumen i {
+      color: var(--color-gold);
+    }
+
+    .actividad-lista {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .actividad-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #ECECEC;
+    }
+
+    .actividad-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .actividad-icono {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background-color: #111111;
+      color: var(--color-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .actividad-icono.riesgo {
+      background-color: #FEF2F2;
+      color: #B91C1C;
+    }
+
+    .actividad-cuerpo {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .actividad-accion {
+      font-family: var(--font-display);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--color-text-dark);
+    }
+
+    .actividad-detalles {
+      font-size: 0.76rem;
+      color: #4B5563;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .actividad-meta {
+      font-size: 0.72rem;
+      color: #6B7280;
+      margin-top: 2px;
+    }
+
+    .firma-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .firma-ok {
+      background-color: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #047857;
+    }
+
+    .firma-mal {
+      background-color: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #B91C1C;
+    }
+
+    @media (min-width: 768px) {
+      .perfil-wrapper {
+        margin: 40px auto 20px auto;
+      }
+
+      .perfil-grid {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+    <section class="auth-body-content">
+      <div class="perfil-wrapper">
+        <div class="screen-kicker">02 / MI PERFIL</div>
+
+        {% include 'usuarios/_mensajes.html' %}
+
+        <h1 class="screen-title">Mi perfil</h1>
+        <p class="screen-description">
+          Tus datos, la seguridad de tu contraseña y la actividad reciente de tu cuenta.
+        </p>
+
+        <div class="perfil-grid">
+
+          {# ---------- Mis datos ---------- #}
+          <div>
+            {# Se muestra un extracto truncado del hash a propósito (para evidencias del informe); nunca el hash completo. #}
+            <div class="account-summary-card">
+              <div class="account-badge-verified">
+                <i class="bi bi-shield-lock-fill"></i> Cuenta Verificada · SHA-256
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Correo electrónico</span>
+                <span class="account-detail-value">{{ perfil.correo }}</span>
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Documento</span>
+                <span class="account-detail-value">{{ perfil.identificacion }}</span>
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Rol asignado</span>
+                <span class="account-detail-value">{{ perfil.get_rol_display }}</span>
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Fecha de registro</span>
+                <span class="account-detail-value">{{ perfil.fecha_registro|date:"d/m/Y H:i" }}</span>
+              </div>
+
+              <div class="account-detail-row">
+                <span class="account-detail-label">Algoritmo de clave</span>
+                <span class="account-detail-value"><span class="hash-code-pill">PBKDF2-HMAC-SHA256</span></span>
+              </div>
+
+              {% if iteraciones %}
+              <div class="account-detail-row">
+                <span class="account-detail-label">Iteraciones</span>
+                <span class="account-detail-value">{{ iteraciones }}</span>
+              </div>
+              {% endif %}
+
+              {% if perfil.password_hash %}
+              <div class="account-detail-row">
+                <span class="account-detail-label">Hash almacenado</span>
+                <span class="account-detail-value"><span class="hash-code-pill">{{ perfil.password_hash|truncatechars:28 }}</span></span>
+              </div>
+              {% endif %}
+            </div>
+
+            <a href="{% url 'index' %}" class="btn-gold-submit" style="margin-top: 12px; margin-bottom: 12px;">
+              <span>Ir a las votaciones</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+
+            {% if request.user.is_staff or perfil.rol == 'administrador' %}
+            <a href="{% url 'panel_principal' %}" class="btn-outline-logout mb-3">
+              <i class="bi bi-speedometer2"></i>
+              <span>Ir al Panel Administrativo</span>
+            </a>
+            {% endif %}
+
+            {# Logout por POST + CSRF (logout_view tiene @require_POST). #}
+            <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+              {% csrf_token %}
+              <button type="submit" class="btn-outline-logout">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Cerrar sesión segura</span>
+              </button>
+            </form>
+          </div>
+
+          {# ---------- Cambiar contraseña ---------- #}
+          <div class="perfil-card">
+            <div class="perfil-card-title"><i class="bi bi-key-fill"></i> Cambiar contraseña</div>
+            <p class="perfil-card-subtitle">
+              Confirma tu contraseña actual. Al cambiarla se cierran las demás sesiones abiertas de tu cuenta.
+            </p>
+
+            {# novalidate: el servidor (perfil_view) es la autoridad y responde con mensajes en español. Las contraseñas nunca se devuelven al template. #}
+            <form method="post" action="{% url 'perfil' %}" novalidate>
+              {% csrf_token %}
+
+              <div class="form-group-minimal">
+                <label class="field-label" for="passwordActualInput">Contraseña actual</label>
+                <div class="input-box-minimal">
+                  <span class="input-icon-svg">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                  <input
+                    type="password"
+                    id="passwordActualInput"
+                    name="password_actual"
+                    class="native-input"
+                    placeholder="Ingresa tu contraseña actual"
+                    autocomplete="current-password"
+                    required
+                  />
+                </div>
+              </div>
+
+              {# Los id passwordInput / togglePasswordVisibility / strengthSeg* son los que busca auth.js: así se reutilizan el ojo y el medidor del registro sin JS nuevo. #}
+              <div class="form-group-minimal" style="margin-bottom: 0;">
+                <label class="field-label" for="passwordInput">Nueva contraseña</label>
+                <div class="input-box-minimal">
+                  <span class="input-icon-svg">
+                    <i class="bi bi-shield-lock"></i>
+                  </span>
+                  <input
+                    type="password"
+                    id="passwordInput"
+                    name="password_nueva"
+                    class="native-input"
+                    placeholder="Ingresa la nueva contraseña"
+                    autocomplete="new-password"
+                    required
+                  />
+                  <button type="button" id="togglePasswordVisibility" class="btn-toggle-eye" aria-label="Mostrar u ocultar contraseña">
+                    <i id="passwordEyeIcon" class="bi bi-eye-slash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="field-hint-text">
+                Usa al menos 8 caracteres, letras y números.
+              </div>
+
+              <div class="password-strength-meter">
+                <div class="strength-bars">
+                  <div class="strength-bar-segment" id="strengthSeg1"></div>
+                  <div class="strength-bar-segment" id="strengthSeg2"></div>
+                  <div class="strength-bar-segment" id="strengthSeg3"></div>
+                  <div class="strength-bar-segment" id="strengthSeg4"></div>
+                </div>
+                <div class="strength-meta">
+                  <span id="strengthLabelText">Nivel de seguridad: Pendiente</span>
+                  <span><i class="bi bi-shield-lock text-warning"></i> PBKDF2-SHA256</span>
+                </div>
+              </div>
+
+              <div class="form-group-minimal" style="margin-bottom: 0;">
+                <label class="field-label" for="passwordConfirmInput">Confirmar nueva contraseña</label>
+                <div class="input-box-minimal">
+                  <span class="input-icon-svg">
+                    <i class="bi bi-shield-check"></i>
+                  </span>
+                  <input
+                    type="password"
+                    id="passwordConfirmInput"
+                    name="password_confirmacion"
+                    class="native-input"
+                    placeholder="Repite la nueva contraseña"
+                    autocomplete="new-password"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" class="btn-gold-submit" style="margin-bottom: 0;">
+                <span>Actualizar contraseña</span>
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {# ---------- Mi actividad ---------- #}
+        <div class="perfil-card">
+          <div class="perfil-card-title"><i class="bi bi-clock-history"></i> Mi actividad</div>
+          <p class="perfil-card-subtitle" style="margin-bottom: 10px;">
+            Últimos eventos de tu cuenta en la bitácora de auditoría. Cada uno lleva una firma SHA-256: si alguien altera el registro, la firma deja de coincidir.
+          </p>
+
+          {% if actividad %}
+            <div class="actividad-resumen">
+              <i class="bi bi-patch-check-fill"></i>
+              <span><strong>{{ firmas_validas }} de {{ actividad|length }}</strong> firmas verificadas</span>
+            </div>
+
+            <ul class="actividad-lista">
+              {% for evento in actividad %}
+              <li class="actividad-item">
+                {# Intentos fallidos y bloqueos se marcan en rojo para que salten a la vista. #}
+                <div class="actividad-icono {% if 'Intento' in evento.accion or 'Bloqueo' in evento.accion %}riesgo{% endif %}">
+                  {% if 'Intento' in evento.accion or 'Bloqueo' in evento.accion %}
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  {% elif 'Cierre' in evento.accion %}
+                    <i class="bi bi-box-arrow-right"></i>
+                  {% elif 'Cambio' in evento.accion %}
+                    <i class="bi bi-key-fill"></i>
+                  {% elif 'Registro' in evento.accion %}
+                    <i class="bi bi-person-plus-fill"></i>
+                  {% else %}
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  {% endif %}
+                </div>
+                <div class="actividad-cuerpo">
+                  <div class="actividad-accion">{{ evento.accion }}</div>
+                  {% if evento.detalles %}<div class="actividad-detalles">{{ evento.detalles }}</div>{% endif %}
+                  <div class="actividad-meta">{{ evento.fecha_hora|date:"d/m/Y H:i:s" }} · IP {{ evento.ip_origen|default:"desconocida" }}</div>
+                </div>
+                {% if evento.firma_ok %}
+                  <span class="firma-badge firma-ok" title="Firma {{ evento.hash_sha256|truncatechars:20 }}"><i class="bi bi-check-lg"></i> Firma válida</span>
+                {% else %}
+                  <span class="firma-badge firma-mal" title="La firma guardada no coincide con los datos del evento"><i class="bi bi-x-lg"></i> No coincide</span>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-secondary small mb-0">Aún no hay actividad registrada en tu cuenta.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+  {# Solo para el ojo y el medidor de fortaleza de la nueva contraseña (ver comentario del formulario). #}
+  <script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}
