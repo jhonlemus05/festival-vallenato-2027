@@ -385,6 +385,18 @@ D:\no_borrar\programacion\Python\Django\
 - **Django Admin**: la lista de votos muestra y permite buscar por código de comprobante.
 - **Pruebas**: 3 nuevas. Total: **70 pruebas OK en MySQL**.
 
+### [17] Perfil > Mis comprobantes (CU-05)
+- **Rama Git:** `desarrollo_total`.
+- **`usuarios/views.py`**: `perfil_comprobantes_view` en `/usuarios/perfil/comprobantes/` (`perfil_comprobantes`):
+  lista las encuestas en las que votó la persona con su código y fecha, **sin mostrar la opción elegida**
+  (postcondición del CU-05). Flujo 2a: si no ha votado, lo informa. Flujo 3a: un campo para **verificar un
+  código** (acepta minúsculas y espacios) que confirma si existe, sin decir de quién es ni qué se eligió.
+- **`perfil_base.html`**: cuarta opción del menú lateral, "Mis comprobantes" ("Votos" en celular, 4 en fila).
+- **Página de éxito**: enlaza a "Mis comprobantes" junto al código.
+- **Pruebas**: 3 nuevas y 2 ajustadas (las secciones del perfil ahora son 4). Total: **73 pruebas OK en MySQL**.
+- **Verificación en navegador**: votar → comprobante en la página de éxito → Mis comprobantes → verificar el
+  código propio y uno inexistente → "Voto registrado" en Mi actividad; celular sin scroll horizontal.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

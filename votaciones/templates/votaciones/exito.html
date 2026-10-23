@@ -155,6 +155,10 @@
       font-size: 0.66rem;
     }
 
+    .receipt-code-link {
+      color: var(--color-gold);
+    }
+
     .success-home-link {
       display: flex;
       justify-content: center;
@@ -214,7 +218,7 @@
       <div class="receipt-code-box">
         <span class="receipt-code-label">Código de comprobante</span>
         <span class="receipt-code">{{ voto.codigo_comprobante }}</span>
-        <span class="receipt-code-date">{{ voto.fecha_creacion|date:"d/m/Y H:i" }} · Guárdalo para verificar tu voto.</span>
+        <span class="receipt-code-date">{{ voto.fecha_creacion|date:"d/m/Y H:i" }} · También lo encuentras en <a href="{% url 'perfil_comprobantes' %}" class="receipt-code-link">Mis comprobantes</a>.</span>
       </div>
     </article>
 

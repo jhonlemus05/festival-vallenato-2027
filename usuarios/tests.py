@@ -1,6 +1,8 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
+from votaciones.models import Encuesta, Voto
+
 from .models import Usuario, Bitacora
 
 
@@ -301,7 +303,7 @@ class PerfilUsuarioTests(TestCase):
         self.assertRedirects(response, reverse('perfil'), fetch_redirect_response=False)
 
     def test_secciones_del_perfil_requieren_sesion(self):
-        for nombre in ('perfil', 'perfil_contrasena', 'perfil_actividad'):
+        for nombre in ('perfil', 'perfil_contrasena', 'perfil_actividad', 'perfil_comprobantes'):
             with self.subTest(seccion=nombre):
                 response = self.client.get(reverse(nombre))
                 self.assertRedirects(response, f"{reverse('login')}?next={reverse(nombre)}", fetch_redirect_response=False)
@@ -312,6 +314,7 @@ class PerfilUsuarioTests(TestCase):
             ('perfil', 'datos', 'usuarios/perfil_datos.html'),
             ('perfil_contrasena', 'contrasena', 'usuarios/perfil_contrasena.html'),
             ('perfil_actividad', 'actividad', 'usuarios/perfil_actividad.html'),
+            ('perfil_comprobantes', 'comprobantes', 'usuarios/perfil_comprobantes.html'),
         ]
         for nombre, seccion, template in secciones:
             with self.subTest(seccion=seccion):
@@ -393,3 +396,43 @@ class PerfilUsuarioTests(TestCase):
         perfil = Usuario.objects.get(correo='robo@correo.com')
         self.assertTrue(perfil.esta_bloqueado())
         self.assertTrue(perfil.user.check_password(self.PASSWORD))
+
+
+class MisComprobantesTests(TestCase):
+    """CU-05: el votante ve sus comprobantes y puede verificar un código, sin que se muestre la opción elegida."""
+
+    def setUp(self):
+        self.encuesta = Encuesta.objects.get(nombre='Artista favorito del público')
+        self.opciones = list(self.encuesta.opciones.all())
+        self.votante = User.objects.create_user(username='comprobantes@correo.com', password='TestPassword123!')
+        self.otro = User.objects.create_user(username='otro@correo.com', password='TestPassword123!')
+        self.client.force_login(self.votante)
+
+    def test_sin_votos_lo_informa(self):
+        response = self.client.get(reverse('perfil_comprobantes'))
+
+        self.assertContains(response, 'Todavía no has votado en ninguna encuesta.')
+
+    def test_lista_solo_mis_votos_sin_la_opcion_elegida(self):
+        mio = Voto.objects.create(encuesta=self.encuesta, opcion=self.opciones[1], usuario=self.votante)
+        ajeno = Voto.objects.create(encuesta=self.encuesta, opcion=self.opciones[2], usuario=self.otro)
+
+        response = self.client.get(reverse('perfil_comprobantes'))
+
+        self.assertContains(response, mio.codigo_comprobante)
+        self.assertContains(response, self.encuesta.nombre)
+        self.assertNotContains(response, ajeno.codigo_comprobante)
+        self.assertNotContains(response, self.opciones[1].nombre)
+
+    def test_verificar_un_codigo_confirma_si_existe_sin_revelar_la_opcion(self):
+        ajeno = Voto.objects.create(encuesta=self.encuesta, opcion=self.opciones[2], usuario=self.otro)
+
+        # Se acepta en minúsculas y con espacios, como lo escribiría una persona.
+        response = self.client.get(reverse('perfil_comprobantes'), {'codigo': f'  {ajeno.codigo_comprobante.lower()} '})
+
+        self.assertContains(response, 'está registrado')
+        self.assertNotContains(response, self.opciones[2].nombre)
+        self.assertNotContains(response, 'otro@correo.com')
+
+        response = self.client.get(reverse('perfil_comprobantes'), {'codigo': 'FV-AAAA-AAAA'})
+        self.assertContains(response, 'No hay ningún voto registrado con el comprobante')

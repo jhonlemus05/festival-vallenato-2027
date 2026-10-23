@@ -1,0 +1,67 @@
+{% extends 'usuarios/perfil_base.html' %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | Mis comprobantes{% endblock %}
+{% block descripcion %}Consulta los comprobantes de tus votos en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+
+{% block perfil_titulo %}Mis comprobantes{% endblock %}
+{% block perfil_descripcion %}Las encuestas en las que participaste, con el código y la fecha de tu voto. Por seguridad no se muestra la opción que elegiste.{% endblock %}
+
+{% block perfil_contenido %}
+  {# Flujo 3a del CU-05: verificar un código sin revelar a quién pertenece ni qué se eligió. #}
+  <div class="perfil-card mb-3">
+    <form method="get" action="{% url 'perfil_comprobantes' %}" class="comprobante-verificar">
+      <label class="field-label" for="codigoInput">Verificar un código de comprobante</label>
+      <div class="comprobante-verificar-fila">
+        <div class="input-box-minimal flex-grow-1">
+          <span class="input-icon-svg"><i class="bi bi-upc-scan"></i></span>
+          <input
+            type="text"
+            id="codigoInput"
+            name="codigo"
+            class="native-input"
+            placeholder="FV-XXXX-XXXX"
+            maxlength="20"
+            value="{{ verificacion.codigo|default:'' }}"
+            autocomplete="off"
+          />
+        </div>
+        <button type="submit" class="btn-outline-logout comprobante-verificar-btn">Verificar</button>
+      </div>
+    </form>
+
+    {% if verificacion %}
+      {% if verificacion.voto %}
+        <div class="auth-alert auth-alert-success mt-3 mb-0" role="status">
+          <i class="bi bi-check-circle-fill text-warning"></i>
+          <div>El comprobante <strong>{{ verificacion.codigo }}</strong> está registrado: encuesta «{{ verificacion.voto.encuesta.nombre }}», {{ verificacion.voto.fecha_creacion|date:"d/m/Y H:i" }}.</div>
+        </div>
+      {% else %}
+        <div class="auth-alert auth-alert-error mt-3 mb-0" role="status">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>No hay ningún voto registrado con el comprobante <strong>{{ verificacion.codigo }}</strong>.</div>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="perfil-card">
+    {% if votos %}
+      <ul class="actividad-lista">
+        {% for voto in votos %}
+        <li class="actividad-item">
+          <div class="actividad-icono"><i class="bi bi-receipt"></i></div>
+          <div class="actividad-cuerpo">
+            <div class="actividad-accion">{{ voto.encuesta.nombre }}</div>
+            <div class="actividad-detalles">{{ voto.encuesta.categoria.nombre }} · {{ voto.encuesta.categoria.edicion.nombre }}</div>
+            <div class="actividad-meta">Votaste el {{ voto.fecha_creacion|date:"d/m/Y" }} a las {{ voto.fecha_creacion|date:"H:i" }}</div>
+          </div>
+          <span class="hash-code-pill">{{ voto.codigo_comprobante }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {# Flujo 2a del CU-05. #}
+      <p class="text-secondary small mb-0">Todavía no has votado en ninguna encuesta. <a href="{% url 'categorias_publicas' %}">Ver las encuestas activas</a>.</p>
+    {% endif %}
+  </div>
+{% endblock %}
