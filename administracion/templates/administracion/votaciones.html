@@ -1,0 +1,337 @@
+{% extends 'administracion/admin_base.html' %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | {% if seccion_admin == 'resultados' %}Resultados{% else %}Votaciones{% endif %}{% endblock %}
+{% block descripcion %}Estado y resultados agregados de las encuestas del Festival de la Leyenda Vallenata 2027.{% endblock %}
+
+{% block breadcrumb %}
+  <a href="{% url 'panel_principal' %}" class="bc-parent">Administración</a>
+  <i class="bi bi-chevron-right bc-sep"></i>
+  <span class="bc-current">{% if seccion_admin == 'resultados' %}Resultados{% else %}Votaciones{% endif %}</span>
+{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .vote-admin-intro {
+      margin-bottom: 24px;
+    }
+
+    .vote-admin-kicker {
+      margin-bottom: 5px;
+      color: #9A7414;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .vote-admin-title {
+      margin-bottom: 6px;
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .vote-admin-description {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: 0.86rem;
+    }
+
+    .vote-admin-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .vote-admin-metric,
+    .vote-survey-card {
+      background: #fff;
+      border: 1px solid var(--color-card-border);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.015);
+    }
+
+    .vote-admin-metric {
+      padding: 20px;
+    }
+
+    .vote-admin-metric-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--color-text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .vote-admin-metric-value {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .vote-admin-list-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 28px 0 14px;
+    }
+
+    .vote-admin-list-heading h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .vote-admin-update-link {
+      color: #8D6810;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .vote-survey-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .vote-survey-card {
+      padding: 22px;
+      scroll-margin-top: 20px;
+    }
+
+    .vote-survey-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #EEEFF1;
+    }
+
+    .vote-survey-category {
+      margin-bottom: 4px;
+      color: var(--color-text-muted);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .vote-survey-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.02rem;
+      font-weight: 800;
+    }
+
+    .vote-survey-total {
+      flex-shrink: 0;
+      color: #111;
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .vote-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 0.64rem;
+      font-weight: 700;
+    }
+
+    .vote-state-active {
+      color: #28613C;
+      background: #E8F5EC;
+    }
+
+    .vote-state-upcoming {
+      color: #765A12;
+      background: #F8F0D8;
+    }
+
+    .vote-state-closed {
+      color: #5E6268;
+      background: #ECEEF0;
+    }
+
+    .vote-options {
+      display: grid;
+      gap: 16px;
+      padding-top: 17px;
+    }
+
+    .vote-option-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 7px;
+      font-size: 0.78rem;
+    }
+
+    .vote-option-name {
+      font-weight: 700;
+    }
+
+    .vote-option-count {
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    .vote-result-track {
+      height: 8px;
+      overflow: hidden;
+      background: #F0F1F3;
+      border-radius: 10px;
+    }
+
+    .vote-result-fill {
+      height: 100%;
+      min-width: 0;
+      background: var(--color-gold);
+      border-radius: inherit;
+      transition: width 0.25s ease;
+    }
+
+    .vote-empty-message {
+      margin: 0;
+      padding: 18px 0 0;
+      color: var(--color-text-muted);
+      font-size: 0.78rem;
+    }
+
+    .vote-empty-state {
+      padding: 30px;
+      color: var(--color-text-muted);
+      background: #fff;
+      border: 1px dashed var(--color-card-border);
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 767px) {
+      .vote-admin-metrics {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .vote-admin-metric {
+        padding: 16px;
+      }
+
+      .vote-admin-metric-value {
+        font-size: 1.5rem;
+      }
+
+      .vote-survey-card {
+        padding: 17px;
+      }
+
+      .vote-survey-header {
+        align-items: flex-start;
+      }
+
+      .vote-survey-total {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+  <section class="vote-admin-intro">
+    <div class="vote-admin-kicker">FESTIVAL DE LA LEYENDA VALLENATA 2027</div>
+    <h1 class="vote-admin-title">{% if seccion_admin == 'resultados' %}Resultados{% else %}Estado de votaciones{% endif %}</h1>
+    <p class="vote-admin-description">
+      {% if seccion_admin == 'votaciones' %}
+        Consulta el avance de las encuestas que continúan activas.
+      {% else %}
+        Consulta los resultados consolidados de las encuestas finalizadas o cerradas.
+      {% endif %}
+      Los datos son agregados y no muestran la identidad de los votantes.
+    </p>
+  </section>
+
+  <section class="vote-admin-metrics" aria-label="Resumen de votaciones">
+    <article class="vote-admin-metric">
+      <span class="vote-admin-metric-label">Votos registrados</span>
+      <div class="vote-admin-metric-value">{{ total_votos }}</div>
+    </article>
+    <article class="vote-admin-metric">
+      <span class="vote-admin-metric-label">{% if seccion_admin == 'votaciones' %}Encuestas activas{% else %}Encuestas finalizadas{% endif %}</span>
+      <div class="vote-admin-metric-value">{{ total_encuestas }}</div>
+    </article>
+    <article class="vote-admin-metric">
+      <span class="vote-admin-metric-label">Candidatos y opciones</span>
+      <div class="vote-admin-metric-value">{{ total_opciones }}</div>
+    </article>
+  </section>
+
+  <section id="resultados">
+    <div class="vote-admin-list-heading">
+      <h2>{% if seccion_admin == 'votaciones' %}Estadísticas de votaciones activas{% else %}Resultados de votaciones finalizadas{% endif %}</h2>
+      <a class="vote-admin-update-link" href="{% if seccion_admin == 'votaciones' %}{% url 'admin_votaciones' %}{% else %}{% url 'admin_resultados' %}{% endif %}">
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar
+      </a>
+    </div>
+
+    {% if encuestas %}
+      <div class="vote-survey-list">
+        {% for encuesta in encuestas %}
+          <article class="vote-survey-card" id="encuesta-{{ encuesta.pk }}">
+            <header class="vote-survey-header">
+              <div>
+                <div class="vote-survey-category">{{ encuesta.categoria.nombre }}</div>
+                <h3 class="vote-survey-title">{{ encuesta.nombre }}</h3>
+                <span class="vote-state vote-state-{% if encuesta.estado == 'activa' %}active{% elif encuesta.estado == 'cerrada' %}closed{% else %}upcoming{% endif %}">
+                  <i class="bi {% if encuesta.estado == 'activa' %}bi-broadcast{% elif encuesta.estado == 'cerrada' %}bi-lock{% else %}bi-hourglass-split{% endif %}" aria-hidden="true"></i>
+                  {{ encuesta.get_estado_display }}
+                </span>
+              </div>
+              <div class="vote-survey-total">{{ encuesta.votos_totales }} voto{{ encuesta.votos_totales|pluralize:"s" }}</div>
+            </header>
+
+            {% if encuesta.opciones.all %}
+              <div class="vote-options">
+                {% for opcion in encuesta.opciones.all %}
+                  <div>
+                    <div class="vote-option-meta">
+                      <span class="vote-option-name">{{ opcion.nombre }}</span>
+                      <span class="vote-option-count">{{ opcion.votos_recibidos }} · {{ opcion.porcentaje }}%</span>
+                    </div>
+                    <div
+                      class="vote-result-track"
+                      role="progressbar"
+                      aria-label="Porcentaje de votos de {{ opcion.nombre }}"
+                      aria-valuenow="{{ opcion.porcentaje }}"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      <div class="vote-result-fill" style="width: {{ opcion.porcentaje }}%;"></div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="vote-empty-message">Esta encuesta todavía no tiene opciones configuradas.</p>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="vote-empty-state">
+        {% if seccion_admin == 'votaciones' %}
+          No hay encuestas activas en este momento.
+        {% else %}
+          Aún no hay encuestas finalizadas o cerradas.
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
