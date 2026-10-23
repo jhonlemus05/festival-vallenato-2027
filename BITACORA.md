@@ -226,6 +226,32 @@ D:\no_borrar\programacion\Python\Django\
 - **`usuarios/tests.py`**: 3 pruebas nuevas (las 3 secciones piden sesión, el menú marca la sección activa,
   Mi actividad por separado). Total: **18 pruebas OK**.
 
+### [10] Configuración: MySQL y secretos fuera del repositorio (Entrega 2)
+- **Rama Git:** `feature/migracion-usuarios`.
+- **`pr_festivalVallenato/settings.py`**: la base de datos pasa a **MySQL** (`django.db.backends.mysql`,
+  `charset utf8mb4`) y los datos de conexión y la `SECRET_KEY` se leen de un archivo **`.env`** con
+  `python-dotenv`. Sin `DJANGO_SECRET_KEY` el proyecto no arranca y lo dice. `DB_ENGINE=sqlite` en el `.env`
+  queda solo como respaldo temporal para quien aún no instala MySQL.
+- **`.env.example`** (sí va al repo): plantilla con las variables y cómo generar la clave. El **`.env`** real
+  no se sube (`.gitignore`). La clave vieja quedó en el historial de git, así que cada quien genera la suya.
+- **`requirements.txt`**: `Django==6.1.2`, `mysqlclient==2.3.0` (driver recomendado por Django; en Windows
+  se instala sin compilar) y `python-dotenv==1.2.4`.
+- **`login.html`**: "Un voto único garantizado por categoría" → "Un voto por encuesta, sin duplicados"
+  (la regla RN-03 sigue pendiente de validación; lo implementado es un voto por encuesta).
+- **Cómo dejar MySQL listo (una sola vez por equipo):**
+  1. Instalar MySQL 8. Ubuntu: `sudo apt install mysql-server pkg-config default-libmysqlclient-dev build-essential python3-dev`
+     (los últimos cuatro son para compilar `mysqlclient`). Windows: MySQL Installer (Server 8.4).
+  2. Crear la base y el usuario (en Ubuntu con `sudo mysql`; en Windows con MySQL Shell o Workbench como root):
+     ```sql
+     CREATE DATABASE festival_vallenato CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+     CREATE USER 'festival'@'localhost' IDENTIFIED BY 'una-clave-tuya';
+     GRANT ALL PRIVILEGES ON festival_vallenato.* TO 'festival'@'localhost';
+     GRANT ALL PRIVILEGES ON test_festival_vallenato.* TO 'festival'@'localhost';
+     ```
+     (la segunda base la crea Django al correr las pruebas).
+  3. Copiar `.env.example` como `.env`, generar la clave y poner la contraseña de MySQL.
+  4. `pip install -r requirements.txt`, luego `python manage.py migrate` y `python manage.py createsuperuser`.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

@@ -36,7 +36,8 @@ class Usuario(models.Model):
         verbose_name='Usuario del sistema',
     )
     # Documento único: es lo que garantiza "una persona = un votante" más adelante,
-    # cuando se implemente la restricción de voto único por categoría.
+    # junto con la restricción de un voto por encuesta (la regla definitiva, RN-03, sigue
+    # pendiente de validación con la Fundación).
     identificacion = models.CharField(
         max_length=50,
         unique=True,
