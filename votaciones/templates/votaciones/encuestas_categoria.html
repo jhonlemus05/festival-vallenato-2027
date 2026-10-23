@@ -1,0 +1,229 @@
+{% extends 'votaciones/base.html' %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | {{ categoria.nombre }}{% endblock %}
+{% block descripcion %}Encuestas y consultas de la categoría {{ categoria.nombre }} del Festival de la Leyenda Vallenata 2027.{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .surveys-body-content {
+      flex: 1;
+      padding: 26px 20px 96px;
+      background-color: var(--color-canvas-bg);
+    }
+
+    .screen-kicker {
+      margin-bottom: 6px;
+      color: #71717A;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .screen-title {
+      margin-bottom: 8px;
+      color: #111;
+      font-family: var(--font-display);
+      font-size: 1.72rem;
+      font-weight: 800;
+      line-height: 1.16;
+    }
+
+    .screen-description {
+      margin-bottom: 18px;
+      color: #666;
+      font-size: 0.82rem;
+    }
+
+    .survey-list-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      color: #777;
+      font-size: 0.72rem;
+    }
+
+    .survey-list-heading a {
+      color: #111;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .survey-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .survey-card {
+      padding: 16px;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
+    }
+
+    .survey-card-active {
+      color: #fff;
+      background: #222;
+    }
+
+    .survey-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .survey-status {
+      display: inline-block;
+      padding: 4px 10px;
+      color: #222;
+      background: #F5EBD7;
+      border-radius: 20px;
+      font-size: 0.62rem;
+      font-weight: 700;
+    }
+
+    .survey-status-closed {
+      background: #E7E5E4;
+    }
+
+    .survey-status-upcoming {
+      background: #F3F4F6;
+      color: #555;
+    }
+
+    .survey-card-icon {
+      color: var(--color-gold);
+      font-size: 1rem;
+    }
+
+    .survey-title {
+      margin: 0 0 7px;
+      color: inherit;
+      font-family: var(--font-display);
+      font-size: 1.02rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .survey-description,
+    .survey-detail {
+      margin: 0;
+      color: #666;
+      font-size: 0.69rem;
+      line-height: 1.45;
+    }
+
+    .survey-card-active .survey-description,
+    .survey-card-active .survey-detail {
+      color: #E5E5E5;
+    }
+
+    .survey-action {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px 12px;
+      color: #111;
+      background: var(--color-gold);
+      border: 0;
+      border-radius: 9px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .survey-card:not(.survey-card-active) .survey-action {
+      background: transparent;
+      border: 1px solid #222;
+    }
+
+    .survey-empty {
+      padding: 22px;
+      color: #666;
+      background: #fff;
+      border-radius: 16px;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    .survey-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 18px;
+      color: #555;
+      font-size: 0.75rem;
+      text-decoration: none;
+    }
+
+    .survey-back-link:hover {
+      color: #111;
+    }
+
+    @media (min-width: 768px) {
+      .surveys-body-content {
+        padding: 42px 36px 56px;
+      }
+
+      .survey-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .survey-card {
+        min-height: 190px;
+        padding: 20px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+  <section class="surveys-body-content">
+    <div class="screen-kicker">03 / {{ categoria.nombre }}</div>
+    <h1 class="screen-title">{{ categoria.nombre }} nos une</h1>
+    <p class="screen-description">Explora las encuestas asociadas a esta categoría.</p>
+
+    <div class="survey-list-heading">
+      <span>{{ encuestas|length }} encuesta{{ encuestas|length|pluralize:"s" }} disponible{{ encuestas|length|pluralize:"s" }}</span>
+      <span>{% if encuestas_activas == 1 %}1 activa{% else %}{{ encuestas_activas }} activas{% endif %}</span>
+    </div>
+
+    {% if encuestas %}
+      <div class="survey-list">
+        {% for encuesta in encuestas %}
+          <article class="survey-card{% if encuesta.estado == 'activa' %} survey-card-active{% endif %}">
+            <div class="survey-card-header">
+              <span class="survey-status{% if encuesta.estado == 'cerrada' %} survey-status-closed{% elif encuesta.estado == 'proxima' %} survey-status-upcoming{% endif %}">
+                {{ encuesta.get_estado_display }}
+              </span>
+              <i class="bi {% if encuesta.estado == 'cerrada' %}bi-lock{% elif encuesta.estado == 'proxima' %}bi-hourglass-split{% else %}bi-award{% endif %} survey-card-icon" aria-hidden="true"></i>
+            </div>
+            <h2 class="survey-title">{{ encuesta.nombre }}</h2>
+            <p class="survey-description">{{ encuesta.descripcion }}</p>
+            {% if encuesta.detalle %}
+              <p class="survey-detail mt-2">{{ encuesta.detalle }}</p>
+            {% endif %}
+            {% if encuesta.estado == 'activa' %}
+              {% if encuesta.total_opciones %}
+                <a class="survey-action d-block text-center text-decoration-none" href="{% url 'votar_encuesta' encuesta.pk %}">Elegir mi favorito <i class="bi bi-arrow-right ms-1"></i></a>
+              {% else %}
+                <button type="button" class="survey-action" disabled aria-disabled="true">Opciones próximamente <i class="bi bi-arrow-right ms-1"></i></button>
+              {% endif %}
+            {% elif encuesta.estado == 'cerrada' %}
+              <button type="button" class="survey-action" disabled aria-disabled="true">Consulta finalizada</button>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="survey-empty">Aún no hay encuestas registradas para esta categoría.</div>
+    {% endif %}
+
+    <a class="survey-back-link" href="{% url 'categorias_publicas' %}">
+      <i class="bi bi-arrow-left"></i> Volver a categorías
+    </a>
+  </section>
+{% endblock %}

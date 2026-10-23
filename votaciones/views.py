@@ -1,5 +1,129 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError, transaction
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .models import Categoria, Encuesta, OpcionEncuesta, Voto
 
 
 def index(request):
     return render(request, 'votaciones/index.html', {'seccion_activa': 'inicio'})
+
+
+def categorias(request):
+    categorias_visibles = Categoria.objects.filter(activa=True).annotate(
+        encuestas_activas=Count('encuestas', filter=Q(encuestas__estado='activa')),
+    )
+    return render(
+        request,
+        'votaciones/categorias.html',
+        {
+            'seccion_activa': 'categorias',
+            'categorias': categorias_visibles,
+        },
+    )
+
+
+def categoria_encuestas(request, categoria_id):
+    categoria = get_object_or_404(
+        Categoria.objects.filter(activa=True),
+        pk=categoria_id,
+    )
+    encuestas = Encuesta.objects.filter(categoria=categoria).order_by('orden', 'nombre').annotate(
+        total_opciones=Count('opciones'),
+    )
+    return render(
+        request,
+        'votaciones/encuestas_categoria.html',
+        {
+            'seccion_activa': 'categorias',
+            'categoria': categoria,
+            'encuestas': encuestas,
+            'encuestas_activas': encuestas.filter(estado='activa').count(),
+        },
+    )
+
+
+@login_required
+def votar_encuesta(request, encuesta_id):
+    encuesta = get_object_or_404(
+        Encuesta.objects.select_related('categoria').prefetch_related('opciones'),
+        pk=encuesta_id,
+        estado='activa',
+        categoria__activa=True,
+    )
+    voto_existente = Voto.objects.filter(
+        encuesta=encuesta,
+        usuario=request.user,
+    ).first()
+    if voto_existente:
+        return redirect('voto_exitoso', voto_id=voto_existente.pk)
+
+    opciones = encuesta.opciones.all()
+    if not opciones.exists():
+        messages.info(request, 'Esta encuesta aún no tiene opciones disponibles.')
+        return redirect('categoria_encuestas', categoria_id=encuesta.categoria_id)
+
+    if request.method == 'POST':
+        opcion_id = request.POST.get('opcion')
+        opcion = get_object_or_404(opciones, pk=opcion_id) if opcion_id and opcion_id.isdecimal() else None
+        if opcion is None:
+            messages.error(request, 'Selecciona una opción válida para registrar tu voto.')
+            return render(
+                request,
+                'votaciones/votacion.html',
+                {
+                    'seccion_activa': 'categorias',
+                    'encuesta': encuesta,
+                    'opciones': opciones,
+                    'opcion_seleccionada': None,
+                },
+                status=400,
+            )
+
+        try:
+            with transaction.atomic():
+                voto = Voto.objects.create(
+                    encuesta=encuesta,
+                    opcion=opcion,
+                    usuario=request.user,
+                )
+        except IntegrityError:
+            voto = Voto.objects.filter(
+                encuesta=encuesta,
+                usuario=request.user,
+            ).first()
+            if voto is None:
+                raise
+            return redirect('voto_exitoso', voto_id=voto.pk)
+
+        return redirect('voto_exitoso', voto_id=voto.pk)
+
+    return render(
+        request,
+        'votaciones/votacion.html',
+        {
+            'seccion_activa': 'categorias',
+            'encuesta': encuesta,
+            'opciones': opciones,
+            'opcion_seleccionada': opciones.first(),
+        },
+    )
+
+
+@login_required
+def voto_exitoso(request, voto_id):
+    voto = get_object_or_404(
+        Voto.objects.select_related('encuesta', 'encuesta__categoria', 'opcion'),
+        pk=voto_id,
+        usuario=request.user,
+    )
+    return render(
+        request,
+        'votaciones/exito.html',
+        {
+            'seccion_activa': 'inicio',
+            'voto': voto,
+        },
+    )

@@ -49,12 +49,16 @@ D:\no_borrar\programacion\Python\Django\
 │   ├── views.py                    # login_view, registro_view, perfil_*_view, logout_view
 │   └── tests.py                    # Pruebas de registro, login, logout, bitácora y perfil
 ├── votaciones\                     # APP 2: experiencia pública (MIGRANDO)
+│   ├── migrations\0001_initial.py  # Modelo Categoria + datos iniciales
 │   ├── templates\votaciones\
 │   │   ├── base.html               # Layout público (navbar, footer, offcanvas, scripts)
-│   │   └── index.html              # Página de Inicio (ex inicio.html)
-│   ├── urls.py                     # '' -> views.index (name='index')
-│   └── views.py                    # def index(...)
+│   │   ├── index.html              # Página de Inicio (ex inicio.html)
+│   │   └── categorias.html         # Catálogo público de categorías activas
+│   ├── models.py                   # Categoria (catálogo público y administrativo)
+│   ├── urls.py                     # '' -> Inicio ; 'categorias/' -> catálogo público
+│   └── views.py                    # vistas Inicio y Categorías
 ├── administracion\                 # APP 3: panel privado (MIGRANDO)
+│   ├── forms.py                    # CategoriaForm (alta y edición)
 │   ├── templates\administracion\
 │   │   ├── admin_base.html             # Layout privado (sidebar, topbar, offcanvas, scripts)
 │   │   ├── _admin_sidebar_nav.html     # Menú lateral reutilizable (sidebar + offcanvas)
@@ -138,6 +142,10 @@ D:\no_borrar\programacion\Python\Django\
   categorías) va en `{% block contenido %}`; los modales y el toast en `{% block modales %}`; el CSS
   específico de la página en `{% block extra_css %}`.
 - **`administracion/views.py`**: `def panel_principal(request)` -> render con `{'seccion_admin': 'panel'}`.
+- **Panel conectado a la base de datos**: los totales de votos, encuestas activas en categorías visibles,
+  usuarios registrados y categorías activas se consultan en cada solicitud. La actividad reciente muestra
+  votos reales; el desglose excluye encuestas cerradas o categorías ocultas y calcula sus barras según los
+  votos de las encuestas activas.
 - **`administracion/urls.py`**: `path('', views.panel_principal, name='panel_principal')` (ruta `/admin-panel/`).
 - **Enlaces:** "Volver a vista pública" -> `{% url 'index' %}`. Los ítems Categorías/Votaciones/Opciones/
   Resultados del menú quedaron como `href="#"` hasta migrarlos.
@@ -226,13 +234,64 @@ D:\no_borrar\programacion\Python\Django\
 - **`usuarios/tests.py`**: 3 pruebas nuevas (las 3 secciones piden sesión, el menú marca la sección activa,
   Mi actividad por separado). Total: **18 pruebas OK**.
 
+### [10] Votaciones: catálogo público y gestión de categorías
+- **`votaciones/models.py`**: modelo `Categoria` con nombre, descripción, icono, estado de visibilidad,
+  orden y fechas de creación/actualización.
+- **`votaciones/migrations/0001_initial.py`**: crea la tabla y carga las categorías iniciales Música,
+  Piloneras y Comparsas.
+- **`administracion/forms.py` / `views.py`**: formulario Django para crear y editar categorías, validar
+  nombres duplicados y activar/ocultar cada categoría. Para facilitar la validación de vistas en este
+  entorno académico, el panel y su gestión están temporalmente disponibles sin autenticación; protegerlos
+  antes de un despliegue real.
+- **`administracion/templates/administracion/categorias.html`**: tabla y métricas conectadas a la base de
+  datos; formulario modal con CSRF, mensajes de resultado, búsqueda y filtro por estado.
+- **`votaciones/views.py` / `urls.py`**: catálogo público en `/categorias/`, que muestra las categorías
+  activas. Los enlaces del navbar, menú móvil y llamadas a la acción de Inicio apuntan a esta ruta.
+- **Encuestas dentro de Música**: `votaciones/models.py` añade `Encuesta`, relacionada con `Categoria`
+  y con estados Activa, Próximamente y Cerrada. La migración `0002_encuesta.py` carga Artista favorito
+  del público, Canción favorita del público, Clásico vallenato favorito y Acordeonista; `0003` convierte
+  la antigua categoría raíz Acordeonista en encuesta de Música y `0004` conserva el orden del prototipo,
+  dejando Acordeonista al final.
+- **Gestión**: `administracion/forms.py` y `views.py` permiten crear y editar encuestas desde la sección
+  Categorías. La plantilla `administracion/categorias.html` contiene su formulario modal y las lista bajo
+  su categoría. Se conserva el mismo patrón visual de modales y mensajes del panel.
+- **Vista pública**: cada tarjeta de `/categorias/` abre `/categorias/<id>/`, que muestra las encuestas
+  asociadas con sus respectivos estados.
+- **Verificación de categorías**: se confirmó en navegador el catálogo, las cuatro encuestas de Música
+  y el modal de edición. Las migraciones hasta `0004_ordenar_encuestas_musica` están aplicadas.
+- **`votaciones/migrations/0005_opciones_y_votos.py`**: crea opciones y votos, aplica la restricción de
+  un voto por usuario y encuesta, y carga los cuatro participantes de Artista favorito del público.
+- **Votación pública**: `/encuestas/<id>/votar/` presenta las opciones, pide confirmación y registra el
+  voto para la cuenta autenticada. La pantalla `/votos/<id>/exito/` solo es visible para quien emitió ese
+  voto. Una cuenta no puede cambiar ni volver a emitir su elección en la misma encuesta. Las otras
+  encuestas activas permanecen sin votación hasta que tengan opciones configuradas.
+- **Panel de estado y resultados**: `/admin-panel/votaciones/` y `/admin-panel/resultados/` muestran
+  totales y distribución porcentual por opción en forma agregada. Votaciones incluye únicamente
+  encuestas activas y Resultados únicamente encuestas cerradas. El menú de administración y el acceso
+  del panel principal enlazan a estas vistas; no se exponen identidades de votantes.
+- **Gestión de candidatos y opciones**: desde Categorías se pueden crear y editar opciones vinculadas
+  a cualquier encuesta, independientemente de su categoría. Se valida que el nombre no se repita en la
+  misma encuesta; las imágenes se indican mediante una ruta relativa de `static` (no se suben archivos).
+- **Verificación de la separación y opciones**: se añadieron pruebas para filtros activos/cerrados,
+  alta, edición, duplicados, validación de rutas de imagen y candidatos sin imagen. La suite completa
+  del proyecto pasó con 45 pruebas; `manage.py check` y `makemigrations --check --dry-run` no reportan
+  problemas.
+- **Imágenes de opciones**: los cuatro retratos usados por el prototipo están en `static/images/`.
+- **Verificación de votación**: `manage.py check`, comprobación de migraciones y las 39 pruebas del
+  proyecto pasaron. En navegador se probó el acceso a la votación, el cambio de opción, la confirmación,
+  el comprobante y la distribución del voto en el panel administrativo.
+- **`votaciones/templates/votaciones/categorias.html`**: vista pública adaptable a móvil/escritorio,
+  siguiendo el diseño institucional del prototipo.
+- **Pruebas de categorías**: cubren catálogo público, altas, edición, visibilidad, duplicados y permisos;
+  las pruebas de votación agregadas en la fase siguiente cubren el registro y la restricción de voto único.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):
-- [ ] `categorias.html` -> vista Categorías
-- [ ] `encuestas.html` -> vista Encuestas
-- [ ] `votacion.html` -> vista Votación
-- [ ] `exito.html` -> vista Éxito
+- [x] `categorias.html` -> `votaciones/templates/votaciones/categorias.html` (ruta `/categorias/`)
+- [x] Vista de encuestas por categoría -> `votaciones/templates/votaciones/encuestas_categoria.html` (ruta `/categorias/<id>/`)
+- [x] `votacion.html` -> `votaciones/templates/votaciones/votacion.html` (selección y confirmación)
+- [x] `exito.html` -> `votaciones/templates/votaciones/exito.html` (comprobante de voto)
 
 Autenticación (app `usuarios`):
 - [x] `login.html` -> `usuarios/templates/usuarios/login.html` (vistas `login`, `registro`, `logout` en `/usuarios/login/`)
@@ -242,10 +301,9 @@ Autenticación (app `usuarios`):
 Admin (app `administracion`, usar `admin_base.html`):
 - [x] `admin.html` -> `panel_principal.html` (vista `panel_principal`, `/admin-panel/`)
 - [x] `admin-categorias.html` -> `categorias.html` (vista `categorias`, `/admin-panel/categorias/`)
-- [ ] `admin-votaciones.html` -> gestión de votaciones (`seccion_admin='votaciones'`)
+- [x] `admin-votaciones.html` -> `votaciones.html` (estado de encuestas y distribución de votos)
 - [ ] `admin-opciones.html` -> gestión de opciones (`seccion_admin='opciones'`)
-- [ ] `admin-resultados.html` -> estadísticas (`seccion_admin='resultados'`)
+- [x] `admin-resultados.html` -> `votaciones.html` (resultados agregados por opción)
 
 > Nota: `admin.html` del prototipo NO comparte las mismas variables CSS institucionales
 > (`--color-gold: #D8A629`) que el resto; revisar al migrarlo.
-
