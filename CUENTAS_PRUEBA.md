@@ -30,6 +30,7 @@
 
 - Ruta: `http://127.0.0.1:8000/usuarios/login/`
 - Se puede ingresar con el **correo** o con el **número de documento** más la contraseña.
+- Al entrar se llega a **Mi perfil**: `http://127.0.0.1:8000/usuarios/perfil/` (datos, cambio de contraseña y actividad).
 - Django Admin (solo administrador): `http://127.0.0.1:8000/admin/`
 
 ## 4. Recrear las cuentas en otro entorno

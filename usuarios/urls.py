@@ -10,5 +10,9 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     # Atajo que abre directamente la pestaña "Registrarse".
     path('registro/', views.registro_view, name='registro'),
+    # Perfil (requiere sesión): una URL por cada opción del menú lateral.
+    path('perfil/', views.perfil_view, name='perfil'),
+    path('perfil/contrasena/', views.perfil_contrasena_view, name='perfil_contrasena'),
+    path('perfil/actividad/', views.perfil_actividad_view, name='perfil_actividad'),
     path('logout/', views.logout_view, name='logout'),
 ]

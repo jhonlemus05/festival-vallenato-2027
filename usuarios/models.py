@@ -140,6 +140,11 @@ class Usuario(models.Model):
             self.bloqueado_hasta = None
             self.save(update_fields=['intentos_fallidos', 'bloqueado_hasta'])
 
+    @property
+    def nombre_visible(self):
+        """Parte del correo antes de la @. El modelo no guarda nombre, así que es lo que se muestra en el perfil."""
+        return self.correo.split('@')[0]
+
     def __str__(self):
         return f"{self.correo} ({self.identificacion})"
 
@@ -183,8 +188,11 @@ class Bitacora(models.Model):
         editable=False,
         verbose_name='Firma de integridad SHA-256',
     )
+    # default (y NO auto_now_add): auto_now_add pisa la fecha en el INSERT, después de que
+    # save() ya firmó con otra, y la firma nunca volvería a coincidir al verificarla.
     fecha_hora = models.DateTimeField(
-        auto_now_add=True,
+        default=timezone.now,
+        editable=False,
         verbose_name='Fecha y hora',
     )
 
@@ -194,18 +202,22 @@ class Bitacora(models.Model):
         verbose_name_plural = 'Bitácoras'
         ordering = ['-fecha_hora']
 
+    def calcular_firma(self):
+        """SHA-256 de los campos auditados. Lo usan save() al firmar y firma_valida() al verificar."""
+        identificador = str(self.usuario_id or 'anonimo')
+        # Se concatena SECRET_KEY como "pimienta": sin ella cualquiera con acceso a la BD
+        # podría recalcular un hash válido tras alterar una fila.
+        payload = f"{identificador}|{self.accion}|{self.detalles}|{self.ip_origen or ''}|{self.fecha_hora.isoformat()}|{settings.SECRET_KEY}"
+        return hashlib.sha256(payload.encode('utf-8')).hexdigest()
+
+    def firma_valida(self):
+        """True si la fila no se alteró desde que se creó (la firma recalculada coincide con la guardada)."""
+        return bool(self.hash_sha256) and self.hash_sha256 == self.calcular_firma()
+
     def save(self, *args, **kwargs):
-        # `auto_now_add` rellena fecha_hora recién en el INSERT, pero el hash la necesita
-        # antes, así que la fijamos a mano para que ambos usen exactamente el mismo valor.
-        if not self.fecha_hora:
-            self.fecha_hora = timezone.now()
         # Solo se firma una vez (al crear). Si ya trae hash, no se recalcula.
         if not self.hash_sha256:
-            identificador = str(self.usuario_id or 'anonimo')
-            # Se concatena SECRET_KEY como "pimienta": sin ella cualquiera con acceso a la BD
-            # podría recalcular un hash válido tras alterar una fila.
-            payload = f"{identificador}|{self.accion}|{self.detalles}|{self.ip_origen or ''}|{self.fecha_hora.isoformat()}|{settings.SECRET_KEY}"
-            self.hash_sha256 = hashlib.sha256(payload.encode('utf-8')).hexdigest()
+            self.hash_sha256 = self.calcular_firma()
         super().save(*args, **kwargs)
 
     def __str__(self):
