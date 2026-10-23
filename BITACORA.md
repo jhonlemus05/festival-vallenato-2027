@@ -414,6 +414,13 @@ D:\no_borrar\programacion\Python\Django\
   (solo si no tenían fechas). "Canción favorita" ahora dice "3 canciones de prueba".
 - **Pruebas**: 5 nuevas y 1 ajustada (la de encuesta cerrada esperaba 404). Total: **78 pruebas OK en MySQL**.
 
+### [19] README rediseñado
+- **`README.md`**: reescrito como documentación formal del proyecto: alcance (incluido y pendiente de validación),
+  tecnologías, arquitectura MVT y modelo de datos (diagramas Mermaid que GitHub dibuja), funcionalidades por rol
+  ligadas a los RF/CU de la Entrega 1, seguridad, instalación paso a paso en Windows y Linux, variables de entorno,
+  rutas, comandos, pruebas (78), estructura de carpetas y solución de problemas frecuentes. Sin emojis.
+  Falta completar los nombres de los integrantes.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):
