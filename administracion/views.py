@@ -62,9 +62,10 @@ def panel_principal(request):
 
 def _render_panel_votaciones(request, seccion_admin):
     estado_encuesta = 'activa' if seccion_admin == 'votaciones' else 'cerrada'
+    # order_by explícito: con annotate (GROUP BY) Django no aplica el ordering del modelo.
     opciones_con_votos = OpcionEncuesta.objects.annotate(
         votos_recibidos=Count('votos'),
-    )
+    ).order_by('orden', 'nombre')
     encuestas = list(
         Encuesta.objects.filter(estado=estado_encuesta).select_related('categoria')
         .prefetch_related(Prefetch('opciones', queryset=opciones_con_votos))

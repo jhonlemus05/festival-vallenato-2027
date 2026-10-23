@@ -1,7 +1,7 @@
 {% extends 'votaciones/base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Categorías{% endblock %}
-{% block descripcion %}Conoce las categorías de música, piloneras y comparsas del Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion.anio|default:'2027' }} | Categorías{% endblock %}
+{% block descripcion %}Conoce las categorías de música, piloneras y comparsas del Festival de la Leyenda Vallenata {{ edicion.anio|default:'2027' }}.{% endblock %}
 
 {% block extra_css %}
   <style>
@@ -131,6 +131,39 @@
       margin-top: 1px;
     }
 
+    .edition-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .edition-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      color: #111;
+      background-color: #fff;
+      border: 1px solid rgba(216, 166, 41, 0.45);
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .edition-pill i {
+      color: var(--color-gold);
+    }
+
+    .edition-link {
+      color: #111;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
     .category-empty {
       padding: 24px;
       color: #666;
@@ -168,6 +201,16 @@
     <p class="screen-description">
       Música, danza y tradición. Descubre las categorías del Festival y apoya el talento que te inspira.
     </p>
+
+    {% if edicion %}
+      <div class="edition-bar">
+        <span class="edition-pill">
+          <i class="bi bi-calendar-event" aria-hidden="true"></i>
+          {{ edicion.nombre }} · {{ edicion.fecha_inicio|date:"j \d\e F"|lower }} al {{ edicion.fecha_fin|date:"j \d\e F \d\e Y"|lower }}
+        </span>
+        <a href="{% url 'ediciones' %}" class="edition-link">Ver todas las ediciones</a>
+      </div>
+    {% endif %}
 
     {% if categorias %}
       <div class="categories-grid">
@@ -214,7 +257,7 @@
       </div>
     {% else %}
       <div class="category-empty">
-        Las categorías estarán disponibles próximamente.
+        {% if edicion %}Las categorías estarán disponibles próximamente.{% else %}Aún no hay ediciones del Festival publicadas.{% endif %}
       </div>
     {% endif %}
 

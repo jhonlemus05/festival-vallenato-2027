@@ -4,22 +4,41 @@ from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Categoria, Encuesta, OpcionEncuesta, Voto
+from .models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 
 
 def index(request):
     return render(request, 'votaciones/index.html', {'seccion_activa': 'inicio'})
 
 
-def categorias(request):
-    categorias_visibles = Categoria.objects.filter(activa=True).annotate(
-        encuestas_activas=Count('encuestas', filter=Q(encuestas__estado='activa')),
+def ediciones(request):
+    # order_by explícito: con annotate (GROUP BY) Django no aplica el ordering del modelo.
+    lista = Edicion.objects.annotate(
+        total_categorias=Count('categorias', filter=Q(categorias__activa=True)),
+    ).order_by('-anio')
+    return render(
+        request,
+        'votaciones/ediciones.html',
+        {
+            'seccion_activa': 'categorias',
+            'ediciones': lista,
+            'vigente': Edicion.vigente(),
+        },
     )
+
+
+def categorias(request, anio=None):
+    # Sin año se muestra la edición vigente; /ediciones/<año>/ permite consultar las demás.
+    edicion = Edicion.vigente() if anio is None else get_object_or_404(Edicion, anio=anio)
+    categorias_visibles = Categoria.objects.filter(activa=True, edicion=edicion).annotate(
+        encuestas_activas=Count('encuestas', filter=Q(encuestas__estado='activa')),
+    ).order_by('orden', 'nombre')
     return render(
         request,
         'votaciones/categorias.html',
         {
             'seccion_activa': 'categorias',
+            'edicion': edicion,
             'categorias': categorias_visibles,
         },
     )

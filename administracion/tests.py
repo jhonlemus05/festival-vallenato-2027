@@ -1,8 +1,10 @@
+from datetime import date
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from votaciones.models import Categoria, Encuesta, OpcionEncuesta, Voto
+from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 
 
 class GestionCategoriasTests(TestCase):
@@ -68,6 +70,37 @@ class GestionCategoriasTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Ya existe una categoría con ese nombre.')
         self.assertEqual(Categoria.objects.count(), 3)
+
+    def test_categoria_nueva_queda_en_la_edicion_vigente(self):
+        self.client.post(self.url, {
+            'nombre': 'Canción inédita',
+            'descripcion': 'Composiciones originales del festival.',
+            'icono': 'music',
+            'activa': 'on',
+        })
+
+        categoria = Categoria.objects.get(nombre='Canción inédita')
+        self.assertEqual(categoria.edicion, Edicion.vigente())
+
+    def test_nombre_repetido_de_otra_edicion_no_se_toma_como_duplicado(self):
+        anterior = Edicion.objects.create(
+            nombre='Festival de la Leyenda Vallenata 2026',
+            anio=2026,
+            fecha_inicio=date(2026, 4, 29),
+            fecha_fin=date(2026, 5, 2),
+            estado='finalizada',
+        )
+        Categoria.objects.create(edicion=anterior, nombre='Canción inédita', descripcion='Edición anterior.')
+
+        response = self.client.post(self.url, {
+            'nombre': 'Canción inédita',
+            'descripcion': 'Composiciones originales del festival.',
+            'icono': 'music',
+            'activa': 'on',
+        })
+
+        self.assertRedirects(response, self.url)
+        self.assertEqual(Categoria.objects.filter(nombre='Canción inédita').count(), 2)
 
     def test_crea_encuesta_en_categoria_desde_el_panel(self):
         categoria = Categoria.objects.get(nombre='Música')

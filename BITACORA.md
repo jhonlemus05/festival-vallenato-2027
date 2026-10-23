@@ -311,6 +311,25 @@ D:\no_borrar\programacion\Python\Django\
   3. Copiar `.env.example` como `.env`, generar la clave y poner la contraseña de MySQL.
   4. `pip install -r requirements.txt`, luego `python manage.py migrate` y `python manage.py createsuperuser`.
 
+### [12] Votaciones: Ediciones del Festival (Entrega 2, RN-01)
+- **Rama Git:** `desarrollo_total` (ya incluye la rama `feature/migracion-votaciones` de Teo, integrada con merge).
+- **`votaciones/models.py`**: modelo **`Edicion`** según el MER (`nombre`, `anio` único, `fecha_inicio`,
+  `fecha_fin`, `estado`: En preparación / Activa / Finalizada), con validación de fechas y `Edicion.vigente()`
+  (la activa más reciente). `Categoria` pasa a pertenecer a una edición (`on_delete=PROTECT`) y su nombre es
+  único **dentro de cada edición**, no en general.
+- **`votaciones/migrations/0006_edicion.py`**: crea la tabla, registra el **60° Festival (28 de abril al 1 de
+  mayo de 2027, boletín n.° 028 de la Fundación)** y le asigna Música, Piloneras y Comparsas. Se puede revertir.
+- **Django Admin**: `Edicion` registrada con sus categorías en línea; `Categoria` muestra y filtra por edición.
+- **Panel propio** (`administracion/forms.py`): las categorías nuevas se crean en la edición vigente y el
+  control de nombres repetidos se limita a esa edición.
+- **Vista pública**: `/categorias/` muestra la edición vigente con sus fechas; `/ediciones/` lista todas y
+  `/ediciones/<año>/` muestra las categorías de cada una.
+- **Corrección**: las consultas con `annotate` no traían `order_by` (Django ignora el `ordering` del modelo con
+  GROUP BY); en MySQL las categorías salían en orden alfabético. Se agregó el orden explícito en categorías,
+  ediciones y opciones del panel.
+- **Pruebas**: 10 nuevas (8 de ediciones en `votaciones`, 2 del panel en `administracion`). Total del proyecto:
+  **57 pruebas OK en MySQL**.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

@@ -1,6 +1,6 @@
 from django import forms
 
-from votaciones.models import Categoria, Encuesta, OpcionEncuesta
+from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta
 
 
 class CategoriaForm(forms.ModelForm):
@@ -28,9 +28,25 @@ class CategoriaForm(forms.ModelForm):
             'activa': 'Visible y activa en la aplicación pública',
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # El panel crea las categorías nuevas en la edición vigente (RN-01: ninguna queda sin edición).
+        # Las ediciones se administran desde Django Admin.
+        if not self.instance.pk and not self.instance.edicion_id:
+            edicion = Edicion.vigente()
+            if edicion:
+                self.instance.edicion = edicion
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.instance.edicion_id:
+            raise forms.ValidationError('Primero registra una edición del Festival en Django Admin.')
+        return cleaned_data
+
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre'].strip()
-        duplicadas = Categoria.objects.all()
+        # Solo choca con categorías de la misma edición: "Música" puede repetirse en otro año.
+        duplicadas = Categoria.objects.filter(edicion_id=self.instance.edicion_id)
         if self.instance.pk:
             duplicadas = duplicadas.exclude(pk=self.instance.pk)
         if any(nombre.casefold() == nombre_existente.casefold()

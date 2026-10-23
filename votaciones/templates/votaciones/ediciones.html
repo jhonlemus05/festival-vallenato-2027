@@ -1,0 +1,165 @@
+{% extends 'votaciones/base.html' %}
+
+{% block titulo %}Festival de la Leyenda Vallenata | Ediciones{% endblock %}
+{% block descripcion %}Consulta las ediciones del Festival de la Leyenda Vallenata y sus categorías de votación.{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .editions-body-content {
+      flex: 1;
+      padding: 26px 20px 96px;
+      background-color: var(--color-canvas-bg);
+    }
+
+    .screen-kicker {
+      margin-bottom: 6px;
+      color: #71717A;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .screen-title {
+      margin-bottom: 8px;
+      color: var(--color-text-dark);
+      font-family: var(--font-display);
+      font-size: 1.86rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .screen-description {
+      margin-bottom: 24px;
+      color: var(--color-text-muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .editions-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .edition-card {
+      display: block;
+      padding: 20px 19px;
+      color: inherit;
+      text-decoration: none;
+      background-color: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .edition-card:hover {
+      color: inherit;
+      border-color: rgba(216, 166, 41, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .edition-card.vigente {
+      border-color: var(--color-gold);
+    }
+
+    .edition-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .edition-year {
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .edition-badge {
+      padding: 5px 11px;
+      color: #111;
+      background-color: #F5EBD7;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .edition-badge.finalizada {
+      color: #555;
+      background-color: #EFEFEF;
+    }
+
+    .edition-title {
+      margin: 0 0 4px;
+      color: #111;
+      font-family: var(--font-display);
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .edition-meta {
+      margin: 0;
+      color: #555;
+      font-size: 0.76rem;
+      line-height: 1.5;
+    }
+
+    .edition-empty {
+      padding: 24px;
+      color: #666;
+      background: #fff;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .editions-body-content {
+        padding: 42px 36px 56px;
+      }
+
+      .editions-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+  <section class="editions-body-content">
+    <div class="screen-kicker">02 / Ediciones</div>
+    <h1 class="screen-title">Ediciones del Festival</h1>
+    <p class="screen-description">
+      Cada edición agrupa sus propias categorías y votaciones. Elige una para ver sus categorías.
+    </p>
+
+    {% if ediciones %}
+      <div class="editions-grid">
+        {% for edicion in ediciones %}
+          <a href="{% url 'edicion_categorias' edicion.anio %}" class="edition-card {% if edicion == vigente %}vigente{% endif %}">
+            <div class="edition-card-top">
+              <span class="edition-year">{{ edicion.anio }}</span>
+              <span class="edition-badge {% if edicion.estado == 'finalizada' %}finalizada{% endif %}">
+                {% if edicion == vigente %}Vigente · {% endif %}{{ edicion.get_estado_display }}
+              </span>
+            </div>
+            <h2 class="edition-title">{{ edicion.nombre }}</h2>
+            <p class="edition-meta">{{ edicion.fecha_inicio|date:"j \d\e F"|lower }} al {{ edicion.fecha_fin|date:"j \d\e F \d\e Y"|lower }}</p>
+            <p class="edition-meta">
+              {% if edicion.total_categorias == 1 %}1 categoría{% else %}{{ edicion.total_categorias }} categorías{% endif %}
+            </p>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="edition-empty">Aún no hay ediciones del Festival publicadas.</div>
+    {% endif %}
+  </section>
+{% endblock %}

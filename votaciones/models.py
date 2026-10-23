@@ -1,5 +1,44 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+
+
+class Edicion(models.Model):
+    """Edición anual del Festival: primer nivel de la jerarquía Edición → Categoría → Votación → Opción (RN-01)."""
+
+    ESTADOS = [
+        ('preparacion', 'En preparación'),
+        ('activa', 'Activa'),
+        ('finalizada', 'Finalizada'),
+    ]
+
+    nombre = models.CharField(max_length=150, verbose_name='Nombre')
+    anio = models.PositiveSmallIntegerField(unique=True, verbose_name='Año')
+    fecha_inicio = models.DateField(verbose_name='Fecha de inicio')
+    fecha_fin = models.DateField(verbose_name='Fecha de finalización')
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default='preparacion',
+        verbose_name='Estado',
+    )
+
+    class Meta:
+        ordering = ['-anio']
+        verbose_name = 'Edición'
+        verbose_name_plural = 'Ediciones'
+
+    def __str__(self):
+        return f'{self.nombre} ({self.anio})'
+
+    def clean(self):
+        if self.fecha_inicio and self.fecha_fin and self.fecha_fin < self.fecha_inicio:
+            raise ValidationError({'fecha_fin': 'La fecha de finalización no puede ser anterior a la de inicio.'})
+
+    @classmethod
+    def vigente(cls):
+        """La edición que ve el público: la activa más reciente o, si no hay activa, la más reciente."""
+        return cls.objects.filter(estado='activa').first() or cls.objects.first()
 
 
 class Categoria(models.Model):
@@ -10,7 +49,14 @@ class Categoria(models.Model):
         ('trophy', 'Trofeo'),
     ]
 
-    nombre = models.CharField(max_length=100, unique=True, verbose_name='Nombre')
+    # PROTECT: no se puede borrar una edición que todavía tiene categorías (y con ellas votos).
+    edicion = models.ForeignKey(
+        Edicion,
+        on_delete=models.PROTECT,
+        related_name='categorias',
+        verbose_name='Edición',
+    )
+    nombre = models.CharField(max_length=100, verbose_name='Nombre')
     descripcion = models.CharField(max_length=220, verbose_name='Descripción')
     icono = models.CharField(
         max_length=20,
@@ -25,6 +71,13 @@ class Categoria(models.Model):
 
     class Meta:
         ordering = ['orden', 'nombre']
+        # El nombre se repite entre ediciones (Música 2027, Música 2028), no dentro de una misma.
+        constraints = [
+            models.UniqueConstraint(
+                fields=['edicion', 'nombre'],
+                name='votacion_categoria_unica_por_edicion',
+            ),
+        ]
         verbose_name = 'Categoría'
         verbose_name_plural = 'Categorías'
 

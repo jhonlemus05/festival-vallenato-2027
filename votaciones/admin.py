@@ -1,13 +1,27 @@
 from django.contrib import admin
-from .models import Categoria, Encuesta, OpcionEncuesta, Voto
+from .models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
+
+
+class CategoriaInline(admin.TabularInline):
+    model = Categoria
+    fields = ('nombre', 'descripcion', 'icono', 'activa', 'orden')
+    extra = 0
+
+
+@admin.register(Edicion)
+class EdicionAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'anio', 'fecha_inicio', 'fecha_fin', 'estado')
+    list_filter = ('estado',)
+    search_fields = ('nombre',)
+    inlines = [CategoriaInline]
 
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'activa', 'orden', 'fecha_actualizacion')
-    list_filter = ('activa',)
+    list_display = ('nombre', 'edicion', 'activa', 'orden', 'fecha_actualizacion')
+    list_filter = ('edicion', 'activa')
     search_fields = ('nombre', 'descripcion')
-    ordering = ('orden', 'nombre')
+    ordering = ('-edicion__anio', 'orden', 'nombre')
 
 
 @admin.register(Encuesta)
