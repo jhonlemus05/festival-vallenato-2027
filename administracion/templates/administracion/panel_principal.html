@@ -243,7 +243,7 @@
 {% block contenido %}
       <!-- ENCABEZADO DE PÁGINA (TÍTULO Y BOTÓN DE ACCIÓN) -->
       <section class="dashboard-page-header">
-        <div class="panel-kicker">FESTIVAL DE LA LEYENDA VALLENATA 2027</div>
+        <div class="panel-kicker">{% if edicion %}{{ edicion.nombre|upper }} · {{ edicion.anio }}{% else %}FESTIVAL DE LA LEYENDA VALLENATA{% endif %}</div>
         <div class="panel-header-row">
           <div>
             <h1 class="panel-title">Panel principal</h1>

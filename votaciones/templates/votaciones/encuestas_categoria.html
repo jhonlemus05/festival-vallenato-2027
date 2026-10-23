@@ -1,7 +1,7 @@
 {% extends 'votaciones/base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | {{ categoria.nombre }}{% endblock %}
-{% block descripcion %}Encuestas y consultas de la categoría {{ categoria.nombre }} del Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ categoria.edicion.anio }} | {{ categoria.nombre }}{% endblock %}
+{% block descripcion %}Encuestas y consultas de la categoría {{ categoria.nombre }} del Festival de la Leyenda Vallenata {{ categoria.edicion.anio }}.{% endblock %}
 
 {% block extra_css %}
   <style>
@@ -182,9 +182,9 @@
 
 {% block contenido %}
   <section class="surveys-body-content">
-    <div class="screen-kicker">03 / {{ categoria.nombre }}</div>
+    <div class="screen-kicker">03 / {{ categoria.nombre }} · {{ categoria.edicion.anio }}</div>
     <h1 class="screen-title">{{ categoria.nombre }} nos une</h1>
-    <p class="screen-description">Explora las encuestas asociadas a esta categoría.</p>
+    <p class="screen-description">Explora las encuestas de esta categoría en {{ categoria.edicion.nombre }}.</p>
 
     <div class="survey-list-heading">
       <span>{{ encuestas|length }} encuesta{{ encuestas|length|pluralize:"s" }} disponible{{ encuestas|length|pluralize:"s" }}</span>
@@ -222,8 +222,9 @@
       <div class="survey-empty">Aún no hay encuestas registradas para esta categoría.</div>
     {% endif %}
 
-    <a class="survey-back-link" href="{% url 'categorias_publicas' %}">
-      <i class="bi bi-arrow-left"></i> Volver a categorías
+    {# Vuelve a las categorías de la edición de esta categoría (no siempre a la vigente). #}
+    <a class="survey-back-link" href="{% url 'edicion_categorias' categoria.edicion.anio %}">
+      <i class="bi bi-arrow-left"></i> Volver a categorías de {{ categoria.edicion.anio }}
     </a>
   </section>
 {% endblock %}

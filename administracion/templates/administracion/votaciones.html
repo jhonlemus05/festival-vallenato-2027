@@ -246,7 +246,7 @@
 
 {% block contenido %}
   <section class="vote-admin-intro">
-    <div class="vote-admin-kicker">FESTIVAL DE LA LEYENDA VALLENATA 2027</div>
+    <div class="vote-admin-kicker">{% if edicion %}{{ edicion.nombre|upper }} · {{ edicion.anio }}{% else %}FESTIVAL DE LA LEYENDA VALLENATA{% endif %}</div>
     <h1 class="vote-admin-title">{% if seccion_admin == 'resultados' %}Resultados{% else %}Estado de votaciones{% endif %}</h1>
     <p class="vote-admin-description">
       {% if seccion_admin == 'votaciones' %}

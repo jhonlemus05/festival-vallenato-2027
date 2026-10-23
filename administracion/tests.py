@@ -338,3 +338,32 @@ class PanelPrincipalTests(TestCase):
         self.assertEqual(response.context['total_encuestas_activas'], 0)
         self.assertContains(response, 'No hay encuestas activas en categorías visibles.')
         self.assertNotContains(response, 'Artista favorito del público')
+
+    def test_panel_muestra_solo_la_edicion_vigente_y_quien_esta_conectado(self):
+        anterior = Edicion.objects.create(
+            nombre='Festival de la Leyenda Vallenata 2026',
+            anio=2026,
+            fecha_inicio=date(2026, 4, 29),
+            fecha_fin=date(2026, 5, 2),
+            estado='finalizada',
+        )
+        musica_2026 = Categoria.objects.create(edicion=anterior, nombre='Música', descripcion='Edición anterior.')
+        encuesta_2026 = Encuesta.objects.create(
+            categoria=musica_2026,
+            nombre='Encuesta 2026',
+            descripcion='De la edición anterior.',
+            estado='activa',
+        )
+        opcion_2026 = OpcionEncuesta.objects.create(encuesta=encuesta_2026, nombre='Opción 2026')
+        votante = User.objects.create_user(username='votante-2026', password='TestPassword123!')
+        Voto.objects.create(encuesta=encuesta_2026, opcion=opcion_2026, usuario=votante)
+
+        response = self.client.get(reverse('panel_principal'))
+
+        self.assertEqual(response.context['edicion'].anio, 2027)
+        self.assertEqual(response.context['total_votos'], 0)
+        self.assertEqual(response.context['categorias_activas'], ['Música', 'Piloneras', 'Comparsas'])
+        self.assertNotIn(encuesta_2026, response.context['encuestas_activas'])
+        self.assertContains(response, 'admin-panel')
+        self.assertNotContains(response, 'Panel sin autenticación')
+        self.assertNotContains(response, 'href="#"')

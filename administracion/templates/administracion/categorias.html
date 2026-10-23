@@ -453,20 +453,9 @@
 {% endblock %}
 
 {% block contenido %}
-      {% if messages %}
-        <div class="mb-3" aria-live="polite">
-          {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show rounded-3" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
       <!-- ENCABEZADO DE PÁGINA (TÍTULO Y BOTÓN DE ACCIÓN) -->
       <section class="dashboard-page-header">
-        <div class="panel-kicker">FESTIVAL DE LA LEYENDA VALLENATA 2027</div>
+        <div class="panel-kicker">{% if edicion %}{{ edicion.nombre|upper }} · {{ edicion.anio }}{% else %}FESTIVAL DE LA LEYENDA VALLENATA{% endif %}</div>
         <div class="panel-header-row">
           <div>
             <h1 class="panel-title">Gestión de categorías</h1>
@@ -604,7 +593,8 @@
         </div>
       </section>
 
-      <section class="mb-4">
+      {# id usado por el enlace "Opciones" del menú: las opciones se gestionan dentro de cada encuesta. #}
+      <section class="mb-4" id="encuestas-y-opciones">
         <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
           <div>
             <h2 class="catalog-title mb-1">Encuestas por categoría</h2>

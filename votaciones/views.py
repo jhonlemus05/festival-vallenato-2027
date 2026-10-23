@@ -8,7 +8,8 @@ from .models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 
 
 def index(request):
-    return render(request, 'votaciones/index.html', {'seccion_activa': 'inicio'})
+    # La edición vigente alimenta el contador regresivo y las fechas de la portada.
+    return render(request, 'votaciones/index.html', {'seccion_activa': 'inicio', 'edicion': Edicion.vigente()})
 
 
 def ediciones(request):
@@ -46,7 +47,7 @@ def categorias(request, anio=None):
 
 def categoria_encuestas(request, categoria_id):
     categoria = get_object_or_404(
-        Categoria.objects.filter(activa=True),
+        Categoria.objects.filter(activa=True).select_related('edicion'),
         pk=categoria_id,
     )
     encuestas = Encuesta.objects.filter(categoria=categoria).order_by('orden', 'nombre').annotate(
@@ -126,7 +127,8 @@ def votar_encuesta(request, encuesta_id):
             'seccion_activa': 'categorias',
             'encuesta': encuesta,
             'opciones': opciones,
-            'opcion_seleccionada': opciones.first(),
+            # Sin preselección: el votante debe elegir a propósito (el botón Votar arranca deshabilitado).
+            'opcion_seleccionada': None,
         },
     )
 

@@ -103,6 +103,19 @@
       object-fit: cover;
     }
 
+    .contestant-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 3.2rem;
+      font-weight: 800;
+      background: linear-gradient(145deg, #111111, #2A2418);
+    }
+
     .contestant-check {
       position: absolute;
       top: 8px;
@@ -389,7 +402,7 @@
   <section class="voting-page">
     <div class="voting-kicker">04 / {{ encuesta.categoria.nombre }}</div>
     <h1 class="voting-title">{{ encuesta.nombre }}</h1>
-    <p class="voting-description">Selecciona a quien quieres darle tu voto.</p>
+    <p class="voting-description">Selecciona a quién quieres darle tu voto.</p>
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-{{ message.tags|default:'info' }} py-2 small" role="alert">{{ message }}</div>
@@ -419,6 +432,9 @@
             <div class="contestant-photo">
               {% if opcion.imagen %}
                 <img src="{% static opcion.imagen %}" alt="{{ opcion.nombre }}">
+              {% else %}
+                {# Sin foto: la inicial del nombre en vez de un recuadro vacío que parece una imagen rota. #}
+                <span class="contestant-placeholder" aria-hidden="true">{{ opcion.nombre|first|upper }}</span>
               {% endif %}
               <span class="contestant-check"><i class="bi bi-check2" aria-hidden="true"></i></span>
             </div>

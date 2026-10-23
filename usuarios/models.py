@@ -84,8 +84,9 @@ class Usuario(models.Model):
 
     class Meta:
         db_table = 'usuario'
-        verbose_name = 'Usuario'
-        verbose_name_plural = 'Usuarios'
+        # "Perfil" y no "Usuario": en Django Admin ya existe la sección Usuarios (auth.User).
+        verbose_name = 'Perfil de usuario'
+        verbose_name_plural = 'Perfiles de usuario'
         ordering = ['-fecha_registro']
 
     def save(self, *args, **kwargs):

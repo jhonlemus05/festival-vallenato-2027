@@ -94,6 +94,18 @@ class VotacionPublicaTests(TestCase):
         self.assertRedirects(response, f'{reverse("login")}?next={self.url}')
         self.assertEqual(Voto.objects.count(), 0)
 
+    def test_ninguna_opcion_viene_preseleccionada(self):
+        self.client.force_login(self.usuario)
+
+        response = self.client.get(self.url)
+
+        self.assertIsNone(response.context['opcion_seleccionada'])
+        # Ningún radio de opción marcado ("checked" también aparece en el CSS y el JS de la página).
+        html = response.content.decode()
+        self.assertNotRegex(html, r'<input[^>]*name="opcion"[^>]*\bchecked\b[^>]*>')
+        self.assertRegex(html, r'class="voting-submit"[^>]*\bdisabled\b')
+        self.assertContains(response, 'Selecciona a quién quieres darle tu voto.')
+
     def test_pagina_muestra_opciones_y_guarda_voto_confirmado(self):
         self.client.force_login(self.usuario)
 
@@ -310,6 +322,21 @@ class EdicionesTests(TestCase):
         self.assertContains(response, 'Danza 2026')
         self.assertNotContains(response, 'Piloneras')
         self.assertEqual(self.client.get(reverse('edicion_categorias', args=[1999])).status_code, 404)
+
+    def test_encuestas_de_otra_edicion_vuelven_a_su_edicion(self):
+        anterior = self.crear_edicion(2026)
+        musica_2026 = Categoria.objects.create(edicion=anterior, nombre='Música', descripcion='Edición anterior.')
+
+        response = self.client.get(reverse('categoria_encuestas', args=[musica_2026.pk]))
+
+        self.assertContains(response, reverse('edicion_categorias', args=[2026]))
+        self.assertContains(response, 'Música · 2026')
+
+    def test_contador_de_la_portada_usa_la_fecha_de_la_edicion_vigente(self):
+        response = self.client.get(reverse('index'))
+
+        self.assertContains(response, 'data-inicio="2027-04-28"')
+        self.assertNotContains(response, 'Fechas oficiales por anunciar')
 
     def test_django_admin_registra_y_lista_ediciones(self):
         admin = User.objects.create_superuser('admin-ediciones', 'admin@festivalvallenato.com', 'ClaveAdmin2027!')

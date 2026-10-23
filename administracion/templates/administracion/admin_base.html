@@ -686,7 +686,7 @@
       <!-- Titular del Sistema -->
       <div class="system-identity-block">
         <div class="system-kicker">SISTEMA DE VOTACIONES</div>
-        <div class="system-title">Festival 2027</div>
+        <div class="system-title">Festival {{ edicion.anio|default:"2027" }}</div>
       </div>
     </div>
 
@@ -738,7 +738,7 @@
       <div class="sidebar-header-box pt-3 pb-2">
         <div class="system-identity-block">
           <div class="system-kicker">SISTEMA DE VOTACIONES</div>
-          <div class="system-title" style="font-size: 1.25rem;">Festival 2027</div>
+          <div class="system-title" style="font-size: 1.25rem;">Festival {{ edicion.anio|default:"2027" }}</div>
         </div>
       </div>
 
@@ -784,7 +784,7 @@
             referrerpolicy="no-referrer"
             onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';"
           />
-          <span class="mobile-brand-title">Festival 2027</span>
+          <span class="mobile-brand-title">Festival {{ edicion.anio|default:"2027" }}</span>
         </div>
 
         <!-- Breadcrumb de navegación (Escritorio) -->
@@ -805,9 +805,10 @@
           <div class="user-avatar-circle">
             <i class="bi bi-person"></i>
           </div>
+          {# El panel exige rol de administrador (usuarios.permisos.administrador_requerido). #}
           <div class="user-info-text">
-            <span class="user-name">Vista de operador</span>
-            <span class="user-role">Panel sin autenticación</span>
+            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <span class="user-role">Administrador</span>
           </div>
         </div>
       </div>
@@ -815,6 +816,17 @@
 
     <!-- ÁREA DE CONTENIDO DEL DASHBOARD -->
     <div class="dashboard-content-area">
+      {# Mensajes en todas las páginas del panel (antes solo los mostraba Categorías). #}
+      {% if messages %}
+        <div class="mb-3" aria-live="polite">
+          {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show rounded-3" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
       {% block contenido %}{% endblock %}
     </div>
 

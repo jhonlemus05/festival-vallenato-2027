@@ -274,7 +274,9 @@
         <div class="countdown-desktop-left">
           <!-- Título de sección -->
           <h2 class="section-headline">La leyenda se acerca</h2>
-          <div class="countdown-footnote mt-0 mb-3">Fechas oficiales por anunciar.</div>
+          <div class="countdown-footnote mt-0 mb-3">
+            {% if edicion %}Del {{ edicion.fecha_inicio|date:"j \d\e F"|lower }} al {{ edicion.fecha_fin|date:"j \d\e F \d\e Y"|lower }} · Valledupar{% else %}Fechas oficiales por anunciar.{% endif %}
+          </div>
           <!-- Texto descriptivo de la votación -->
           <p class="promo-paragraph mb-0">
             Tu voz también hace parte de la leyenda. Conoce las categorías y elige tus favoritos.
@@ -282,7 +284,8 @@
         </div>
 
         <!-- Cuadrícula de 4 tarjetas de cuenta regresiva (Días, Horas, Minutos, Segundos) -->
-        <div class="countdown-grid">
+        {# data-inicio: fecha de inicio de la edición vigente (la lee countdown.js); sin edición quedan los guiones. #}
+        <div class="countdown-grid" {% if edicion %}data-inicio="{{ edicion.fecha_inicio|date:'Y-m-d' }}"{% endif %}>
           <div class="countdown-tile">
             <div class="countdown-value" id="count-days">--</div>
             <div class="countdown-label">Días</div>

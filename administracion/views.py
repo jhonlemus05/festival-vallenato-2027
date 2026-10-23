@@ -4,16 +4,19 @@ from django.db.models import Count, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 
 from usuarios.permisos import administrador_requerido
-from votaciones.models import Categoria, Encuesta, OpcionEncuesta, Voto
+from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 from .forms import CategoriaForm, EncuestaForm, OpcionEncuestaForm
 
 
 @administrador_requerido
 def panel_principal(request):
+    # El panel trabaja sobre la edición vigente (las anteriores se consultan en /ediciones/ y Django Admin).
+    edicion = Edicion.vigente()
     encuestas_activas = list(
         Encuesta.objects.filter(
             estado='activa',
             categoria__activa=True,
+            categoria__edicion=edicion,
         )
         .select_related('categoria')
         .annotate(
@@ -31,17 +34,17 @@ def panel_principal(request):
         )
 
     categorias_activas = list(
-        Categoria.objects.filter(activa=True).order_by('orden', 'nombre').values_list('nombre', flat=True)
+        Categoria.objects.filter(activa=True, edicion=edicion).order_by('orden', 'nombre').values_list('nombre', flat=True)
     )
     votos_recientes = list(
-        Voto.objects.select_related(
+        Voto.objects.filter(encuesta__categoria__edicion=edicion).select_related(
             'opcion',
             'encuesta',
             'encuesta__categoria',
         ).order_by('-fecha_creacion')[:6]
     )
-    encuestas_con_votos = Encuesta.objects.filter(votos__isnull=False).distinct().count()
-    total_votos = Voto.objects.count()
+    encuestas_con_votos = Encuesta.objects.filter(categoria__edicion=edicion, votos__isnull=False).distinct().count()
+    total_votos = Voto.objects.filter(encuesta__categoria__edicion=edicion).count()
     usuario_model = get_user_model()
 
     return render(
@@ -49,6 +52,7 @@ def panel_principal(request):
         'administracion/panel_principal.html',
         {
             'seccion_admin': 'panel',
+            'edicion': edicion,
             'total_votos': total_votos,
             'total_encuestas_activas': len(encuestas_activas),
             'total_usuarios': usuario_model.objects.count(),
@@ -64,12 +68,13 @@ def panel_principal(request):
 
 def _render_panel_votaciones(request, seccion_admin):
     estado_encuesta = 'activa' if seccion_admin == 'votaciones' else 'cerrada'
+    edicion = Edicion.vigente()
     # order_by explícito: con annotate (GROUP BY) Django no aplica el ordering del modelo.
     opciones_con_votos = OpcionEncuesta.objects.annotate(
         votos_recibidos=Count('votos'),
     ).order_by('orden', 'nombre')
     encuestas = list(
-        Encuesta.objects.filter(estado=estado_encuesta).select_related('categoria')
+        Encuesta.objects.filter(estado=estado_encuesta, categoria__edicion=edicion).select_related('categoria')
         .prefetch_related(Prefetch('opciones', queryset=opciones_con_votos))
         .order_by('categoria__orden', 'orden', 'nombre')
         .annotate(votos_totales=Count('votos', distinct=True))
@@ -87,6 +92,7 @@ def _render_panel_votaciones(request, seccion_admin):
         'administracion/votaciones.html',
         {
             'seccion_admin': seccion_admin,
+            'edicion': edicion,
             'encuestas': encuestas,
             'total_votos': sum(encuesta.votos_totales for encuesta in encuestas),
             'total_encuestas': len(encuestas),
@@ -220,7 +226,8 @@ def categorias(request):
             else:
                 open_modal = 'new'
 
-    categorias = Categoria.objects.prefetch_related(
+    edicion = Edicion.vigente()
+    categorias = Categoria.objects.filter(edicion=edicion).prefetch_related(
         Prefetch(
             'encuestas',
             queryset=Encuesta.objects.prefetch_related('opciones').order_by('orden', 'nombre'),
@@ -232,6 +239,7 @@ def categorias(request):
         opcion_encuesta_nombre = ''
     context = {
         'seccion_admin': 'categorias',
+        'edicion': edicion,
         'categorias': categorias,
         'total_categorias': categorias.count(),
         'categorias_activas': categorias.filter(activa=True).count(),
