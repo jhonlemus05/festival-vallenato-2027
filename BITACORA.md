@@ -345,6 +345,18 @@ D:\no_borrar\programacion\Python\Django\
 - **Pruebas**: la de Teo que comprobaba el acceso libre ahora comprueba login/403/200; 4 nuevas (votante
   bloqueado y auditado, rol administrador sin staff, enlace oculto). Total: **60 pruebas OK en MySQL**.
 
+### [14] Datos de prueba y README (Entrega 2)
+- **Rama Git:** `desarrollo_total`.
+- **`votaciones/management/commands/cargar_datos_prueba.py`**: `python manage.py cargar_datos_prueba` agrega una
+  **Edición de prueba 2026** (finalizada) con una encuesta cerrada, opciones para "Canción favorita" y
+  "Clásico vallenato favorito", y **36 votos** de 12 votantes de prueba (`@demo.festivalvallenato.test`,
+  sin contraseña utilizable: nadie puede entrar con ellos). Todo es de prueba, no son datos de la Fundación.
+  Se puede correr varias veces sin duplicar nada.
+- **`README.md`**: descripción, tecnologías, estructura, instalación paso a paso en Windows y Linux (entorno,
+  dependencias, MySQL, `.env`, migraciones, superusuario, datos de prueba), rutas principales, pruebas y
+  seguridad. Falta poner los nombres de los integrantes.
+- **Pruebas**: 3 nuevas del comando (carga, no duplica, votantes sin contraseña). Total: **63 pruebas OK en MySQL**.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

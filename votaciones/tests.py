@@ -1,5 +1,7 @@
 from datetime import date
+from io import StringIO
 
+from django.core.management import call_command
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
@@ -328,3 +330,35 @@ class EdicionesTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Edicion.objects.filter(anio=2028).exists())
         self.assertContains(self.client.get(reverse('admin:votaciones_edicion_changelist')), '2028')
+
+
+class CargarDatosPruebaTests(TestCase):
+    def cargar(self):
+        call_command('cargar_datos_prueba', stdout=StringIO())
+
+    def test_carga_ediciones_opciones_y_votos(self):
+        self.cargar()
+
+        self.assertEqual(Edicion.objects.count(), 2)
+        self.assertTrue(Edicion.objects.filter(anio=2026, estado='finalizada').exists())
+        self.assertEqual(Encuesta.objects.get(nombre='Canción favorita del público').opciones.count(), 3)
+        # 12 votos en Artista favorito, 12 en Clásico vallenato y 12 en la edición 2026.
+        self.assertEqual(Voto.objects.count(), 36)
+
+    def test_se_puede_correr_varias_veces_sin_duplicar(self):
+        self.cargar()
+        conteos = (Edicion.objects.count(), OpcionEncuesta.objects.count(), Voto.objects.count(), User.objects.count())
+
+        self.cargar()
+
+        self.assertEqual(
+            (Edicion.objects.count(), OpcionEncuesta.objects.count(), Voto.objects.count(), User.objects.count()),
+            conteos,
+        )
+
+    def test_votantes_de_prueba_no_pueden_iniciar_sesion(self):
+        self.cargar()
+
+        votantes = User.objects.filter(username__endswith='@demo.festivalvallenato.test')
+        self.assertEqual(votantes.count(), 12)
+        self.assertFalse(any(votante.has_usable_password() for votante in votantes))
