@@ -367,3 +367,5 @@ class PanelPrincipalTests(TestCase):
         self.assertContains(response, 'admin-panel')
         self.assertNotContains(response, 'Panel sin autenticación')
         self.assertNotContains(response, 'href="#"')
+        # El panel tiene su propio "Cerrar sesión" (POST al logout).
+        self.assertContains(response, f'action="{reverse("logout")}"')

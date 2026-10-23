@@ -433,8 +433,8 @@
               {% if opcion.imagen %}
                 <img src="{% static opcion.imagen %}" alt="{{ opcion.nombre }}">
               {% else %}
-                {# Sin foto: la inicial del nombre en vez de un recuadro vacío que parece una imagen rota. #}
-                <span class="contestant-placeholder" aria-hidden="true">{{ opcion.nombre|first|upper }}</span>
+                {# Sin foto: un ícono en vez de un recuadro vacío que parece una imagen rota. #}
+                <span class="contestant-placeholder" aria-hidden="true"><i class="bi bi-music-note-beamed"></i></span>
               {% endif %}
               <span class="contestant-check"><i class="bi bi-check2" aria-hidden="true"></i></span>
             </div>

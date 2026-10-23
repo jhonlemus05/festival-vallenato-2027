@@ -360,7 +360,7 @@ D:\no_borrar\programacion\Python\Django\
 ### [15] Correcciones tras la prueba completa en navegador
 - **Rama Git:** `desarrollo_total`.
 - **Votación**: ninguna opción viene preseleccionada (el botón Votar arranca deshabilitado); opciones sin foto
-  muestran su inicial; "a quien" → "a quién".
+  muestran un ícono musical en vez de un recuadro vacío; "a quien" → "a quién".
 - **Encuestas por categoría**: muestran el año de la edición y "Volver" lleva a las categorías de esa edición.
 - **Portada**: el contador y las fechas salen de la edición vigente (antes 26 de abril escrito en `countdown.js`).
 - **Panel administrativo**: todas sus páginas muestran solo la edición vigente; el encabezado muestra al
@@ -369,6 +369,9 @@ D:\no_borrar\programacion\Python\Django\
 - **Django Admin**: `Usuario` se muestra como "Perfiles de usuario" (migración `0003`), para no confundirse con
   "Usuarios" de Django.
 - **Pruebas**: 4 nuevas. Total: **67 pruebas OK en MySQL**.
+- **Revisión en navegador** (después del commit anterior): portada, encuestas 2026, votación y panel verificados.
+  Además: el panel administrativo tiene su propio **"Cerrar sesión"** (POST) en el menú lateral, y la sección
+  de la app `usuarios` en Django Admin se llama **"Cuentas y auditoría"** (antes "Usuarios", igual que la de Django).
 
 ## 5. Vistas pendientes (por migrar del prototipo)
 

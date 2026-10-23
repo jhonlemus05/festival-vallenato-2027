@@ -258,6 +258,18 @@
       color: var(--color-gold);
     }
 
+    .sidebar-logout-form {
+      margin: 0;
+    }
+
+    .sidebar-logout-btn {
+      margin-top: 10px;
+      padding: 0;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+
     /* ------------------------------------------------------------
        2. ÁREA PRINCIPAL DE CONTENIDO
        ------------------------------------------------------------ */
@@ -707,6 +719,14 @@
         <i class="bi bi-arrow-left"></i>
         <span>Volver a vista pública</span>
       </a>
+      {# Logout por POST + CSRF (logout_view tiene @require_POST). #}
+      <form method="post" action="{% url 'logout' %}" class="sidebar-logout-form">
+        {% csrf_token %}
+        <button type="submit" class="sidebar-back-link sidebar-logout-btn">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Cerrar sesión</span>
+        </button>
+      </form>
     </div>
   </aside>
 
@@ -759,6 +779,14 @@
           <i class="bi bi-arrow-left"></i>
           <span>Volver a vista pública</span>
         </a>
+        {# Logout por POST + CSRF (logout_view tiene @require_POST). #}
+        <form method="post" action="{% url 'logout' %}" class="sidebar-logout-form">
+          {% csrf_token %}
+          <button type="submit" class="sidebar-back-link sidebar-logout-btn">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Cerrar sesión</span>
+          </button>
+        </form>
       </div>
     </div>
   </div>
