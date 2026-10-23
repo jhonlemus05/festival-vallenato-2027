@@ -629,6 +629,8 @@
                     data-description="{{ encuesta.descripcion }}"
                     data-detail="{{ encuesta.detalle }}"
                     data-status="{{ encuesta.estado }}"
+                    data-opening="{{ encuesta.fecha_apertura|date:'Y-m-d\TH:i' }}"
+                    data-closing="{{ encuesta.fecha_cierre|date:'Y-m-d\TH:i' }}"
                   >Editar</button>
                 </div>
                 <div class="survey-options-admin">
@@ -792,6 +794,20 @@
               {{ encuesta_form.estado }}
               {% for error in encuesta_form.estado.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
+            {# RN-05: con fechas, la encuesta se abre y se cierra sola (votaciones.middleware). #}
+            <div class="row g-2 mb-1">
+              <div class="col-sm-6">
+                <label class="form-label small fw-semibold" for="{{ encuesta_form.fecha_apertura.id_for_label }}">Apertura (opcional)</label>
+                {{ encuesta_form.fecha_apertura }}
+                {% for error in encuesta_form.fecha_apertura.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label small fw-semibold" for="{{ encuesta_form.fecha_cierre.id_for_label }}">Cierre (opcional)</label>
+                {{ encuesta_form.fecha_cierre }}
+                {% for error in encuesta_form.fecha_cierre.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+              </div>
+            </div>
+            <p class="text-secondary small mb-2">Con fechas, la encuesta se abre y se cierra sola a la hora indicada.</p>
             {% for error in encuesta_form.non_field_errors %}<div class="text-danger small mt-2">{{ error }}</div>{% endfor %}
           </div>
           <div class="modal-footer border-top">
@@ -959,6 +975,8 @@
           document.getElementById('id_encuesta-descripcion').value = button.dataset.description;
           document.getElementById('id_encuesta-detalle').value = button.dataset.detail;
           document.getElementById('id_encuesta-estado').value = button.dataset.status;
+          document.getElementById('id_encuesta-fecha_apertura').value = button.dataset.opening;
+          document.getElementById('id_encuesta-fecha_cierre').value = button.dataset.closing;
           surveyModalTitle.textContent = 'Editar encuesta';
           surveyCategoryName.textContent = button.dataset.categoryName;
           surveySubmitButton.textContent = 'Guardar cambios';

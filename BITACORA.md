@@ -397,6 +397,23 @@ D:\no_borrar\programacion\Python\Django\
 - **Verificación en navegador**: votar → comprobante en la página de éxito → Mis comprobantes → verificar el
   código propio y uno inexistente → "Voto registrado" en Mi actividad; celular sin scroll horizontal.
 
+### [18] Fechas de apertura y cierre con cierre automático (RN-05, confirmada)
+- **Rama Git:** `desarrollo_total`.
+- **`votaciones/models.py`**: `Encuesta.fecha_apertura` y `fecha_cierre` (opcionales; el cierre debe ser posterior a la
+  apertura, CU-06 5b) y `actualizar_estados_por_fecha()`: "Próximamente" con apertura cumplida → Activa; Activa o
+  Próximamente con cierre cumplido → Cerrada. Cada cambio queda en la bitácora ("Apertura/Cierre automático de
+  encuesta", CU-07 paso 6). **Migración `0008`**.
+- **`votaciones/middleware.py`**: `EstadoEncuestasMiddleware` (en `settings.MIDDLEWARE`) revisa las fechas en cada
+  petición, así no se necesita un cron y nada muestra una encuesta abierta después de su cierre.
+- **Votación (CU-04, 6a)**: votar en una encuesta cerrada o que aún no abre ya no da 404: vuelve a la categoría con
+  un mensaje ("ya está cerrada" / "abre el …"). La página de la categoría ahora muestra los mensajes (antes el aviso
+  de "sin opciones" se perdía) y las fechas ("Cierra el …" / "Abre el …"); la votación muestra el cierre.
+- **Panel**: el modal de encuestas tiene Apertura y Cierre (selector de fecha y hora) y los carga al editar.
+  **Django Admin**: la lista de encuestas muestra las fechas.
+- **Datos de prueba**: Artista y Canción favorita cierran el 27/04/2027 23:59; Acordeonista abre el 28/04/2027 08:00
+  (solo si no tenían fechas). "Canción favorita" ahora dice "3 canciones de prueba".
+- **Pruebas**: 5 nuevas y 1 ajustada (la de encuesta cerrada esperaba 404). Total: **78 pruebas OK en MySQL**.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

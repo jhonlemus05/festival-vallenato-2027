@@ -26,7 +26,7 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 @admin.register(Encuesta)
 class EncuestaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'categoria', 'estado', 'orden', 'fecha_actualizacion')
+    list_display = ('nombre', 'categoria', 'estado', 'fecha_apertura', 'fecha_cierre', 'orden')
     list_filter = ('categoria', 'estado')
     search_fields = ('nombre', 'descripcion', 'categoria__nombre')
     ordering = ('categoria__orden', 'orden', 'nombre')

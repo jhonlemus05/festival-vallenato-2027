@@ -61,13 +61,22 @@ class CategoriaForm(forms.ModelForm):
 class EncuestaForm(forms.ModelForm):
     class Meta:
         model = Encuesta
-        fields = ['nombre', 'descripcion', 'detalle', 'estado']
+        fields = ['nombre', 'descripcion', 'detalle', 'estado', 'fecha_apertura', 'fecha_cierre']
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'form-control rounded-3',
                 'placeholder': 'Ej. Acordeonista',
                 'maxlength': 120,
             }),
+            # datetime-local: el navegador muestra un selector de fecha y hora (RN-05).
+            'fecha_apertura': forms.DateTimeInput(
+                attrs={'type': 'datetime-local', 'class': 'form-control rounded-3'},
+                format='%Y-%m-%dT%H:%M',
+            ),
+            'fecha_cierre': forms.DateTimeInput(
+                attrs={'type': 'datetime-local', 'class': 'form-control rounded-3'},
+                format='%Y-%m-%dT%H:%M',
+            ),
             'descripcion': forms.TextInput(attrs={
                 'class': 'form-control rounded-3',
                 'placeholder': 'Descripción breve de la encuesta',
@@ -85,6 +94,8 @@ class EncuestaForm(forms.ModelForm):
             'descripcion': 'Descripción',
             'detalle': 'Información adicional',
             'estado': 'Estado',
+            'fecha_apertura': 'Apertura (opcional)',
+            'fecha_cierre': 'Cierre (opcional)',
         }
 
     def clean(self):

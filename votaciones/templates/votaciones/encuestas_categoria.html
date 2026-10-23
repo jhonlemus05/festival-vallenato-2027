@@ -185,6 +185,10 @@
     <div class="screen-kicker">03 / {{ categoria.nombre }} · {{ categoria.edicion.anio }}</div>
     <h1 class="screen-title">{{ categoria.nombre }} nos une</h1>
     <p class="screen-description">Explora las encuestas de esta categoría en {{ categoria.edicion.nombre }}.</p>
+    {# Avisos al volver de una votación que no se puede usar (cerrada, sin abrir o sin opciones). #}
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} py-2 small" role="alert">{{ message }}</div>
+    {% endfor %}
 
     <div class="survey-list-heading">
       <span>{{ encuestas|length }} encuesta{{ encuestas|length|pluralize:"s" }} disponible{{ encuestas|length|pluralize:"s" }}</span>
@@ -205,6 +209,12 @@
             <p class="survey-description">{{ encuesta.descripcion }}</p>
             {% if encuesta.detalle %}
               <p class="survey-detail mt-2">{{ encuesta.detalle }}</p>
+            {% endif %}
+            {# RN-05: la ventana de votación programada. #}
+            {% if encuesta.estado == 'activa' and encuesta.fecha_cierre %}
+              <p class="survey-detail mt-1"><i class="bi bi-clock" aria-hidden="true"></i> Cierra el {{ encuesta.fecha_cierre|date:"d/m/Y \a \l\a\s H:i" }}</p>
+            {% elif encuesta.estado == 'proxima' and encuesta.fecha_apertura %}
+              <p class="survey-detail mt-1"><i class="bi bi-calendar-event" aria-hidden="true"></i> Abre el {{ encuesta.fecha_apertura|date:"d/m/Y \a \l\a\s H:i" }}</p>
             {% endif %}
             {% if encuesta.estado == 'activa' %}
               {% if encuesta.total_opciones %}

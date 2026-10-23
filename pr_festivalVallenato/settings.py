@@ -62,7 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+    # Abre y cierra encuestas según su fecha programada (RN-05).
+    'votaciones.middleware.EstadoEncuestasMiddleware',
 ]
 
 ROOT_URLCONF = 'pr_festivalVallenato.urls'

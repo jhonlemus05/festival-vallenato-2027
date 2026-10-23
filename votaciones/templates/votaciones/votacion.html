@@ -405,11 +405,11 @@
     <p class="voting-description">Selecciona a quién quieres darle tu voto.</p>
     {% if messages %}
       {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }} py-2 small" role="alert">{{ message }}</div>
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} py-2 small" role="alert">{{ message }}</div>
       {% endfor %}
     {% endif %}
     <div class="voting-status-row">
-      <span class="voting-active-badge">Activa</span>
+      <span class="voting-active-badge">Activa{% if encuesta.fecha_cierre %} · cierra el {{ encuesta.fecha_cierre|date:"d/m/Y \a \l\a\s H:i" }}{% endif %}</span>
       <span>{{ opciones|length }} opciones · Elige una</span>
     </div>
 

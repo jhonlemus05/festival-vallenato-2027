@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from usuarios.views import obtener_perfil, registrar_evento_bitacora
 
@@ -72,7 +73,6 @@ def votar_encuesta(request, encuesta_id):
     encuesta = get_object_or_404(
         Encuesta.objects.select_related('categoria').prefetch_related('opciones'),
         pk=encuesta_id,
-        estado='activa',
         categoria__activa=True,
     )
     voto_existente = Voto.objects.filter(
@@ -89,6 +89,17 @@ def votar_encuesta(request, encuesta_id):
                 f'Encuesta «{encuesta.nombre}» · ya votó con el comprobante {voto_existente.codigo_comprobante}',
             )
         return redirect('voto_exitoso', voto_id=voto_existente.pk)
+
+    # CU-04, flujo 6a: fuera de la ventana de votación se rechaza el voto y se explica por qué.
+    if encuesta.estado != 'activa':
+        if encuesta.estado == 'cerrada':
+            messages.error(request, f'La votación «{encuesta.nombre}» ya está cerrada.')
+        elif encuesta.fecha_apertura:
+            apertura = timezone.localtime(encuesta.fecha_apertura).strftime('%d/%m/%Y a las %H:%M')
+            messages.info(request, f'La votación «{encuesta.nombre}» abre el {apertura}.')
+        else:
+            messages.info(request, f'La votación «{encuesta.nombre}» todavía no está abierta.')
+        return redirect('categoria_encuestas', categoria_id=encuesta.categoria_id)
 
     opciones = encuesta.opciones.all()
     if not opciones.exists():

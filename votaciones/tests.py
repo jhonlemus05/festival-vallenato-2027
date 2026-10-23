@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from io import StringIO
 
 from django.core.management import call_command
@@ -7,6 +7,7 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
 from usuarios.models import Bitacora
 
@@ -180,9 +181,11 @@ class VotacionPublicaTests(TestCase):
         self.encuesta.save(update_fields=['estado'])
         self.client.force_login(self.usuario)
 
-        response = self.client.get(self.url)
+        # CU-04, flujo 6a: se rechaza e informa que está cerrada (antes era un 404 sin explicación).
+        response = self.client.post(self.url, {'opcion': self.opciones[0].pk}, follow=True)
 
-        self.assertEqual(response.status_code, 404)
+        self.assertRedirects(response, reverse('categoria_encuestas', args=[self.encuesta.categoria_id]))
+        self.assertContains(response, 'ya está cerrada')
         self.assertEqual(Voto.objects.count(), 0)
 
     def test_pantalla_de_exito_solo_es_visible_para_quien_voto(self):
@@ -414,3 +417,56 @@ class CargarDatosPruebaTests(TestCase):
         votantes = User.objects.filter(username__endswith='@demo.festivalvallenato.test')
         self.assertEqual(votantes.count(), 12)
         self.assertFalse(any(votante.has_usable_password() for votante in votantes))
+
+
+class FechasEncuestaTests(TestCase):
+    """RN-05: cada votación puede tener apertura y cierre; el sistema la abre y la cierra solo."""
+
+    def setUp(self):
+        self.encuesta = Encuesta.objects.get(nombre='Artista favorito del público')
+        self.url = reverse('votar_encuesta', args=[self.encuesta.pk])
+        self.usuario = User.objects.create_user(username='votante-fechas', password='TestPassword123!')
+        self.client.force_login(self.usuario)
+
+    def test_se_cierra_sola_al_cumplirse_el_cierre_y_queda_en_bitacora(self):
+        self.encuesta.fecha_cierre = timezone.now() - timedelta(minutes=1)
+        self.encuesta.save()
+
+        response = self.client.post(self.url, {'opcion': self.encuesta.opciones.first().pk}, follow=True)
+
+        self.encuesta.refresh_from_db()
+        self.assertEqual(self.encuesta.estado, 'cerrada')
+        self.assertContains(response, 'ya está cerrada')
+        self.assertEqual(Voto.objects.count(), 0)
+        self.assertTrue(Bitacora.objects.filter(accion='Cierre automático de encuesta').exists())
+
+    def test_se_abre_sola_al_cumplirse_la_apertura(self):
+        self.encuesta.estado = 'proxima'
+        self.encuesta.fecha_apertura = timezone.now() - timedelta(minutes=1)
+        self.encuesta.fecha_cierre = timezone.now() + timedelta(days=1)
+        self.encuesta.save()
+
+        response = self.client.get(self.url)
+
+        self.encuesta.refresh_from_db()
+        self.assertEqual(self.encuesta.estado, 'activa')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'cierra el')
+        self.assertTrue(Bitacora.objects.filter(accion='Apertura automática de encuesta').exists())
+
+    def test_antes_de_la_apertura_informa_cuando_abre(self):
+        self.encuesta.estado = 'proxima'
+        self.encuesta.fecha_apertura = timezone.now() + timedelta(days=2)
+        self.encuesta.save()
+
+        response = self.client.get(self.url, follow=True)
+
+        self.assertContains(response, 'abre el')
+        self.assertContains(response, 'Abre el')  # también en la tarjeta de la categoría
+
+    def test_cierre_no_puede_ser_anterior_a_la_apertura(self):
+        self.encuesta.fecha_apertura = timezone.now()
+        self.encuesta.fecha_cierre = timezone.now() - timedelta(hours=1)
+
+        with self.assertRaises(ValidationError):
+            self.encuesta.full_clean()

@@ -1,8 +1,9 @@
-from datetime import date
+from datetime import date, datetime
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.utils import timezone
 
 from usuarios.models import Usuario
 from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
@@ -34,6 +35,21 @@ class Command(BaseCommand):
 
         cancion = self.buscar(Encuesta, categoria=musica, nombre='Canción favorita del público')
         self.crear_opciones(cancion, ['Canción de prueba A', 'Canción de prueba B', 'Canción de prueba C'])
+        # El texto original de la migración dice "6 canciones"; con los datos de prueba son 3.
+        if cancion.detalle.startswith('6 canciones'):
+            cancion.detalle = '3 canciones de prueba · Un voto por persona'
+            cancion.save(update_fields=['detalle'])
+
+        # RN-05: fechas de prueba para mostrar la ventana de votación (solo si la encuesta no tiene).
+        cierre = timezone.make_aware(datetime(2027, 4, 27, 23, 59))
+        for encuesta in (artista, cancion):
+            if encuesta.fecha_cierre is None:
+                encuesta.fecha_cierre = cierre
+                encuesta.save(update_fields=['fecha_cierre'])
+        acordeonista = self.buscar(Encuesta, categoria=musica, nombre='Acordeonista')
+        if acordeonista.fecha_apertura is None:
+            acordeonista.fecha_apertura = timezone.make_aware(datetime(2027, 4, 28, 8, 0))
+            acordeonista.save(update_fields=['fecha_apertura'])
 
         clasico = self.buscar(Encuesta, categoria=musica, nombre='Clásico vallenato favorito')
         opciones_clasico = self.crear_opciones(clasico, ['Clásico de prueba A', 'Clásico de prueba B', 'Clásico de prueba C'])

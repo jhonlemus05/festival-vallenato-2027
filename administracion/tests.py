@@ -3,6 +3,7 @@ from datetime import date
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
 from usuarios.models import Bitacora, Usuario
 from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
@@ -190,6 +191,31 @@ class GestionCategoriasTests(TestCase):
             nombre='Piqueria',
             estado='proxima',
         ).exists())
+
+    def test_programa_apertura_y_cierre_de_una_encuesta(self):
+        categoria = Categoria.objects.get(nombre='Música')
+        datos = {
+            'action': 'save_encuesta',
+            'encuesta_categoria_id': categoria.pk,
+            'encuesta_id': '',
+            'encuesta-nombre': 'Piqueria',
+            'encuesta-descripcion': 'La tradición de la piqueria vallenata.',
+            'encuesta-detalle': '',
+            'encuesta-estado': 'proxima',
+            'encuesta-fecha_apertura': '2027-04-28T08:00',
+            'encuesta-fecha_cierre': '2027-05-01T18:00',
+        }
+
+        response = self.client.post(self.url, datos)
+
+        self.assertRedirects(response, self.url)
+        encuesta = Encuesta.objects.get(nombre='Piqueria')
+        self.assertEqual(timezone.localtime(encuesta.fecha_apertura).strftime('%Y-%m-%d %H:%M'), '2027-04-28 08:00')
+
+        # Cierre antes de la apertura: no se guarda y se explica (CU-06, flujo 5b).
+        response = self.client.post(self.url, {**datos, 'encuesta-nombre': 'Piqueria 2', 'encuesta-fecha_cierre': '2027-04-27T18:00'})
+        self.assertContains(response, 'El cierre debe ser posterior a la apertura.')
+        self.assertFalse(Encuesta.objects.filter(nombre='Piqueria 2').exists())
 
     def test_edita_estado_y_detalle_de_encuesta(self):
         encuesta = Encuesta.objects.get(nombre='Acordeonista')
