@@ -187,6 +187,14 @@ class VotacionPublicaTests(TestCase):
 
 
 class ResultadosAdminTests(TestCase):
+    def setUp(self):
+        # Estas vistas son del panel administrativo: solo entra una cuenta administradora.
+        self.client.force_login(User.objects.create_user(
+            username='admin-resultados',
+            password='TestPassword123!',
+            is_staff=True,
+        ))
+
     def test_votaciones_muestra_solo_encuestas_activas(self):
         encuesta = Encuesta.objects.get(nombre='Artista favorito del público')
         opciones = list(encuesta.opciones.all())

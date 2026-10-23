@@ -278,7 +278,9 @@
           <li><a href="{% url 'index' %}" class="desktop-nav-link {% if seccion_activa == 'inicio' or not seccion_activa %}active{% endif %}"><i class="bi bi-house"></i> Inicio</a></li>
           <li><a href="{% url 'categorias_publicas' %}" class="desktop-nav-link {% if seccion_activa == 'categorias' %}active{% endif %}"><i class="bi bi-grid"></i> Categorías</a></li>
           <li><a href="{% url 'login' %}" class="desktop-nav-link {% if seccion_activa == 'cuenta' %}active{% endif %}"><i class="bi bi-person"></i> Mi cuenta</a></li>
+          {% if es_administrador %}
           <li><a href="{% url 'panel_principal' %}" class="desktop-nav-link {% if seccion_activa == 'admin' %}active{% endif %}"><i class="bi bi-speedometer2"></i> Administración</a></li>
+          {% endif %}
         </ul>
 
         <!-- Acciones en desktop / Botón menú móvil -->
@@ -417,9 +419,11 @@
         <a href="{% url 'categorias_publicas' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-check2-square text-warning"></i> <span>Encuestas y votaciones</span>
         </a>
+        {% if es_administrador %}
         <a href="{% url 'panel_principal' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-speedometer2 text-warning"></i> <span>Panel administrativo</span>
         </a>
+        {% endif %}
         {% if request.user.is_authenticated %}
         <button type="submit" form="logoutForm" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-box-arrow-right text-warning"></i> <span>Cerrar sesión</span>

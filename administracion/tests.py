@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+from usuarios.models import Bitacora, Usuario
 from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 
 
@@ -19,13 +20,62 @@ class GestionCategoriasTests(TestCase):
             password='TestPassword123!',
         )
         self.url = reverse('categorias')
+        self.client.force_login(self.admin)
 
-    def test_vistas_admin_disponibles_para_validacion(self):
-        self.assertEqual(self.client.get(self.url).status_code, 200)
-        self.assertEqual(self.client.get(reverse('panel_principal')).status_code, 200)
+    def test_panel_solo_para_administradores(self):
+        vistas = ['panel_principal', 'categorias', 'admin_votaciones', 'admin_resultados']
+
+        # Sin sesión: al login, recordando a dónde quería ir.
+        self.client.logout()
+        for nombre in vistas:
+            with self.subTest(sin_sesion=nombre):
+                response = self.client.get(reverse(nombre))
+                self.assertRedirects(response, f"{reverse('login')}?next={reverse(nombre)}", fetch_redirect_response=False)
+
+        # Votante con sesión: 403 (al login no, porque lo devolvería aquí en bucle).
         self.client.force_login(self.votante)
-        self.assertEqual(self.client.get(self.url).status_code, 200)
+        for nombre in vistas:
+            with self.subTest(votante=nombre):
+                self.assertEqual(self.client.get(reverse(nombre)).status_code, 403)
+
+        self.client.force_login(self.admin)
+        for nombre in vistas:
+            with self.subTest(administrador=nombre):
+                self.assertEqual(self.client.get(reverse(nombre)).status_code, 200)
+
+    def test_votante_no_puede_crear_categorias_y_el_intento_queda_en_bitacora(self):
+        self.client.force_login(self.votante)
+
+        response = self.client.post(self.url, {
+            'nombre': 'Categoría intrusa',
+            'descripcion': 'No debería guardarse.',
+            'icono': 'music',
+            'activa': 'on',
+        })
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Categoria.objects.filter(nombre='Categoría intrusa').exists())
+        self.assertTrue(Bitacora.objects.filter(accion='Acceso denegado al panel administrativo').exists())
+
+    def test_perfil_con_rol_administrador_entra_al_panel(self):
+        usuario = User.objects.create_user(username='rol-admin@correo.com', password='TestPassword123!')
+        Usuario.objects.create(
+            user=usuario,
+            identificacion='1065999111',
+            correo='rol-admin@correo.com',
+            rol='administrador',
+        )
+        self.client.force_login(usuario)
+
         self.assertEqual(self.client.get(reverse('panel_principal')).status_code, 200)
+
+    def test_enlace_al_panel_solo_se_muestra_a_administradores(self):
+        response = self.client.get(reverse('categorias_publicas'))
+        self.assertContains(response, reverse('panel_principal'))
+
+        self.client.force_login(self.votante)
+        response = self.client.get(reverse('categorias_publicas'))
+        self.assertNotContains(response, reverse('panel_principal'))
 
     def test_crea_categoria_y_la_muestra_en_el_catalogo_publico(self):
         response = self.client.post(self.url, {
@@ -232,6 +282,13 @@ class GestionCategoriasTests(TestCase):
 
 
 class PanelPrincipalTests(TestCase):
+    def setUp(self):
+        self.client.force_login(User.objects.create_user(
+            username='admin-panel',
+            password='TestPassword123!',
+            is_staff=True,
+        ))
+
     def test_resumen_se_actualiza_con_votos_usuarios_y_encuestas_visibles(self):
         encuesta = Encuesta.objects.get(nombre='Artista favorito del público')
         categoria_oculta = Categoria.objects.get(nombre='Piloneras')
@@ -252,7 +309,8 @@ class PanelPrincipalTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['total_votos'], 1)
-        self.assertEqual(response.context['total_usuarios'], 2)
+        # Los dos votantes más la cuenta administradora con la que se entra al panel.
+        self.assertEqual(response.context['total_usuarios'], 3)
         self.assertEqual(
             response.context['total_encuestas_activas'],
             Encuesta.objects.filter(estado='activa', categoria__activa=True).count(),

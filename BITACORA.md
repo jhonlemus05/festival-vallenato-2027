@@ -330,6 +330,21 @@ D:\no_borrar\programacion\Python\Django\
 - **Pruebas**: 10 nuevas (8 de ediciones en `votaciones`, 2 del panel en `administracion`). Total del proyecto:
   **57 pruebas OK en MySQL**.
 
+### [13] Seguridad: panel administrativo solo para administradores (RNF-01, RF-02, riesgo R5102)
+- **Rama Git:** `desarrollo_total`. Cierra lo que la entrada [10] dejó pendiente ("panel disponible sin autenticación").
+- **`usuarios/permisos.py`**: `es_administrador(user)` (cuenta staff de Django o perfil con `rol='administrador'`)
+  y el decorador `@administrador_requerido`: sin sesión manda al login con `?next=`; con sesión pero sin rol
+  responde **403** (no al login, para no caer en un bucle) y registra el intento en la bitácora.
+- **`administracion/views.py`**: el decorador protege `panel_principal`, `categorias`, `panel_votaciones` y
+  `panel_resultados`. Los resultados ya no son públicos (RF-02).
+- **`usuarios/context_processors.py`** + `settings.py`: `es_administrador` disponible en todas las plantillas;
+  el enlace "Administración" del navbar, del menú móvil y del perfil solo aparece para administradores.
+- **`usuarios/templates/403.html`**: página de acceso restringido con el diseño del sitio.
+- **Cómo dar el rol:** `createsuperuser`, o en Django Admin marcar "Es staff" en el usuario o poner
+  `rol = administrador` en su perfil (`Usuario`).
+- **Pruebas**: la de Teo que comprobaba el acceso libre ahora comprueba login/403/200; 4 nuevas (votante
+  bloqueado y auditado, rol administrador sin staff, enlace oculto). Total: **60 pruebas OK en MySQL**.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

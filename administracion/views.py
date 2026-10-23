@@ -3,10 +3,12 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 
+from usuarios.permisos import administrador_requerido
 from votaciones.models import Categoria, Encuesta, OpcionEncuesta, Voto
 from .forms import CategoriaForm, EncuestaForm, OpcionEncuestaForm
 
 
+@administrador_requerido
 def panel_principal(request):
     encuestas_activas = list(
         Encuesta.objects.filter(
@@ -94,14 +96,17 @@ def _render_panel_votaciones(request, seccion_admin):
     )
 
 
+@administrador_requerido
 def panel_votaciones(request):
     return _render_panel_votaciones(request, 'votaciones')
 
 
+@administrador_requerido
 def panel_resultados(request):
     return _render_panel_votaciones(request, 'resultados')
 
 
+@administrador_requerido
 def categorias(request):
     category_form = CategoriaForm()
     form_category_id = None
