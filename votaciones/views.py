@@ -4,6 +4,8 @@ from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from usuarios.views import obtener_perfil, registrar_evento_bitacora
+
 from .models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 
 
@@ -78,6 +80,14 @@ def votar_encuesta(request, encuesta_id):
         usuario=request.user,
     ).first()
     if voto_existente:
+        # Volver a abrir la encuesta es normal; intentar enviar otro voto se audita (RNF-03, RNF-04).
+        if request.method == 'POST':
+            registrar_evento_bitacora(
+                request,
+                obtener_perfil(request.user),
+                'Intento de voto duplicado',
+                f'Encuesta «{encuesta.nombre}» · ya votó con el comprobante {voto_existente.codigo_comprobante}',
+            )
         return redirect('voto_exitoso', voto_id=voto_existente.pk)
 
     opciones = encuesta.opciones.all()
@@ -118,6 +128,14 @@ def votar_encuesta(request, encuesta_id):
                 raise
             return redirect('voto_exitoso', voto_id=voto.pk)
 
+        # Se audita el voto con su comprobante pero SIN la opción elegida: ni el administrador ni el
+        # auditor deben ver el sentido del voto individual (RF-10).
+        registrar_evento_bitacora(
+            request,
+            obtener_perfil(request.user),
+            'Voto registrado',
+            f'Encuesta «{encuesta.nombre}» · comprobante {voto.codigo_comprobante}',
+        )
         return redirect('voto_exitoso', voto_id=voto.pk)
 
     return render(

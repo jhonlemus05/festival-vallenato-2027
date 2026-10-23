@@ -121,6 +121,25 @@ class GestionCategoriasTests(TestCase):
         self.assertContains(response, 'Ya existe una categoría con ese nombre.')
         self.assertEqual(Categoria.objects.count(), 3)
 
+    def test_altas_y_cambios_del_panel_quedan_en_bitacora(self):
+        self.client.post(self.url, {
+            'nombre': 'Canción inédita',
+            'descripcion': 'Composiciones originales del festival.',
+            'icono': 'music',
+            'activa': 'on',
+        })
+        categoria = Categoria.objects.get(nombre='Canción inédita')
+        self.client.post(self.url, {
+            'categoria_id': categoria.pk,
+            'nombre': 'Canción inédita',
+            'descripcion': 'Descripción corregida.',
+            'icono': 'music',
+            'activa': 'on',
+        })
+
+        acciones = list(Bitacora.objects.filter(accion__startswith='Categoría').values_list('accion', flat=True))
+        self.assertCountEqual(acciones, ['Categoría creada', 'Categoría actualizada'])
+
     def test_categoria_nueva_queda_en_la_edicion_vigente(self):
         self.client.post(self.url, {
             'nombre': 'Canción inédita',

@@ -4,8 +4,15 @@ from django.db.models import Count, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 
 from usuarios.permisos import administrador_requerido
+from usuarios.views import obtener_perfil, registrar_evento_bitacora
 from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 from .forms import CategoriaForm, EncuestaForm, OpcionEncuestaForm
+
+
+def auditar_accion(request, objeto, instancia_previa, detalle):
+    """Registra en la bitácora una alta o edición hecha desde el panel (RNF-04: acciones administrativas)."""
+    accion = f'{objeto} {"actualizada" if instancia_previa else "creada"}'
+    registrar_evento_bitacora(request, obtener_perfil(request.user), accion, detalle)
 
 
 @administrador_requerido
@@ -157,6 +164,7 @@ def categorias(request):
                 if not opcion.pk:
                     opcion.orden = encuesta.opciones.count() + 1
                 opcion.save()
+                auditar_accion(request, 'Opción', instance, f'«{opcion.nombre}» en la encuesta «{encuesta.nombre}»')
                 messages.success(
                     request,
                     f'La opción «{opcion.nombre}» se '
@@ -189,6 +197,7 @@ def categorias(request):
                 encuesta = form.save(commit=False)
                 encuesta.categoria = categoria
                 encuesta.save()
+                auditar_accion(request, 'Encuesta', instance, f'«{encuesta.nombre}» en {categoria.nombre} (estado: {encuesta.get_estado_display()})')
                 messages.success(
                     request,
                     f'La encuesta «{encuesta.nombre}» se '
@@ -211,6 +220,7 @@ def categorias(request):
 
             if form.is_valid():
                 categoria = form.save()
+                auditar_accion(request, 'Categoría', instance, f'«{categoria.nombre}» de {categoria.edicion}')
                 messages.success(
                     request,
                     f'La categoría «{categoria.nombre}» se '

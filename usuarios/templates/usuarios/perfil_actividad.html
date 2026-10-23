@@ -25,6 +25,10 @@
               <i class="bi bi-box-arrow-right"></i>
             {% elif 'Cambio' in evento.accion %}
               <i class="bi bi-key-fill"></i>
+            {% elif 'Voto' in evento.accion %}
+              <i class="bi bi-check2-square"></i>
+            {% elif 'creada' in evento.accion or 'actualizada' in evento.accion %}
+              <i class="bi bi-pencil-square"></i>
             {% elif 'Registro' in evento.accion %}
               <i class="bi bi-person-plus-fill"></i>
             {% else %}

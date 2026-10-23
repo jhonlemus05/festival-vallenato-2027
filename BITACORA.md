@@ -373,6 +373,18 @@ D:\no_borrar\programacion\Python\Django\
   Además: el panel administrativo tiene su propio **"Cerrar sesión"** (POST) en el menú lateral, y la sección
   de la app `usuarios` en Django Admin se llama **"Cuentas y auditoría"** (antes "Usuarios", igual que la de Django).
 
+### [16] Votos con código de comprobante y auditoría del ciclo de votación (CU-04, RNF-04, MER)
+- **Rama Git:** `desarrollo_total`.
+- **`votaciones/models.py`**: `Voto.codigo_comprobante` (único, formato `FV-XXXX-XXXX`, generado con `secrets`
+  y sin caracteres ambiguos como 0/O o 1/I). **Migración `0007`**: asigna código a los votos que ya existían.
+- **Página de éxito**: muestra el código de comprobante y la fecha del voto.
+- **Bitácora**: cada voto queda como "Voto registrado" con la encuesta y el comprobante, **sin la opción elegida**
+  (RF-10: nadie ve el sentido del voto individual); los intentos de votar de nuevo quedan como
+  "Intento de voto duplicado"; las altas y cambios de categorías, encuestas y opciones hechas desde el panel
+  quedan como "… creada / actualizada". (Las acciones del Django Admin ya las guarda su propio historial.)
+- **Django Admin**: la lista de votos muestra y permite buscar por código de comprobante.
+- **Pruebas**: 3 nuevas. Total: **70 pruebas OK en MySQL**.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

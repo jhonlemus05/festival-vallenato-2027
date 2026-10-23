@@ -124,6 +124,37 @@
       font-weight: 700;
     }
 
+    .receipt-code-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #111;
+      border-radius: 10px;
+    }
+
+    .receipt-code-label {
+      color: #AAAAAA;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .receipt-code {
+      color: var(--color-gold);
+      font-family: monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .receipt-code-date {
+      color: #CCCCCC;
+      font-size: 0.66rem;
+    }
+
     .success-home-link {
       display: flex;
       justify-content: center;
@@ -179,6 +210,12 @@
       <div class="receipt-category">{{ voto.encuesta.categoria.nombre }}</div>
       <div class="receipt-survey">{{ voto.encuesta.nombre }}</div>
       <span class="receipt-status">Voto registrado</span>
+      {# Comprobante (CU-04): permite verificar el voto sin revelar la opción elegida a terceros. #}
+      <div class="receipt-code-box">
+        <span class="receipt-code-label">Código de comprobante</span>
+        <span class="receipt-code">{{ voto.codigo_comprobante }}</span>
+        <span class="receipt-code-date">{{ voto.fecha_creacion|date:"d/m/Y H:i" }} · Guárdalo para verificar tu voto.</span>
+      </div>
     </article>
 
     <a class="success-home-link" href="{% url 'index' %}">Volver al inicio <i class="bi bi-house" aria-hidden="true"></i></a>

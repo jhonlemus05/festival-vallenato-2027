@@ -1,3 +1,5 @@
+import secrets
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -164,6 +166,14 @@ class Voto(models.Model):
         related_name='votos_festival',
         verbose_name='Votante',
     )
+    # Comprobante del voto (CU-04, CU-05 y MER de la Entrega 1). Permite verificar que el voto
+    # quedó registrado sin revelar la opción elegida.
+    codigo_comprobante = models.CharField(
+        max_length=20,
+        unique=True,
+        editable=False,
+        verbose_name='Código de comprobante',
+    )
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha del voto')
 
     class Meta:
@@ -179,3 +189,24 @@ class Voto(models.Model):
 
     def __str__(self):
         return f'{self.usuario} - {self.encuesta.nombre}: {self.opcion.nombre}'
+
+    def save(self, *args, **kwargs):
+        if not self.codigo_comprobante:
+            self.codigo_comprobante = generar_codigo_comprobante()
+        super().save(*args, **kwargs)
+
+
+# Sin 0/O ni 1/I para que el código se pueda dictar o copiar a mano sin confusiones.
+ALFABETO_COMPROBANTE = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+
+
+def generar_codigo_comprobante():
+    """
+    Código tipo FV-7K2Q-M9XA: 8 caracteres de 32 posibles (~10^12 combinaciones), con `secrets`
+    (aleatorio criptográfico) para que no se pueda adivinar el de otra persona. Se revisa que no exista.
+    """
+    while True:
+        cuerpo = ''.join(secrets.choice(ALFABETO_COMPROBANTE) for _ in range(8))
+        codigo = f'FV-{cuerpo[:4]}-{cuerpo[4:]}'
+        if not Voto.objects.filter(codigo_comprobante=codigo).exists():
+            return codigo

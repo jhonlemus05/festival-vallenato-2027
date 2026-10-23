@@ -8,6 +8,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+from usuarios.models import Bitacora
+
 from .models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 
 
@@ -199,6 +201,29 @@ class VotacionPublicaTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+
+    def test_voto_tiene_comprobante_y_queda_en_bitacora_sin_la_opcion(self):
+        self.client.force_login(self.usuario)
+
+        self.client.post(self.url, {'opcion': self.opciones[1].pk})
+
+        voto = Voto.objects.get()
+        self.assertRegex(voto.codigo_comprobante, r'^FV-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$')
+        evento = Bitacora.objects.get(accion='Voto registrado')
+        self.assertIn(voto.codigo_comprobante, evento.detalles)
+        # El sentido del voto no queda en la bitácora (RF-10).
+        self.assertNotIn(self.opciones[1].nombre, evento.detalles)
+        self.assertTrue(evento.firma_valida())
+        self.assertContains(self.client.get(reverse('voto_exitoso', args=[voto.pk])), voto.codigo_comprobante)
+
+    def test_intento_de_voto_duplicado_queda_en_bitacora(self):
+        self.client.force_login(self.usuario)
+        self.client.post(self.url, {'opcion': self.opciones[0].pk})
+
+        self.client.post(self.url, {'opcion': self.opciones[1].pk})
+
+        self.assertEqual(Voto.objects.count(), 1)
+        self.assertTrue(Bitacora.objects.filter(accion='Intento de voto duplicado').exists())
 
 class ResultadosAdminTests(TestCase):
     def setUp(self):
