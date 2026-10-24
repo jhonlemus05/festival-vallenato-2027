@@ -276,9 +276,11 @@
         <!-- Enlaces superiores visibles únicamente en pantallas grandes (Desktop / PC) -->
         <ul class="desktop-nav-links d-none d-md-flex">
           <li><a href="{% url 'index' %}" class="desktop-nav-link {% if seccion_activa == 'inicio' or not seccion_activa %}active{% endif %}"><i class="bi bi-house"></i> Inicio</a></li>
-          <li><a href="#" class="desktop-nav-link {% if seccion_activa == 'categorias' %}active{% endif %}"><i class="bi bi-grid"></i> Categorías</a></li>
+          <li><a href="{% url 'categorias_publicas' %}" class="desktop-nav-link {% if seccion_activa == 'categorias' %}active{% endif %}"><i class="bi bi-grid"></i> Categorías</a></li>
           <li><a href="{% url 'login' %}" class="desktop-nav-link {% if seccion_activa == 'cuenta' %}active{% endif %}"><i class="bi bi-person"></i> Mi cuenta</a></li>
+          {% if es_administrador %}
           <li><a href="{% url 'panel_principal' %}" class="desktop-nav-link {% if seccion_activa == 'admin' %}active{% endif %}"><i class="bi bi-speedometer2"></i> Administración</a></li>
+          {% endif %}
         </ul>
 
         <!-- Acciones en desktop / Botón menú móvil -->
@@ -289,7 +291,7 @@
               <i class="bi bi-box-arrow-right"></i> Cerrar sesión
             </button>
             {% endif %}
-            <a href="#" class="btn-desktop-account" style="background-color: var(--color-gold); color: #000000; border: none;">
+            <a href="{% url 'categorias_publicas' %}" class="btn-desktop-account" style="background-color: var(--color-gold); color: #000000; border: none;">
               <i class="bi bi-check2-circle"></i> Votar ahora
             </a>
           </div>
@@ -326,8 +328,8 @@
           <h4>Navegación</h4>
           <ul class="desktop-footer-links">
             <li><a href="{% url 'index' %}">Inicio</a></li>
-            <li><a href="#">Categorías</a></li>
-            <li><a href="#">Encuestas Activas</a></li>
+            <li><a href="{% url 'categorias_publicas' %}">Categorías</a></li>
+            <li><a href="{% url 'categorias_publicas' %}">Encuestas Activas</a></li>
             <li><a href="{% url 'login' %}">Registro y Cuenta</a></li>
           </ul>
         </div>
@@ -371,7 +373,7 @@
       </a>
 
       <!-- Tab 2: Categorías -->
-      <a href="#" class="tab-item {% if seccion_activa == 'categorias' %}active{% endif %}">
+      <a href="{% url 'categorias_publicas' %}" class="tab-item {% if seccion_activa == 'categorias' %}active{% endif %}">
         <i class="bi bi-grid"></i>
         <span>Categorías</span>
       </a>
@@ -408,18 +410,20 @@
         <a href="{% url 'index' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-house text-warning"></i> <span>Inicio</span>
         </a>
-        <a href="#" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+        <a href="{% url 'categorias_publicas' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-grid text-warning"></i> <span>Categorías de votación</span>
         </a>
         <a href="{% url 'login' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-person text-warning"></i> <span>{% if request.user.is_authenticated %}Mi cuenta ({{ request.user.username }}){% else %}Registro / Iniciar sesión{% endif %}</span>
         </a>
-        <a href="#" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
+        <a href="{% url 'categorias_publicas' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-check2-square text-warning"></i> <span>Encuestas y votaciones</span>
         </a>
+        {% if es_administrador %}
         <a href="{% url 'panel_principal' %}" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-speedometer2 text-warning"></i> <span>Panel administrativo</span>
         </a>
+        {% endif %}
         {% if request.user.is_authenticated %}
         <button type="submit" form="logoutForm" class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 d-flex align-items-center gap-2">
           <i class="bi bi-box-arrow-right text-warning"></i> <span>Cerrar sesión</span>

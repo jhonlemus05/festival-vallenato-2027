@@ -10,17 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Los secretos (SECRET_KEY y credenciales de MySQL) viven en un archivo .env en la raíz,
+# que NO se sube al repositorio (está en .gitignore). Plantilla con instrucciones: .env.example
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q&@g*k9pvu84qo3jq1a=i%#l3bf5o(zv8))6(z0%!*7@q$+vyi'
+# Ojo: la bitácora la usa para firmar cada evento (ver usuarios.models.Bitacora), así que si se
+# cambia después de tener datos, las firmas viejas dejan de coincidir.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    raise ImproperlyConfigured('Falta DJANGO_SECRET_KEY en el archivo .env (copia .env.example y llénalo).')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -50,7 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+    # Abre y cierra encuestas según su fecha programada (RN-05).
+    'votaciones.middleware.EstadoEncuestasMiddleware',
 ]
 
 ROOT_URLCONF = 'pr_festivalVallenato.urls'
@@ -65,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'usuarios.context_processors.permisos',
             ],
         },
     },
@@ -76,12 +90,29 @@ WSGI_APPLICATION = 'pr_festivalVallenato.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# MySQL es la base de datos del proyecto (arquitectura de la Entrega 1, obligatoria en la Entrega 2).
+# Driver: mysqlclient (el recomendado por Django). Los datos de conexión salen del .env.
+# DB_ENGINE=sqlite queda solo como respaldo temporal para quien todavía no instala MySQL.
+if os.environ.get('DB_ENGINE', 'mysql') == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'festival_vallenato'),
+            'USER': os.environ.get('DB_USER', 'festival'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+            # utf8mb4 = UTF-8 completo (tildes, ñ y emojis); el "utf8" viejo de MySQL se queda corto.
+            'OPTIONS': {'charset': 'utf8mb4'},
+        }
+    }
 
 
 # Password validation

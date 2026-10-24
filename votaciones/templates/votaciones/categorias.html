@@ -1,0 +1,269 @@
+{% extends 'votaciones/base.html' %}
+
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion.anio|default:'2027' }} | Categorías{% endblock %}
+{% block descripcion %}Conoce las categorías de música, piloneras y comparsas del Festival de la Leyenda Vallenata {{ edicion.anio|default:'2027' }}.{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .categories-body-content {
+      flex: 1;
+      padding: 26px 20px 96px;
+      background-color: var(--color-canvas-bg);
+    }
+
+    .screen-kicker {
+      margin-bottom: 6px;
+      color: #71717A;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .screen-title {
+      margin-bottom: 8px;
+      color: var(--color-text-dark);
+      font-family: var(--font-display);
+      font-size: 1.86rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .screen-description {
+      margin-bottom: 24px;
+      color: var(--color-text-muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .category-card {
+      display: block;
+      padding: 20px 19px;
+      color: inherit;
+      text-decoration: none;
+      background-color: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .category-card:hover {
+      color: inherit;
+      border-color: rgba(216, 166, 41, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .category-card-top,
+    .category-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .category-card-top {
+      margin-bottom: 14px;
+    }
+
+    .category-icon-box {
+      display: flex;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      background-color: #F8ECD5;
+      border-radius: 12px;
+      font-size: 1.2rem;
+    }
+
+    .category-badge {
+      padding: 5px 11px;
+      color: #111;
+      background-color: #F5EBD7;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .category-title {
+      margin: 0 0 3px;
+      color: #111;
+      font-family: var(--font-display);
+      font-size: 1.22rem;
+      font-weight: 800;
+    }
+
+    .category-subtitle {
+      margin: 0;
+      color: #555;
+      font-size: 0.76rem;
+      line-height: 1.45;
+    }
+
+    .category-arrow {
+      flex-shrink: 0;
+      margin-left: 12px;
+      color: var(--color-gold);
+      font-size: 1.05rem;
+    }
+
+    .category-footnote {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 20px;
+      color: #666;
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    .category-footnote i {
+      margin-top: 1px;
+    }
+
+    .edition-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .edition-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      color: #111;
+      background-color: #fff;
+      border: 1px solid rgba(216, 166, 41, 0.45);
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .edition-pill i {
+      color: var(--color-gold);
+    }
+
+    .edition-link {
+      color: #111;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .category-empty {
+      padding: 24px;
+      color: #666;
+      background: #fff;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .categories-body-content {
+        padding: 42px 36px 56px;
+      }
+
+      .categories-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .category-card {
+        min-height: 190px;
+        padding: 22px;
+      }
+
+      .screen-description {
+        max-width: 620px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+  <section class="categories-body-content">
+    <div class="screen-kicker">02 / Explora</div>
+    <h1 class="screen-title">Elige una categoría</h1>
+    <p class="screen-description">
+      Música, danza y tradición. Descubre las categorías del Festival y apoya el talento que te inspira.
+    </p>
+
+    {% if edicion %}
+      <div class="edition-bar">
+        <span class="edition-pill">
+          <i class="bi bi-calendar-event" aria-hidden="true"></i>
+          {{ edicion.nombre }} · {{ edicion.fecha_inicio|date:"j \d\e F"|lower }} al {{ edicion.fecha_fin|date:"j \d\e F \d\e Y"|lower }}
+        </span>
+        <a href="{% url 'ediciones' %}" class="edition-link">Ver todas las ediciones</a>
+      </div>
+    {% endif %}
+
+    {% if categorias %}
+      <div class="categories-grid">
+        {% for categoria in categorias %}
+          <a href="{% url 'categoria_encuestas' categoria.pk %}" class="category-card">
+            <div class="category-card-top">
+              <span class="category-icon-box" aria-hidden="true">
+                {% if categoria.icono == 'music' %}
+                  <i class="bi bi-music-note"></i>
+                {% elif categoria.icono == 'flower' %}
+                  <i class="bi bi-flower1"></i>
+                {% elif categoria.icono == 'mask' %}
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9a2 2 0 0 1-2 2H6l-4 4 1-6a6 6 0 0 1 6-6h3a2 2 0 0 1 2 2v4z"></path>
+                    <path d="M18 9h1a4 4 0 0 1 4 4l-1 6-4-4h-2a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2"></path>
+                    <circle cx="6" cy="7" r="1"></circle>
+                    <circle cx="10" cy="7" r="1"></circle>
+                  </svg>
+                {% else %}
+                  <i class="bi bi-trophy"></i>
+                {% endif %}
+              </span>
+              <span class="category-badge">
+                {% if categoria.encuestas_activas == 1 %}
+                  1 activa
+                {% elif categoria.encuestas_activas > 1 %}
+                  {{ categoria.encuestas_activas }} activas
+                {% else %}
+                  Próximamente
+                {% endif %}
+              </span>
+            </div>
+            <div class="category-card-bottom">
+              <div>
+                <h2 class="category-title">{{ categoria.nombre }}</h2>
+                <p class="category-subtitle">{{ categoria.descripcion }}</p>
+              </div>
+              <span class="category-arrow" aria-hidden="true">
+                <i class="bi bi-arrow-up-right"></i>
+              </span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="category-empty">
+        {% if edicion %}Las categorías estarán disponibles próximamente.{% else %}Aún no hay ediciones del Festival publicadas.{% endif %}
+      </div>
+    {% endif %}
+
+    <div class="category-footnote">
+      <i class="bi bi-info-circle"></i>
+      <span>Encuentra las condiciones y fechas oficiales dentro de cada encuesta.</span>
+    </div>
+  </section>
+{% endblock %}

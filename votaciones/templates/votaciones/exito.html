@@ -1,0 +1,230 @@
+{% extends 'votaciones/base.html' %}
+{% load static %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | Voto registrado{% endblock %}
+{% block descripcion %}Tu voto ha sido registrado correctamente.{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .success-page {
+      flex: 1;
+      padding: 34px 24px 96px;
+      background: var(--color-canvas-bg);
+      text-align: center;
+    }
+
+    .success-kicker {
+      color: #686868;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .success-icon-outer {
+      display: grid;
+      width: 82px;
+      height: 82px;
+      margin: 24px auto 18px;
+      place-items: center;
+      background: #F6EDCE;
+      border-radius: 50%;
+    }
+
+    .success-icon-inner {
+      display: grid;
+      width: 60px;
+      height: 60px;
+      place-items: center;
+      color: #111;
+      background: var(--color-gold);
+      border-radius: 50%;
+      font-size: 1.8rem;
+    }
+
+    .success-title {
+      margin-bottom: 10px;
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .success-description {
+      margin-bottom: 22px;
+      color: #777;
+      font-size: 0.8rem;
+      line-height: 1.55;
+    }
+
+    .vote-receipt {
+      margin-bottom: 22px;
+      padding: 16px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      text-align: left;
+    }
+
+    .receipt-candidate {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .receipt-photo {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .receipt-label {
+      color: #777;
+      font-size: 0.63rem;
+    }
+
+    .receipt-name {
+      margin: 2px 0;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .receipt-description {
+      margin: 0;
+      color: #777;
+      font-size: 0.66rem;
+    }
+
+    .receipt-divider {
+      margin: 14px 0;
+      border-color: #E8E5DF;
+    }
+
+    .receipt-category {
+      margin-bottom: 6px;
+      color: #777;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+    }
+
+    .receipt-survey {
+      margin-bottom: 9px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .receipt-status {
+      display: inline-block;
+      padding: 5px 10px;
+      background: #F5EBD0;
+      border-radius: 20px;
+      font-size: 0.62rem;
+      font-weight: 700;
+    }
+
+    .receipt-code-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #111;
+      border-radius: 10px;
+    }
+
+    .receipt-code-label {
+      color: #AAAAAA;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .receipt-code {
+      color: var(--color-gold);
+      font-family: monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .receipt-code-date {
+      color: #CCCCCC;
+      font-size: 0.66rem;
+    }
+
+    .receipt-code-link {
+      color: var(--color-gold);
+    }
+
+    .success-home-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 46px;
+      margin-bottom: 12px;
+      padding: 12px 16px;
+      color: #111;
+      background: var(--color-gold);
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .success-more-link {
+      color: #666;
+      font-size: 0.68rem;
+      text-decoration: none;
+    }
+
+    @media (min-width: 768px) {
+      .success-page {
+        padding: 38px 36px 56px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block contenido %}
+  <section class="success-page">
+    <div class="success-kicker">06 / Gracias por participar</div>
+    <div class="success-icon-outer" aria-hidden="true">
+      <div class="success-icon-inner"><i class="bi bi-check2"></i></div>
+    </div>
+    <h1 class="success-title">¡Voto registrado<br>con éxito!</h1>
+    <p class="success-description">Tu voz ya es parte de esta celebración.<br>Gracias por apoyar el talento vallenato.</p>
+
+    <article class="vote-receipt">
+      <div class="receipt-candidate">
+        {% if voto.opcion.imagen %}
+          <img class="receipt-photo" src="{% static voto.opcion.imagen %}" alt="{{ voto.opcion.nombre }}">
+        {% endif %}
+        <div>
+          <div class="receipt-label">Votaste por</div>
+          <h2 class="receipt-name">{{ voto.opcion.nombre }}</h2>
+          <p class="receipt-description">{{ voto.opcion.descripcion }}</p>
+        </div>
+      </div>
+      <hr class="receipt-divider">
+      <div class="receipt-category">{{ voto.encuesta.categoria.nombre }}</div>
+      <div class="receipt-survey">{{ voto.encuesta.nombre }}</div>
+      <span class="receipt-status">Voto registrado</span>
+      {# Comprobante (CU-04): permite verificar el voto sin revelar la opción elegida a terceros. #}
+      <div class="receipt-code-box">
+        <span class="receipt-code-label">Código de comprobante</span>
+        <span class="receipt-code">{{ voto.codigo_comprobante }}</span>
+        <span class="receipt-code-date">{{ voto.fecha_creacion|date:"d/m/Y H:i" }} · También lo encuentras en <a href="{% url 'perfil_comprobantes' %}" class="receipt-code-link">Mis comprobantes</a>.</span>
+      </div>
+    </article>
+
+    <a class="success-home-link" href="{% url 'index' %}">Volver al inicio <i class="bi bi-house" aria-hidden="true"></i></a>
+    <a class="success-more-link" href="{% url 'categoria_encuestas' voto.encuesta.categoria_id %}">
+      <i class="bi bi-info-circle" aria-hidden="true"></i> Puedes participar en otras encuestas activas.
+    </a>
+  </section>
+{% endblock %}

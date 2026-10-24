@@ -49,12 +49,16 @@ D:\no_borrar\programacion\Python\Django\
 │   ├── views.py                    # login_view, registro_view, perfil_*_view, logout_view
 │   └── tests.py                    # Pruebas de registro, login, logout, bitácora y perfil
 ├── votaciones\                     # APP 2: experiencia pública (MIGRANDO)
+│   ├── migrations\0001_initial.py  # Modelo Categoria + datos iniciales
 │   ├── templates\votaciones\
 │   │   ├── base.html               # Layout público (navbar, footer, offcanvas, scripts)
-│   │   └── index.html              # Página de Inicio (ex inicio.html)
-│   ├── urls.py                     # '' -> views.index (name='index')
-│   └── views.py                    # def index(...)
+│   │   ├── index.html              # Página de Inicio (ex inicio.html)
+│   │   └── categorias.html         # Catálogo público de categorías activas
+│   ├── models.py                   # Categoria (catálogo público y administrativo)
+│   ├── urls.py                     # '' -> Inicio ; 'categorias/' -> catálogo público
+│   └── views.py                    # vistas Inicio y Categorías
 ├── administracion\                 # APP 3: panel privado (MIGRANDO)
+│   ├── forms.py                    # CategoriaForm (alta y edición)
 │   ├── templates\administracion\
 │   │   ├── admin_base.html             # Layout privado (sidebar, topbar, offcanvas, scripts)
 │   │   ├── _admin_sidebar_nav.html     # Menú lateral reutilizable (sidebar + offcanvas)
@@ -138,6 +142,10 @@ D:\no_borrar\programacion\Python\Django\
   categorías) va en `{% block contenido %}`; los modales y el toast en `{% block modales %}`; el CSS
   específico de la página en `{% block extra_css %}`.
 - **`administracion/views.py`**: `def panel_principal(request)` -> render con `{'seccion_admin': 'panel'}`.
+- **Panel conectado a la base de datos**: los totales de votos, encuestas activas en categorías visibles,
+  usuarios registrados y categorías activas se consultan en cada solicitud. La actividad reciente muestra
+  votos reales; el desglose excluye encuestas cerradas o categorías ocultas y calcula sus barras según los
+  votos de las encuestas activas.
 - **`administracion/urls.py`**: `path('', views.panel_principal, name='panel_principal')` (ruta `/admin-panel/`).
 - **Enlaces:** "Volver a vista pública" -> `{% url 'index' %}`. Los ítems Categorías/Votaciones/Opciones/
   Resultados del menú quedaron como `href="#"` hasta migrarlos.
@@ -226,13 +234,200 @@ D:\no_borrar\programacion\Python\Django\
 - **`usuarios/tests.py`**: 3 pruebas nuevas (las 3 secciones piden sesión, el menú marca la sección activa,
   Mi actividad por separado). Total: **18 pruebas OK**.
 
+### [10] Votaciones: catálogo público y gestión de categorías
+- **`votaciones/models.py`**: modelo `Categoria` con nombre, descripción, icono, estado de visibilidad,
+  orden y fechas de creación/actualización.
+- **`votaciones/migrations/0001_initial.py`**: crea la tabla y carga las categorías iniciales Música,
+  Piloneras y Comparsas.
+- **`administracion/forms.py` / `views.py`**: formulario Django para crear y editar categorías, validar
+  nombres duplicados y activar/ocultar cada categoría. Para facilitar la validación de vistas en este
+  entorno académico, el panel y su gestión están temporalmente disponibles sin autenticación; protegerlos
+  antes de un despliegue real.
+- **`administracion/templates/administracion/categorias.html`**: tabla y métricas conectadas a la base de
+  datos; formulario modal con CSRF, mensajes de resultado, búsqueda y filtro por estado.
+- **`votaciones/views.py` / `urls.py`**: catálogo público en `/categorias/`, que muestra las categorías
+  activas. Los enlaces del navbar, menú móvil y llamadas a la acción de Inicio apuntan a esta ruta.
+- **Encuestas dentro de Música**: `votaciones/models.py` añade `Encuesta`, relacionada con `Categoria`
+  y con estados Activa, Próximamente y Cerrada. La migración `0002_encuesta.py` carga Artista favorito
+  del público, Canción favorita del público, Clásico vallenato favorito y Acordeonista; `0003` convierte
+  la antigua categoría raíz Acordeonista en encuesta de Música y `0004` conserva el orden del prototipo,
+  dejando Acordeonista al final.
+- **Gestión**: `administracion/forms.py` y `views.py` permiten crear y editar encuestas desde la sección
+  Categorías. La plantilla `administracion/categorias.html` contiene su formulario modal y las lista bajo
+  su categoría. Se conserva el mismo patrón visual de modales y mensajes del panel.
+- **Vista pública**: cada tarjeta de `/categorias/` abre `/categorias/<id>/`, que muestra las encuestas
+  asociadas con sus respectivos estados.
+- **Verificación de categorías**: se confirmó en navegador el catálogo, las cuatro encuestas de Música
+  y el modal de edición. Las migraciones hasta `0004_ordenar_encuestas_musica` están aplicadas.
+- **`votaciones/migrations/0005_opciones_y_votos.py`**: crea opciones y votos, aplica la restricción de
+  un voto por usuario y encuesta, y carga los cuatro participantes de Artista favorito del público.
+- **Votación pública**: `/encuestas/<id>/votar/` presenta las opciones, pide confirmación y registra el
+  voto para la cuenta autenticada. La pantalla `/votos/<id>/exito/` solo es visible para quien emitió ese
+  voto. Una cuenta no puede cambiar ni volver a emitir su elección en la misma encuesta. Las otras
+  encuestas activas permanecen sin votación hasta que tengan opciones configuradas.
+- **Panel de estado y resultados**: `/admin-panel/votaciones/` y `/admin-panel/resultados/` muestran
+  totales y distribución porcentual por opción en forma agregada. Votaciones incluye únicamente
+  encuestas activas y Resultados únicamente encuestas cerradas. El menú de administración y el acceso
+  del panel principal enlazan a estas vistas; no se exponen identidades de votantes.
+- **Gestión de candidatos y opciones**: desde Categorías se pueden crear y editar opciones vinculadas
+  a cualquier encuesta, independientemente de su categoría. Se valida que el nombre no se repita en la
+  misma encuesta; las imágenes se indican mediante una ruta relativa de `static` (no se suben archivos).
+- **Verificación de la separación y opciones**: se añadieron pruebas para filtros activos/cerrados,
+  alta, edición, duplicados, validación de rutas de imagen y candidatos sin imagen. La suite completa
+  del proyecto pasó con 45 pruebas; `manage.py check` y `makemigrations --check --dry-run` no reportan
+  problemas.
+- **Imágenes de opciones**: los cuatro retratos usados por el prototipo están en `static/images/`.
+- **Verificación de votación**: `manage.py check`, comprobación de migraciones y las 39 pruebas del
+  proyecto pasaron. En navegador se probó el acceso a la votación, el cambio de opción, la confirmación,
+  el comprobante y la distribución del voto en el panel administrativo.
+- **`votaciones/templates/votaciones/categorias.html`**: vista pública adaptable a móvil/escritorio,
+  siguiendo el diseño institucional del prototipo.
+- **Pruebas de categorías**: cubren catálogo público, altas, edición, visibilidad, duplicados y permisos;
+  las pruebas de votación agregadas en la fase siguiente cubren el registro y la restricción de voto único.
+
+### [11] Configuración: MySQL y secretos fuera del repositorio (Entrega 2)
+- **Rama Git:** `desarrollo_total`.
+- **`pr_festivalVallenato/settings.py`**: la base de datos pasa a **MySQL** (`django.db.backends.mysql`,
+  `charset utf8mb4`) y los datos de conexión y la `SECRET_KEY` se leen de un archivo **`.env`** con
+  `python-dotenv`. Sin `DJANGO_SECRET_KEY` el proyecto no arranca y lo dice. `DB_ENGINE=sqlite` en el `.env`
+  queda solo como respaldo temporal para quien aún no instala MySQL.
+- **`.env.example`** (sí va al repo): plantilla con las variables y cómo generar la clave. El **`.env`** real
+  no se sube (`.gitignore`). La clave vieja quedó en el historial de git, así que cada quien genera la suya.
+- **`requirements.txt`**: `Django==6.1.2`, `mysqlclient==2.3.0` (driver recomendado por Django; en Windows
+  se instala sin compilar) y `python-dotenv==1.2.4`.
+- **`login.html`**: "Un voto único garantizado por categoría" → "Un voto por encuesta, sin duplicados"
+  (la regla RN-03 sigue pendiente de validación; lo implementado es un voto por encuesta).
+- **Cómo dejar MySQL listo (una sola vez por equipo):**
+  1. Instalar MySQL 8. Ubuntu: `sudo apt install mysql-server pkg-config default-libmysqlclient-dev build-essential python3-dev`
+     (los últimos cuatro son para compilar `mysqlclient`). Windows: MySQL Installer (Server 8.4).
+  2. Crear la base y el usuario (en Ubuntu con `sudo mysql`; en Windows con MySQL Shell o Workbench como root):
+     ```sql
+     CREATE DATABASE festival_vallenato CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+     CREATE USER 'festival'@'localhost' IDENTIFIED BY 'una-clave-tuya';
+     GRANT ALL PRIVILEGES ON festival_vallenato.* TO 'festival'@'localhost';
+     GRANT ALL PRIVILEGES ON test_festival_vallenato.* TO 'festival'@'localhost';
+     ```
+     (la segunda base la crea Django al correr las pruebas).
+  3. Copiar `.env.example` como `.env`, generar la clave y poner la contraseña de MySQL.
+  4. `pip install -r requirements.txt`, luego `python manage.py migrate` y `python manage.py createsuperuser`.
+
+### [12] Votaciones: Ediciones del Festival (Entrega 2, RN-01)
+- **Rama Git:** `desarrollo_total` (ya incluye la rama `feature/migracion-votaciones` de Teo, integrada con merge).
+- **`votaciones/models.py`**: modelo **`Edicion`** según el MER (`nombre`, `anio` único, `fecha_inicio`,
+  `fecha_fin`, `estado`: En preparación / Activa / Finalizada), con validación de fechas y `Edicion.vigente()`
+  (la activa más reciente). `Categoria` pasa a pertenecer a una edición (`on_delete=PROTECT`) y su nombre es
+  único **dentro de cada edición**, no en general.
+- **`votaciones/migrations/0006_edicion.py`**: crea la tabla, registra el **60° Festival (28 de abril al 1 de
+  mayo de 2027, boletín n.° 028 de la Fundación)** y le asigna Música, Piloneras y Comparsas. Se puede revertir.
+- **Django Admin**: `Edicion` registrada con sus categorías en línea; `Categoria` muestra y filtra por edición.
+- **Panel propio** (`administracion/forms.py`): las categorías nuevas se crean en la edición vigente y el
+  control de nombres repetidos se limita a esa edición.
+- **Vista pública**: `/categorias/` muestra la edición vigente con sus fechas; `/ediciones/` lista todas y
+  `/ediciones/<año>/` muestra las categorías de cada una.
+- **Corrección**: las consultas con `annotate` no traían `order_by` (Django ignora el `ordering` del modelo con
+  GROUP BY); en MySQL las categorías salían en orden alfabético. Se agregó el orden explícito en categorías,
+  ediciones y opciones del panel.
+- **Pruebas**: 10 nuevas (8 de ediciones en `votaciones`, 2 del panel en `administracion`). Total del proyecto:
+  **57 pruebas OK en MySQL**.
+
+### [13] Seguridad: panel administrativo solo para administradores (RNF-01, RF-02, riesgo R5102)
+- **Rama Git:** `desarrollo_total`. Cierra lo que la entrada [10] dejó pendiente ("panel disponible sin autenticación").
+- **`usuarios/permisos.py`**: `es_administrador(user)` (cuenta staff de Django o perfil con `rol='administrador'`)
+  y el decorador `@administrador_requerido`: sin sesión manda al login con `?next=`; con sesión pero sin rol
+  responde **403** (no al login, para no caer en un bucle) y registra el intento en la bitácora.
+- **`administracion/views.py`**: el decorador protege `panel_principal`, `categorias`, `panel_votaciones` y
+  `panel_resultados`. Los resultados ya no son públicos (RF-02).
+- **`usuarios/context_processors.py`** + `settings.py`: `es_administrador` disponible en todas las plantillas;
+  el enlace "Administración" del navbar, del menú móvil y del perfil solo aparece para administradores.
+- **`usuarios/templates/403.html`**: página de acceso restringido con el diseño del sitio.
+- **Cómo dar el rol:** `createsuperuser`, o en Django Admin marcar "Es staff" en el usuario o poner
+  `rol = administrador` en su perfil (`Usuario`).
+- **Pruebas**: la de Teo que comprobaba el acceso libre ahora comprueba login/403/200; 4 nuevas (votante
+  bloqueado y auditado, rol administrador sin staff, enlace oculto). Total: **60 pruebas OK en MySQL**.
+
+### [14] Datos de prueba y README (Entrega 2)
+- **Rama Git:** `desarrollo_total`.
+- **`votaciones/management/commands/cargar_datos_prueba.py`**: `python manage.py cargar_datos_prueba` agrega una
+  **Edición de prueba 2026** (finalizada) con una encuesta cerrada, opciones para "Canción favorita" y
+  "Clásico vallenato favorito", y **36 votos** de 12 votantes de prueba (`@demo.festivalvallenato.test`,
+  sin contraseña utilizable: nadie puede entrar con ellos). Todo es de prueba, no son datos de la Fundación.
+  Se puede correr varias veces sin duplicar nada.
+- **`README.md`**: descripción, tecnologías, estructura, instalación paso a paso en Windows y Linux (entorno,
+  dependencias, MySQL, `.env`, migraciones, superusuario, datos de prueba), rutas principales, pruebas y
+  seguridad. Falta poner los nombres de los integrantes.
+- **Pruebas**: 3 nuevas del comando (carga, no duplica, votantes sin contraseña). Total: **63 pruebas OK en MySQL**.
+
+### [15] Correcciones tras la prueba completa en navegador
+- **Rama Git:** `desarrollo_total`.
+- **Votación**: ninguna opción viene preseleccionada (el botón Votar arranca deshabilitado); opciones sin foto
+  muestran un ícono musical en vez de un recuadro vacío; "a quien" → "a quién".
+- **Encuestas por categoría**: muestran el año de la edición y "Volver" lleva a las categorías de esa edición.
+- **Portada**: el contador y las fechas salen de la edición vigente (antes 26 de abril escrito en `countdown.js`).
+- **Panel administrativo**: todas sus páginas muestran solo la edición vigente; el encabezado muestra al
+  administrador conectado (ya no "Panel sin autenticación"); los mensajes se ven en todas las páginas;
+  "Opciones" lleva a la sección de encuestas y opciones (antes `#`).
+- **Django Admin**: `Usuario` se muestra como "Perfiles de usuario" (migración `0003`), para no confundirse con
+  "Usuarios" de Django.
+- **Pruebas**: 4 nuevas. Total: **67 pruebas OK en MySQL**.
+- **Revisión en navegador** (después del commit anterior): portada, encuestas 2026, votación y panel verificados.
+  Además: el panel administrativo tiene su propio **"Cerrar sesión"** (POST) en el menú lateral, y la sección
+  de la app `usuarios` en Django Admin se llama **"Cuentas y auditoría"** (antes "Usuarios", igual que la de Django).
+
+### [16] Votos con código de comprobante y auditoría del ciclo de votación (CU-04, RNF-04, MER)
+- **Rama Git:** `desarrollo_total`.
+- **`votaciones/models.py`**: `Voto.codigo_comprobante` (único, formato `FV-XXXX-XXXX`, generado con `secrets`
+  y sin caracteres ambiguos como 0/O o 1/I). **Migración `0007`**: asigna código a los votos que ya existían.
+- **Página de éxito**: muestra el código de comprobante y la fecha del voto.
+- **Bitácora**: cada voto queda como "Voto registrado" con la encuesta y el comprobante, **sin la opción elegida**
+  (RF-10: nadie ve el sentido del voto individual); los intentos de votar de nuevo quedan como
+  "Intento de voto duplicado"; las altas y cambios de categorías, encuestas y opciones hechas desde el panel
+  quedan como "… creada / actualizada". (Las acciones del Django Admin ya las guarda su propio historial.)
+- **Django Admin**: la lista de votos muestra y permite buscar por código de comprobante.
+- **Pruebas**: 3 nuevas. Total: **70 pruebas OK en MySQL**.
+
+### [17] Perfil > Mis comprobantes (CU-05)
+- **Rama Git:** `desarrollo_total`.
+- **`usuarios/views.py`**: `perfil_comprobantes_view` en `/usuarios/perfil/comprobantes/` (`perfil_comprobantes`):
+  lista las encuestas en las que votó la persona con su código y fecha, **sin mostrar la opción elegida**
+  (postcondición del CU-05). Flujo 2a: si no ha votado, lo informa. Flujo 3a: un campo para **verificar un
+  código** (acepta minúsculas y espacios) que confirma si existe, sin decir de quién es ni qué se eligió.
+- **`perfil_base.html`**: cuarta opción del menú lateral, "Mis comprobantes" ("Votos" en celular, 4 en fila).
+- **Página de éxito**: enlaza a "Mis comprobantes" junto al código.
+- **Pruebas**: 3 nuevas y 2 ajustadas (las secciones del perfil ahora son 4). Total: **73 pruebas OK en MySQL**.
+- **Verificación en navegador**: votar → comprobante en la página de éxito → Mis comprobantes → verificar el
+  código propio y uno inexistente → "Voto registrado" en Mi actividad; celular sin scroll horizontal.
+
+### [18] Fechas de apertura y cierre con cierre automático (RN-05, confirmada)
+- **Rama Git:** `desarrollo_total`.
+- **`votaciones/models.py`**: `Encuesta.fecha_apertura` y `fecha_cierre` (opcionales; el cierre debe ser posterior a la
+  apertura, CU-06 5b) y `actualizar_estados_por_fecha()`: "Próximamente" con apertura cumplida → Activa; Activa o
+  Próximamente con cierre cumplido → Cerrada. Cada cambio queda en la bitácora ("Apertura/Cierre automático de
+  encuesta", CU-07 paso 6). **Migración `0008`**.
+- **`votaciones/middleware.py`**: `EstadoEncuestasMiddleware` (en `settings.MIDDLEWARE`) revisa las fechas en cada
+  petición, así no se necesita un cron y nada muestra una encuesta abierta después de su cierre.
+- **Votación (CU-04, 6a)**: votar en una encuesta cerrada o que aún no abre ya no da 404: vuelve a la categoría con
+  un mensaje ("ya está cerrada" / "abre el …"). La página de la categoría ahora muestra los mensajes (antes el aviso
+  de "sin opciones" se perdía) y las fechas ("Cierra el …" / "Abre el …"); la votación muestra el cierre.
+- **Panel**: el modal de encuestas tiene Apertura y Cierre (selector de fecha y hora) y los carga al editar.
+  **Django Admin**: la lista de encuestas muestra las fechas.
+- **Datos de prueba**: Artista y Canción favorita cierran el 27/04/2027 23:59; Acordeonista abre el 28/04/2027 08:00
+  (solo si no tenían fechas). "Canción favorita" ahora dice "3 canciones de prueba".
+- **Pruebas**: 5 nuevas y 1 ajustada (la de encuesta cerrada esperaba 404). Total: **78 pruebas OK en MySQL**.
+
+### [19] README rediseñado
+- **`README.md`**: reescrito como documentación formal del proyecto: alcance (incluido y pendiente de validación),
+  tecnologías, arquitectura MVT y modelo de datos (diagramas Mermaid que GitHub dibuja), funcionalidades por rol
+  ligadas a los RF/CU de la Entrega 1, seguridad, instalación paso a paso en Windows y Linux, variables de entorno,
+  rutas, comandos, pruebas (78), estructura de carpetas y solución de problemas frecuentes. Sin emojis.
+  Falta completar los nombres de los integrantes.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):
-- [ ] `categorias.html` -> vista Categorías
-- [ ] `encuestas.html` -> vista Encuestas
-- [ ] `votacion.html` -> vista Votación
-- [ ] `exito.html` -> vista Éxito
+- [x] `categorias.html` -> `votaciones/templates/votaciones/categorias.html` (ruta `/categorias/`)
+- [x] Vista de encuestas por categoría -> `votaciones/templates/votaciones/encuestas_categoria.html` (ruta `/categorias/<id>/`)
+- [x] `votacion.html` -> `votaciones/templates/votaciones/votacion.html` (selección y confirmación)
+- [x] `exito.html` -> `votaciones/templates/votaciones/exito.html` (comprobante de voto)
 
 Autenticación (app `usuarios`):
 - [x] `login.html` -> `usuarios/templates/usuarios/login.html` (vistas `login`, `registro`, `logout` en `/usuarios/login/`)
@@ -242,10 +437,9 @@ Autenticación (app `usuarios`):
 Admin (app `administracion`, usar `admin_base.html`):
 - [x] `admin.html` -> `panel_principal.html` (vista `panel_principal`, `/admin-panel/`)
 - [x] `admin-categorias.html` -> `categorias.html` (vista `categorias`, `/admin-panel/categorias/`)
-- [ ] `admin-votaciones.html` -> gestión de votaciones (`seccion_admin='votaciones'`)
+- [x] `admin-votaciones.html` -> `votaciones.html` (estado de encuestas y distribución de votos)
 - [ ] `admin-opciones.html` -> gestión de opciones (`seccion_admin='opciones'`)
-- [ ] `admin-resultados.html` -> estadísticas (`seccion_admin='resultados'`)
+- [x] `admin-resultados.html` -> `votaciones.html` (resultados agregados por opción)
 
 > Nota: `admin.html` del prototipo NO comparte las mismas variables CSS institucionales
 > (`--color-gold: #D8A629`) que el resto; revisar al migrarlo.
-

@@ -16,8 +16,11 @@ function initCountdown() {
   // Si no existen los elementos en la vista actual, salir
   if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
 
-  // Fecha tentativa de inicio de la 60ª edición (Abril 2027)
-  const targetDate = new Date('2027-04-26T08:00:00').getTime();
+  // La fecha de inicio viene de la edición vigente en la base de datos (data-inicio en index.html).
+  // Sin edición no hay a qué contar: se dejan los guiones del diseño.
+  const inicio = document.querySelector('[data-inicio]')?.dataset.inicio;
+  if (!inicio) return;
+  const targetDate = new Date(`${inicio}T00:00:00`).getTime();
 
   function update() {
     const now = new Date().getTime();
@@ -41,7 +44,7 @@ function initCountdown() {
     }
   }
 
-  // Si se desea mostrar guiones iniciales como en el diseño de Figma, se puede alternar:
-  // update();
+  // Se pinta de una vez para no mostrar guiones durante el primer segundo.
+  update();
   setInterval(update, 1000);
 }

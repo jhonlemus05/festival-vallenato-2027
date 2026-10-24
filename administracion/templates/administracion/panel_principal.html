@@ -243,7 +243,7 @@
 {% block contenido %}
       <!-- ENCABEZADO DE PÁGINA (TÍTULO Y BOTÓN DE ACCIÓN) -->
       <section class="dashboard-page-header">
-        <div class="panel-kicker">FESTIVAL DE LA LEYENDA VALLENATA 2027</div>
+        <div class="panel-kicker">{% if edicion %}{{ edicion.nombre|upper }} · {{ edicion.anio }}{% else %}FESTIVAL DE LA LEYENDA VALLENATA{% endif %}</div>
         <div class="panel-header-row">
           <div>
             <h1 class="panel-title">Panel principal</h1>
@@ -252,11 +252,10 @@
             </p>
           </div>
 
-          <!-- Botón "+ Nueva votación" -->
-          <button type="button" id="btnNewPoll" class="btn-new-poll">
-            <i class="bi bi-plus-lg"></i>
-            <span>Nueva votación</span>
-          </button>
+          <a href="{% url 'admin_votaciones' %}" id="btnNewPoll" class="btn-new-poll text-decoration-none">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Ver votaciones</span>
+          </a>
         </div>
       </section>
 
@@ -268,8 +267,14 @@
             <span class="metric-card-label">Total Votos</span>
             <i class="bi bi-check2-square metric-card-icon"></i>
           </div>
-          <div class="metric-card-number">12.480</div>
-          <p class="metric-card-subtext">Acumulado de las 3 votaciones</p>
+          <div class="metric-card-number">{{ total_votos }}</div>
+          <p class="metric-card-subtext">
+            {% if encuestas_con_votos %}
+              Distribuidos en {{ encuestas_con_votos }} encuesta{{ encuestas_con_votos|pluralize:"s" }}
+            {% else %}
+              Todavía no hay encuestas con votos
+            {% endif %}
+          </p>
         </div>
 
         <!-- Métrica 2: Votaciones Activas -->
@@ -278,8 +283,8 @@
             <span class="metric-card-label">Votaciones Activas</span>
             <i class="bi bi-broadcast metric-card-icon"></i>
           </div>
-          <div class="metric-card-number">2</div>
-          <p class="metric-card-subtext">3 votaciones · 1 cerrada</p>
+          <div class="metric-card-number">{{ total_encuestas_activas }}</div>
+          <p class="metric-card-subtext">En categorías visibles para los votantes</p>
         </div>
 
         <!-- Métrica 3: Usuarios Registrados -->
@@ -288,8 +293,8 @@
             <span class="metric-card-label">Usuarios Registrados</span>
             <i class="bi bi-people metric-card-icon"></i>
           </div>
-          <div class="metric-card-number">8.240</div>
-          <p class="metric-card-subtext">Cuentas en el entorno de muestra</p>
+          <div class="metric-card-number">{{ total_usuarios }}</div>
+          <p class="metric-card-subtext">Cuentas registradas en la plataforma</p>
         </div>
       </section>
 
@@ -301,7 +306,7 @@
           <div class="activity-card-header">
             <div>
               <h2 class="activity-title">Actividad reciente</h2>
-              <p class="activity-subtitle">Últimos votos del registro de demostración</p>
+              <p class="activity-subtitle">Últimos votos guardados en la base de datos</p>
             </div>
             <button type="button" class="btn-filter-icon" aria-label="Filtrar registros">
               <i class="bi bi-filter-right fs-4"></i>
@@ -319,88 +324,29 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- Fila 1 -->
+                {% for voto in votos_recientes %}
                 <tr>
-                  <td class="td-time">14:32:08</td>
+                  <td class="td-time">{{ voto.fecha_creacion|date:"H:i:s" }}</td>
                   <td>
-                    <div class="td-option-name">Mateo Díaz</div>
-                    <div class="td-poll-name">Artista favorito del público</div>
+                    <div class="td-option-name">{{ voto.opcion.nombre }}</div>
+                    <div class="td-poll-name">{{ voto.encuesta.nombre }}</div>
                   </td>
                   <td class="text-end">
                     <span class="badge-status-registered">Registrado</span>
                   </td>
                 </tr>
-
-                <!-- Fila 2 -->
+                {% empty %}
                 <tr>
-                  <td class="td-time">14:31:46</td>
-                  <td>
-                    <div class="td-option-name">Lucía Pineda</div>
-                    <div class="td-poll-name">Artista favorito del público</div>
-                  </td>
-                  <td class="text-end">
-                    <span class="badge-status-registered">Registrado</span>
-                  </td>
+                  <td colspan="3" class="text-center text-secondary py-4">Aún no hay votos registrados.</td>
                 </tr>
-
-                <!-- Fila 3 -->
-                <tr>
-                  <td class="td-time">14:31:22</td>
-                  <td>
-                    <div class="td-option-name">Mi tierra canta</div>
-                    <div class="td-poll-name">Canción favorita del público</div>
-                  </td>
-                  <td class="text-end">
-                    <span class="badge-status-registered">Registrado</span>
-                  </td>
-                </tr>
-
-                <!-- Fila 4 -->
-                <tr>
-                  <td class="td-time">14:30:59</td>
-                  <td>
-                    <div class="td-option-name">Samuel Rojas</div>
-                    <div class="td-poll-name">Artista favorito del público</div>
-                  </td>
-                  <td class="text-end">
-                    <span class="badge-status-registered">Registrado</span>
-                  </td>
-                </tr>
-
-                <!-- Fila 5 -->
-                <tr>
-                  <td class="td-time">14:30:34</td>
-                  <td>
-                    <div class="td-option-name">Valentina López</div>
-                    <div class="td-poll-name">Artista favorito del público</div>
-                  </td>
-                  <td class="text-end">
-                    <span class="badge-status-registered">Registrado</span>
-                  </td>
-                </tr>
-
-                <!-- Fila 6 -->
-                <tr>
-                  <td class="td-time">14:30:12</td>
-                  <td>
-                    <div class="td-option-name">Raíces del alma</div>
-                    <div class="td-poll-name">Canción favorita del público</div>
-                  </td>
-                  <td class="text-end">
-                    <span class="badge-status-registered">Registrado</span>
-                  </td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
 
           <!-- Pie de la Tarjeta de Actividad -->
           <div class="activity-card-footer">
-            <span>6 registros recientes · Hora de Colombia</span>
-            <a href="#" id="btnFullLog" class="activity-full-link">
-              <span>Ver registro completo</span>
-              <i class="bi bi-arrow-right"></i>
-            </a>
+            <span>Mostrando {{ total_votos_recientes }} de {{ total_votos }} votos · Hora de Colombia</span>
           </div>
         </div>
 
@@ -409,56 +355,37 @@
           <!-- Tarjeta 1: Desglose de Votaciones -->
           <div class="edition-polls-card">
             <h2 class="edition-title">Votaciones de la edición</h2>
-            <p class="edition-subtitle">Distribución del total de votos</p>
+            <p class="edition-subtitle">Encuestas activas en categorías visibles</p>
 
-            <!-- Votación 1: Artista favorito -->
-            <div class="poll-breakdown-item">
-              <div class="poll-meta-row">
-                <span class="badge-status-active">Activa</span>
-                <span class="poll-vote-count">6.480 votos</span>
+            {% for encuesta in encuestas_activas %}
+              <div class="poll-breakdown-item">
+                <div class="poll-meta-row">
+                  <span class="badge-status-active">{{ encuesta.get_estado_display }}</span>
+                  <span class="poll-vote-count">{{ encuesta.total_votos }} voto{{ encuesta.total_votos|pluralize:"s" }}</span>
+                </div>
+                <h3 class="poll-breakdown-title">{{ encuesta.nombre }}</h3>
+                <p class="poll-breakdown-sub">{{ encuesta.categoria.nombre }} · {{ encuesta.total_opciones }} opción{{ encuesta.total_opciones|pluralize:"es" }}</p>
+                <div class="poll-progress-track">
+                  <div class="poll-progress-fill" style="width: {{ encuesta.porcentaje_votos }}%;"></div>
+                </div>
               </div>
-              <h3 class="poll-breakdown-title">Artista favorito del público</h3>
-              <p class="poll-breakdown-sub">Música · 4 participantes</p>
-              <div class="poll-progress-track">
-                <div class="poll-progress-fill" style="width: 52%;"></div>
-              </div>
-            </div>
-
-            <!-- Votación 2: Canción favorita -->
-            <div class="poll-breakdown-item">
-              <div class="poll-meta-row">
-                <span class="badge-status-active">Activa</span>
-                <span class="poll-vote-count">3.200 votos</span>
-              </div>
-              <h3 class="poll-breakdown-title">Canción favorita del público</h3>
-              <p class="poll-breakdown-sub">Música · 6 canciones</p>
-              <div class="poll-progress-track">
-                <div class="poll-progress-fill" style="width: 26%;"></div>
-              </div>
-            </div>
-
-            <!-- Votación 3: Clásico vallenato (Cerrada) -->
-            <div class="poll-breakdown-item">
-              <div class="poll-meta-row">
-                <span class="badge-status-closed">Cerrada</span>
-                <span class="poll-vote-count">2.800 votos</span>
-              </div>
-              <h3 class="poll-breakdown-title">Clásico vallenato favorito</h3>
-              <p class="poll-breakdown-sub">Música · Consulta finalizada</p>
-              <div class="poll-progress-track">
-                <div class="poll-progress-fill" style="width: 22%;"></div>
-              </div>
-            </div>
+            {% empty %}
+              <p class="text-secondary small mb-0">No hay encuestas activas en categorías visibles.</p>
+            {% endfor %}
           </div>
 
           <!-- Tarjeta 2: Resumen de Categorías Activas -->
           <div class="categories-summary-box">
             <div class="cat-summary-header">
               <i class="bi bi-grid"></i>
-              <h3 class="cat-summary-title">3 categorías activas</h3>
+              <h3 class="cat-summary-title">{{ total_categorias_activas }} categoría{{ total_categorias_activas|pluralize:"s" }} activa{{ total_categorias_activas|pluralize:"s" }}</h3>
             </div>
             <p class="cat-summary-desc">
-              Música, Piloneras y Comparsas. Las votaciones actuales pertenecen a Música.
+              {% if categorias_activas %}
+                Categorías visibles para los votantes: {{ categorias_activas|join:", " }}.
+              {% else %}
+                No hay categorías visibles para los votantes.
+              {% endif %}
             </p>
           </div>
         </div>
@@ -468,52 +395,11 @@
       <!-- NOTA INFORMATIVA AL PIE DEL DASHBOARD -->
       <div class="dashboard-footer-note">
         <i class="bi bi-info-circle"></i>
-        <span>Datos de demostración. Participantes y resultados ficticios; fechas oficiales de 2027 por anunciar.</span>
+        <span>Resumen actualizado con los registros actuales de la base de datos.</span>
       </div>
 {% endblock %}
 
 {% block modales %}
-  <!-- ============================================================
-       MODAL: "+ NUEVA VOTACIÓN"
-       ============================================================ -->
-  <div class="modal fade" id="modalNewPoll" tabindex="-1" aria-labelledby="modalNewPollLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-4 border-0 shadow">
-        <div class="modal-header border-bottom">
-          <h5 class="modal-title fw-bold" id="modalNewPollLabel">Crear Nueva Votación</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <form id="formNewPoll">
-          <div class="modal-body p-4">
-            <div class="mb-3">
-              <label class="form-label small fw-semibold" for="newPollTitle">Título de la Votación</label>
-              <input type="text" id="newPollTitle" class="form-control rounded-3" placeholder="Ej. Rey Vallenato Profesional 2027" required />
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-semibold" for="newPollCategory">Categoría</label>
-              <select id="newPollCategory" class="form-select rounded-3" required>
-                <option value="Música">Música Vallenata</option>
-                <option value="Piloneras">Danza de Piloneras</option>
-                <option value="Comparsas">Comparsas y Tradición</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-semibold">Número de Opciones/Participantes</label>
-              <input type="number" class="form-control rounded-3" min="2" max="20" value="4" />
-            </div>
-            <div class="alert alert-warning py-2 px-3 small border-0 rounded-3 mb-0" style="background-color: #FEF9C3; color: #854D0E;">
-              <i class="bi bi-info-circle me-1"></i> Modo demostración: Se guardará en la sesión activa.
-            </div>
-          </div>
-          <div class="modal-footer border-top">
-            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-dark fw-bold rounded-3 px-4">Guardar Votación</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <!-- ============================================================
        MODAL: REGISTRO COMPLETO DE AUDITORÍA
        ============================================================ -->
@@ -522,8 +408,8 @@
       <div class="modal-content rounded-4 border-0 shadow">
         <div class="modal-header border-bottom">
           <div>
-            <h5 class="modal-title fw-bold mb-0" id="modalFullLogLabel">Registro Completo de Votos</h5>
-            <span class="text-secondary small">Auditoría en tiempo real del Festival 2027</span>
+            <h5 class="modal-title fw-bold mb-0" id="modalFullLogLabel">Votos recientes</h5>
+            <span class="text-secondary small">Últimos votos guardados en la base de datos</span>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
@@ -539,54 +425,18 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:32:08</td>
-                  <td class="fw-bold">Mateo Díaz</td>
-                  <td class="small text-secondary">Artista favorito del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:31:46</td>
-                  <td class="fw-bold">Lucía Pineda</td>
-                  <td class="small text-secondary">Artista favorito del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:31:22</td>
-                  <td class="fw-bold">Mi tierra canta</td>
-                  <td class="small text-secondary">Canción favorita del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:30:59</td>
-                  <td class="fw-bold">Samuel Rojas</td>
-                  <td class="small text-secondary">Artista favorito del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:30:34</td>
-                  <td class="fw-bold">Valentina López</td>
-                  <td class="small text-secondary">Artista favorito del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:30:12</td>
-                  <td class="fw-bold">Raíces del alma</td>
-                  <td class="small text-secondary">Canción favorita del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:29:45</td>
-                  <td class="fw-bold">Mateo Díaz</td>
-                  <td class="small text-secondary">Artista favorito del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
-                <tr>
-                  <td class="ps-4 font-monospace small">14:29:01</td>
-                  <td class="fw-bold">Aires de mi pueblo</td>
-                  <td class="small text-secondary">Canción favorita del público</td>
-                  <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
-                </tr>
+                {% for voto in votos_recientes %}
+                  <tr>
+                    <td class="ps-4 font-monospace small">{{ voto.fecha_creacion|date:"H:i:s" }}</td>
+                    <td class="fw-bold">{{ voto.opcion.nombre }}</td>
+                    <td class="small text-secondary">{{ voto.encuesta.nombre }}</td>
+                    <td class="pe-4 text-end"><span class="badge bg-secondary-subtle text-dark">Registrado</span></td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center text-secondary py-4">Aún no hay votos registrados.</td>
+                  </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>

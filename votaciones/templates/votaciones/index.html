@@ -242,7 +242,7 @@
 
           <!-- Botones de acción en desktop -->
           <div class="d-none d-md-flex align-items-center gap-3">
-            <a href="#" class="btn btn-warning fw-bold px-4 py-2 text-dark rounded-3" style="background-color: var(--color-gold); border: none;">
+            <a href="{% url 'categorias_publicas' %}" class="btn btn-warning fw-bold px-4 py-2 text-dark rounded-3" style="background-color: var(--color-gold); border: none;">
               Explorar Categorías <i class="bi bi-arrow-right"></i>
             </a>
             <a href="{% url 'login' %}" class="btn btn-outline-light px-3 py-2 rounded-3">
@@ -274,7 +274,9 @@
         <div class="countdown-desktop-left">
           <!-- Título de sección -->
           <h2 class="section-headline">La leyenda se acerca</h2>
-          <div class="countdown-footnote mt-0 mb-3">Fechas oficiales por anunciar.</div>
+          <div class="countdown-footnote mt-0 mb-3">
+            {% if edicion %}Del {{ edicion.fecha_inicio|date:"j \d\e F"|lower }} al {{ edicion.fecha_fin|date:"j \d\e F \d\e Y"|lower }} · Valledupar{% else %}Fechas oficiales por anunciar.{% endif %}
+          </div>
           <!-- Texto descriptivo de la votación -->
           <p class="promo-paragraph mb-0">
             Tu voz también hace parte de la leyenda. Conoce las categorías y elige tus favoritos.
@@ -282,7 +284,8 @@
         </div>
 
         <!-- Cuadrícula de 4 tarjetas de cuenta regresiva (Días, Horas, Minutos, Segundos) -->
-        <div class="countdown-grid">
+        {# data-inicio: fecha de inicio de la edición vigente (la lee countdown.js); sin edición quedan los guiones. #}
+        <div class="countdown-grid" {% if edicion %}data-inicio="{{ edicion.fecha_inicio|date:'Y-m-d' }}"{% endif %}>
           <div class="countdown-tile">
             <div class="countdown-value" id="count-days">--</div>
             <div class="countdown-label">Días</div>
@@ -303,7 +306,7 @@
       </div>
 
       <!-- Botón de llamado a la acción móvil: Ver Categorías → -->
-      <a href="#" class="btn-gold-action d-md-none">
+      <a href="{% url 'categorias_publicas' %}" class="btn-gold-action d-md-none">
         <span>Ver Categorías</span>
         <i class="bi bi-arrow-right"></i>
       </a>
@@ -321,14 +324,14 @@
             <h3 class="fw-bold fs-4 mb-1" style="font-family: var(--font-display);">Categorías en Competencia</h3>
             <p class="text-secondary small mb-0">Selecciona el rubro donde deseas votar por tus favoritos</p>
           </div>
-          <a href="#" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+          <a href="{% url 'categorias_publicas' %}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
             Ver todas <i class="bi bi-arrow-right"></i>
           </a>
         </div>
 
         <div class="row g-4">
           <div class="col-md-4">
-            <a href="#" class="text-decoration-none">
+            <a href="{% url 'categorias_publicas' %}" class="text-decoration-none">
               <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC; transition: transform 0.2s;">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <div class="p-3 rounded-3" style="background: #FDF5E1; color: var(--color-gold);">
@@ -344,7 +347,7 @@
           </div>
 
           <div class="col-md-4">
-            <a href="#" class="text-decoration-none">
+            <a href="{% url 'categorias_publicas' %}" class="text-decoration-none">
               <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC;">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">
@@ -360,7 +363,7 @@
           </div>
 
           <div class="col-md-4">
-            <a href="#" class="text-decoration-none">
+            <a href="{% url 'categorias_publicas' %}" class="text-decoration-none">
               <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC;">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">

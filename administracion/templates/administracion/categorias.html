@@ -245,6 +245,100 @@
       display: inline-block;
     }
 
+    .badge-status-pill-muted {
+      background-color: #F3F4F6;
+      border-color: #E5E7EB;
+      color: #6B7280;
+    }
+
+    .survey-admin-card {
+      margin-bottom: 16px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--color-card-border);
+      border-radius: 16px;
+    }
+
+    .survey-admin-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    .survey-admin-card-header h3 {
+      margin: 0;
+      color: #111;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .survey-admin-list {
+      display: grid;
+      gap: 0;
+    }
+
+    .survey-admin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 20px;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    .survey-admin-row:last-child {
+      border-bottom: 0;
+    }
+
+    .survey-admin-row p {
+      margin: 3px 0 0;
+      color: #6B7280;
+      font-size: 0.76rem;
+    }
+
+    .survey-options-admin {
+      padding: 12px 20px 14px;
+      background: #FAFAFA;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    .survey-options-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: #646464;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .survey-option-admin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      border-top: 1px solid #EEEEEE;
+      font-size: 0.76rem;
+    }
+
+    .survey-option-admin-row small {
+      display: block;
+      color: #777;
+      font-size: 0.68rem;
+    }
+
+    .survey-options-empty {
+      margin: 0;
+      color: #777;
+      font-size: 0.72rem;
+    }
+
     .btn-edit-link {
       background: transparent;
       border: none;
@@ -361,7 +455,7 @@
 {% block contenido %}
       <!-- ENCABEZADO DE PÁGINA (TÍTULO Y BOTÓN DE ACCIÓN) -->
       <section class="dashboard-page-header">
-        <div class="panel-kicker">FESTIVAL DE LA LEYENDA VALLENATA 2027</div>
+        <div class="panel-kicker">{% if edicion %}{{ edicion.nombre|upper }} · {{ edicion.anio }}{% else %}FESTIVAL DE LA LEYENDA VALLENATA{% endif %}</div>
         <div class="panel-header-row">
           <div>
             <h1 class="panel-title">Gestión de categorías</h1>
@@ -383,19 +477,19 @@
         <!-- Métrica 1 -->
         <div class="metric-card-simple">
           <div class="metric-simple-label">Categorías activas</div>
-          <div class="metric-simple-number" id="countCategories">3</div>
+          <div class="metric-simple-number" id="countCategories">{{ categorias_activas }}</div>
         </div>
 
         <!-- Métrica 2 -->
         <div class="metric-card-simple">
-          <div class="metric-simple-label">Votaciones asociadas</div>
-          <div class="metric-simple-number">3</div>
+          <div class="metric-simple-label">Categorías en catálogo</div>
+          <div class="metric-simple-number">{{ total_categorias }}</div>
         </div>
 
         <!-- Métrica 3 -->
         <div class="metric-card-simple">
-          <div class="metric-simple-label">Votaciones activas</div>
-          <div class="metric-simple-number">2</div>
+          <div class="metric-simple-label">Categorías ocultas</div>
+          <div class="metric-simple-number">{{ categorias_inactivas }}</div>
         </div>
       </section>
 
@@ -405,7 +499,7 @@
         <div class="catalog-card-header">
           <div>
             <h2 class="catalog-title">Catálogo de categorías</h2>
-            <p class="catalog-subtitle" id="catalogSubtitleText">3 categorías · Todas visibles en la aplicación</p>
+            <p class="catalog-subtitle" id="catalogSubtitleText">{{ total_categorias }} categorías en el catálogo · {{ categorias_activas }} visibles en la aplicación</p>
           </div>
 
           <div class="catalog-header-controls">
@@ -416,10 +510,11 @@
             </div>
 
             <!-- Filtro -->
-            <button type="button" class="btn-filter-dropdown" id="btnFilterToggle">
-              <i class="bi bi-filter-left fs-5"></i>
-              <span>Todas las categorías</span>
-            </button>
+            <select class="btn-filter-dropdown" id="filterCategoryStatus" aria-label="Filtrar categorías por estado">
+              <option value="all">Todos los estados</option>
+              <option value="active">Activas</option>
+              <option value="inactive">Ocultas</option>
+            </select>
           </div>
         </div>
 
@@ -429,113 +524,149 @@
             <thead>
               <tr>
                 <th>CATEGORÍA</th>
-                <th>VOTACIONES</th>
-                <th>ACTIVAS</th>
-                <th>VOTOS</th>
                 <th>ESTADO</th>
+                <th>ÚLTIMA ACTUALIZACIÓN</th>
                 <th class="text-end">ACCIÓN</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Fila 1: Música -->
-              <tr class="category-row-item" data-name="musica">
-                <td>
-                  <div class="category-cell-main">
-                    <div class="category-icon-square">
-                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 18V5l12-2v13"></path>
-                        <circle cx="6" cy="18" r="3"></circle>
-                        <circle cx="18" cy="16" r="3"></circle>
-                      </svg>
+              {% for categoria in categorias %}
+                <tr
+                  class="category-row-item"
+                  data-name="{{ categoria.nombre|lower }}"
+                  data-active="{{ categoria.activa|yesno:'active,inactive' }}"
+                >
+                  <td>
+                    <div class="category-cell-main">
+                      <div class="category-icon-square">
+                        {% if categoria.icono == 'music' %}
+                          <i class="bi bi-music-note"></i>
+                        {% elif categoria.icono == 'flower' %}
+                          <i class="bi bi-flower1"></i>
+                        {% elif categoria.icono == 'mask' %}
+                          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 9a2 2 0 0 1-2 2H6l-4 4 1-6a6 6 0 0 1 6-6h3a2 2 0 0 1 2 2v4z"></path>
+                            <path d="M18 9h1a4 4 0 0 1 4 4l-1 6-4-4h-2a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2"></path>
+                            <circle cx="6" cy="7" r="1"></circle>
+                            <circle cx="10" cy="7" r="1"></circle>
+                          </svg>
+                        {% else %}
+                          <i class="bi bi-trophy"></i>
+                        {% endif %}
+                      </div>
+                      <div>
+                        <div class="cat-name-text">{{ categoria.nombre }}</div>
+                        <p class="cat-desc-text">{{ categoria.descripcion }}</p>
+                      </div>
                     </div>
-                    <div>
-                      <div class="cat-name-text">Música</div>
-                      <p class="cat-desc-text">Artistas, canciones y tradición vallenata</p>
-                    </div>
-                  </div>
-                </td>
-                <td class="td-num">3</td>
-                <td class="td-num">2</td>
-                <td class="td-num-bold">12.480</td>
-                <td>
-                  <span class="badge-status-pill-gold">Activa</span>
-                </td>
-                <td class="text-end">
-                  <button type="button" class="btn-edit-link" onclick="openEditCategoryModal('Música', 'Artistas, canciones y tradición vallenata')">Editar</button>
-                </td>
-              </tr>
-
-              <!-- Fila 2: Piloneras -->
-              <tr class="category-row-item" data-name="piloneras">
-                <td>
-                  <div class="category-cell-main">
-                    <div class="category-icon-square">
-                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="8" r="3"></circle>
-                        <circle cx="8" cy="12" r="3"></circle>
-                        <circle cx="16" cy="12" r="3"></circle>
-                        <circle cx="12" cy="16" r="3"></circle>
-                        <path d="M12 12v7"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="cat-name-text">Piloneras</div>
-                      <p class="cat-desc-text">Danza y expresión cultural de la región</p>
-                    </div>
-                  </div>
-                </td>
-                <td class="td-num">0</td>
-                <td class="td-num">0</td>
-                <td class="td-num-bold">0</td>
-                <td>
-                  <span class="badge-status-pill-gold">Activa</span>
-                </td>
-                <td class="text-end">
-                  <button type="button" class="btn-edit-link" onclick="openEditCategoryModal('Piloneras', 'Danza y expresión cultural de la región')">Editar</button>
-                </td>
-              </tr>
-
-              <!-- Fila 3: Comparsas -->
-              <tr class="category-row-item" data-name="comparsas">
-                <td>
-                  <div class="category-cell-main">
-                    <div class="category-icon-square">
-                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 9a2 2 0 0 1-2 2H6l-4 4 1-6a6 6 0 0 1 6-6h3a2 2 0 0 1 2 2v4z"></path>
-                        <path d="M18 9h1a4 4 0 0 1 4 4l-1 6-4-4h-2a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2"></path>
-                        <circle cx="6" cy="7" r="1"></circle>
-                        <circle cx="10" cy="7" r="1"></circle>
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="cat-name-text">Comparsas</div>
-                      <p class="cat-desc-text">Creatividad y celebración colectiva</p>
-                    </div>
-                  </div>
-                </td>
-                <td class="td-num">0</td>
-                <td class="td-num">0</td>
-                <td class="td-num-bold">0</td>
-                <td>
-                  <span class="badge-status-pill-gold">Activa</span>
-                </td>
-                <td class="text-end">
-                  <button type="button" class="btn-edit-link" onclick="openEditCategoryModal('Comparsas', 'Creatividad y celebración colectiva')">Editar</button>
-                </td>
-              </tr>
+                  </td>
+                  <td>
+                    <span class="badge-status-pill-gold{% if not categoria.activa %} badge-status-pill-muted{% endif %}">
+                      {% if categoria.activa %}Activa{% else %}Oculta{% endif %}
+                    </span>
+                  </td>
+                  <td class="td-num">{{ categoria.fecha_actualizacion|date:"d/m/Y H:i" }}</td>
+                  <td class="text-end">
+                    <button
+                      type="button"
+                      class="btn-edit-link js-edit-category"
+                      data-id="{{ categoria.pk }}"
+                      data-name="{{ categoria.nombre }}"
+                      data-description="{{ categoria.descripcion }}"
+                      data-icon="{{ categoria.icono }}"
+                      data-active="{{ categoria.activa|yesno:'true,false' }}"
+                    >Editar</button>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-secondary py-4">Aún no hay categorías en el catálogo.</td>
+                </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
 
         <!-- Pie del catálogo y paginación -->
         <div class="catalog-card-footer">
-          <span id="showingCountText">Mostrando 3 de 3 categorías</span>
-          <div class="pagination-pills">
-            <button class="page-btn" aria-label="Página anterior"><i class="bi bi-chevron-left"></i></button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn" aria-label="Página siguiente"><i class="bi bi-chevron-right"></i></button>
+          <span id="showingCountText">Mostrando {{ total_categorias }} de {{ total_categorias }} categorías</span>
+        </div>
+      </section>
+
+      {# id usado por el enlace "Opciones" del menú: las opciones se gestionan dentro de cada encuesta. #}
+      <section class="mb-4" id="encuestas-y-opciones">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+          <div>
+            <h2 class="catalog-title mb-1">Encuestas por categoría</h2>
+            <p class="catalog-subtitle mb-0">Administra los elementos que verá el público al abrir cada categoría.</p>
           </div>
         </div>
+        {% for categoria in categorias %}
+          <article class="survey-admin-card">
+            <div class="survey-admin-card-header">
+              <h3>{{ categoria.nombre }}</h3>
+              <button
+                type="button"
+                class="btn-edit-link js-new-survey"
+                data-category-id="{{ categoria.pk }}"
+                data-category-name="{{ categoria.nombre }}"
+              ><i class="bi bi-plus-lg me-1"></i>Nueva encuesta</button>
+            </div>
+            <div class="survey-admin-list">
+              {% for encuesta in categoria.encuestas.all %}
+                <div class="survey-admin-row">
+                  <div>
+                    <strong>{{ encuesta.nombre }}</strong>
+                    <p>{{ encuesta.get_estado_display }} · {{ encuesta.opciones.all|length }} opciones{% if encuesta.detalle %} · {{ encuesta.detalle }}{% endif %}</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-edit-link js-edit-survey"
+                    data-id="{{ encuesta.pk }}"
+                    data-category-id="{{ categoria.pk }}"
+                    data-category-name="{{ categoria.nombre }}"
+                    data-name="{{ encuesta.nombre }}"
+                    data-description="{{ encuesta.descripcion }}"
+                    data-detail="{{ encuesta.detalle }}"
+                    data-status="{{ encuesta.estado }}"
+                    data-opening="{{ encuesta.fecha_apertura|date:'Y-m-d\TH:i' }}"
+                    data-closing="{{ encuesta.fecha_cierre|date:'Y-m-d\TH:i' }}"
+                  >Editar</button>
+                </div>
+                <div class="survey-options-admin">
+                  <div class="survey-options-heading">
+                    <span>Candidatos y opciones</span>
+                    <button
+                      type="button"
+                      class="btn-edit-link js-new-option"
+                      data-survey-id="{{ encuesta.pk }}"
+                      data-survey-name="{{ encuesta.nombre }}"
+                    ><i class="bi bi-plus-lg me-1"></i>Agregar</button>
+                  </div>
+                  {% for opcion in encuesta.opciones.all %}
+                    <div class="survey-option-admin-row">
+                      <span><strong>{{ opcion.nombre }}</strong>{% if opcion.descripcion %}<small>{{ opcion.descripcion }}</small>{% endif %}</span>
+                      <button
+                        type="button"
+                        class="btn-edit-link js-edit-option"
+                        data-id="{{ opcion.pk }}"
+                        data-survey-id="{{ encuesta.pk }}"
+                        data-survey-name="{{ encuesta.nombre }}"
+                        data-name="{{ opcion.nombre }}"
+                        data-description="{{ opcion.descripcion }}"
+                        data-image="{{ opcion.imagen }}"
+                      >Editar</button>
+                    </div>
+                  {% empty %}
+                    <p class="survey-options-empty">Aún no hay candidatos u opciones registrados.</p>
+                  {% endfor %}
+                </div>
+              {% empty %}
+                <p class="text-secondary small px-3 py-3 mb-0">No hay encuestas asociadas.</p>
+              {% endfor %}
+            </div>
+          </article>
+        {% endfor %}
       </section>
 
       <!-- TARJETAS INFORMATIVAS INFERIORES (2 COLUMNAS) -->
@@ -558,7 +689,7 @@
             <h3 class="info-card-title">Conservación del registro</h3>
           </div>
           <p class="info-card-body-text">
-            Editar una categoría no modifica sus votos. Mantén los nombres institucionales para conservar la continuidad con la experiencia móvil.
+            Mantén los nombres institucionales para conservar la continuidad con la experiencia pública.
           </p>
         </div>
       </section>
@@ -566,95 +697,174 @@
       <!-- NOTA AL PIE GENERAL -->
       <div class="dashboard-footer-note">
         <i class="bi bi-info-circle"></i>
-        <span>Datos de demostración. Participantes y resultados ficticios; fechas oficiales de 2027 por anunciar.</span>
+        <span>Los cambios del catálogo se guardan y se reflejan en la vista pública.</span>
       </div>
 {% endblock %}
 
 {% block modales %}
-  <!-- ============================================================
-       MODAL: "+ NUEVA CATEGORÍA"
-       ============================================================ -->
-  <div class="modal fade" id="modalNewCategory" tabindex="-1" aria-labelledby="modalNewCategoryLabel" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="modalCategoryForm"
+    tabindex="-1"
+    aria-labelledby="modalCategoryFormLabel"
+    aria-hidden="true"
+    data-open-modal="{{ open_modal|default:'' }}"
+  >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content rounded-4 border-0 shadow">
         <div class="modal-header border-bottom">
-          <h5 class="modal-title fw-bold" id="modalNewCategoryLabel">Crear Nueva Categoría</h5>
+          <h5 class="modal-title fw-bold" id="modalCategoryFormLabel">Crear nueva categoría</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <form id="formNewCategory">
+        <form id="formCategory" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="categoria_id" id="categoryId" value="{{ form_category_id|default:'' }}">
           <div class="modal-body p-4">
             <div class="mb-3">
-              <label class="form-label small fw-semibold" for="newCatName">Nombre de la Categoría</label>
-              <input type="text" id="newCatName" class="form-control rounded-3" placeholder="Ej. Canción Inédita" required />
+              <label class="form-label small fw-semibold" for="{{ category_form.nombre.id_for_label }}">Nombre de la categoría</label>
+              {{ category_form.nombre }}
+              {% for error in category_form.nombre.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
             <div class="mb-3">
-              <label class="form-label small fw-semibold" for="newCatDesc">Descripción Breve</label>
-              <input type="text" id="newCatDesc" class="form-control rounded-3" placeholder="Ej. Compositores e intérpretes de letras folclóricas" required />
+              <label class="form-label small fw-semibold" for="{{ category_form.descripcion.id_for_label }}">Descripción breve</label>
+              {{ category_form.descripcion }}
+              {% for error in category_form.descripcion.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
             <div class="mb-3">
-              <label class="form-label small fw-semibold">Icono Representativo</label>
-              <select id="newCatIcon" class="form-select rounded-3">
-                <option value="music">Nota Musical</option>
-                <option value="flower">Danza y Flores</option>
-                <option value="mask">Comparsas y Máscaras</option>
-                <option value="trophy">Rey de Reyes</option>
-              </select>
+              <label class="form-label small fw-semibold" for="{{ category_form.icono.id_for_label }}">Icono representativo</label>
+              {{ category_form.icono }}
+              {% for error in category_form.icono.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
             <div class="form-check form-switch mb-0">
-              <input class="form-check-input" type="checkbox" id="catActiveSwitch" checked />
-              <label class="form-check-label small fw-semibold" for="catActiveSwitch">Visible y Activa en la aplicación pública</label>
+              {{ category_form.activa }}
+              <label class="form-check-label small fw-semibold" for="{{ category_form.activa.id_for_label }}">Visible y activa en la aplicación pública</label>
+              {% for error in category_form.activa.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
+            {% for error in category_form.non_field_errors %}<div class="text-danger small mt-2">{{ error }}</div>{% endfor %}
           </div>
           <div class="modal-footer border-top">
             <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-dark fw-bold rounded-3 px-4">Guardar Categoría</button>
+            <button type="submit" class="btn btn-dark fw-bold rounded-3 px-4" id="categorySubmitButton">Guardar categoría</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- ============================================================
-       MODAL: "EDITAR CATEGORÍA"
-       ============================================================ -->
-  <div class="modal fade" id="modalEditCategory" tabindex="-1" aria-labelledby="modalEditCategoryLabel" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="modalSurveyForm"
+    tabindex="-1"
+    aria-labelledby="modalSurveyFormLabel"
+    aria-hidden="true"
+    data-open-modal="{% if open_survey_modal %}true{% endif %}"
+  >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content rounded-4 border-0 shadow">
         <div class="modal-header border-bottom">
-          <h5 class="modal-title fw-bold" id="modalEditCategoryLabel">Editar Categoría</h5>
+          <div>
+            <h5 class="modal-title fw-bold" id="modalSurveyFormLabel">Nueva encuesta</h5>
+            <div class="small text-secondary" id="surveyCategoryName"></div>
+          </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <form id="formEditCategory">
+        <form id="formSurvey" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="save_encuesta">
+          <input type="hidden" name="encuesta_categoria_id" id="surveyCategoryId" value="{{ encuesta_category_id|default:'' }}">
+          <input type="hidden" name="encuesta_id" id="surveyId" value="{{ encuesta_id|default:'' }}">
           <div class="modal-body p-4">
             <div class="mb-3">
-              <label class="form-label small fw-semibold" for="editCatName">Nombre Institucional</label>
-              <input type="text" id="editCatName" class="form-control rounded-3" required />
+              <label class="form-label small fw-semibold" for="{{ encuesta_form.nombre.id_for_label }}">Nombre de la encuesta</label>
+              {{ encuesta_form.nombre }}
+              {% for error in encuesta_form.nombre.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
             <div class="mb-3">
-              <label class="form-label small fw-semibold" for="editCatDesc">Descripción</label>
-              <input type="text" id="editCatDesc" class="form-control rounded-3" required />
+              <label class="form-label small fw-semibold" for="{{ encuesta_form.descripcion.id_for_label }}">Descripción</label>
+              {{ encuesta_form.descripcion }}
+              {% for error in encuesta_form.descripcion.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
-            <div class="alert alert-secondary py-2 px-3 small border-0 rounded-3 mb-0">
-              <i class="bi bi-info-circle me-1"></i> Recuerda: Editar el nombre no modifica los votos acumulados existentes.
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="{{ encuesta_form.detalle.id_for_label }}">Información adicional</label>
+              {{ encuesta_form.detalle }}
+              {% for error in encuesta_form.detalle.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
             </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="{{ encuesta_form.estado.id_for_label }}">Estado</label>
+              {{ encuesta_form.estado }}
+              {% for error in encuesta_form.estado.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            {# RN-05: con fechas, la encuesta se abre y se cierra sola (votaciones.middleware). #}
+            <div class="row g-2 mb-1">
+              <div class="col-sm-6">
+                <label class="form-label small fw-semibold" for="{{ encuesta_form.fecha_apertura.id_for_label }}">Apertura (opcional)</label>
+                {{ encuesta_form.fecha_apertura }}
+                {% for error in encuesta_form.fecha_apertura.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label small fw-semibold" for="{{ encuesta_form.fecha_cierre.id_for_label }}">Cierre (opcional)</label>
+                {{ encuesta_form.fecha_cierre }}
+                {% for error in encuesta_form.fecha_cierre.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+              </div>
+            </div>
+            <p class="text-secondary small mb-2">Con fechas, la encuesta se abre y se cierra sola a la hora indicada.</p>
+            {% for error in encuesta_form.non_field_errors %}<div class="text-danger small mt-2">{{ error }}</div>{% endfor %}
           </div>
           <div class="modal-footer border-top">
             <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-dark fw-bold rounded-3 px-4">Actualizar Cambios</button>
+            <button type="submit" class="btn btn-dark fw-bold rounded-3 px-4" id="surveySubmitButton">Guardar encuesta</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- TOAST DE CONFIRMACIÓN -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="adminCategoryToast" class="toast align-items-center text-bg-dark border-0 rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="toastCategoryMsg">
-          Categoría actualizada con éxito.
+  <div
+    class="modal fade"
+    id="modalOptionForm"
+    tabindex="-1"
+    aria-labelledby="modalOptionFormLabel"
+    aria-hidden="true"
+    data-open-modal="{% if open_option_modal %}true{% endif %}"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-bottom">
+          <div>
+            <h5 class="modal-title fw-bold" id="modalOptionFormLabel">Nuevo candidato u opción</h5>
+            <div class="small text-secondary" id="optionSurveyName">{{ opcion_encuesta_nombre }}</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        <form id="formOption" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="save_opcion">
+          <input type="hidden" name="opcion_encuesta_id" id="optionSurveyId" value="{{ opcion_encuesta_id|default:'' }}">
+          <input type="hidden" name="opcion_id" id="optionId" value="{{ opcion_id|default:'' }}">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="{{ opcion_form.nombre.id_for_label }}">Nombre del candidato u opción</label>
+              {{ opcion_form.nombre }}
+              {% for error in opcion_form.nombre.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="{{ opcion_form.descripcion.id_for_label }}">Descripción</label>
+              {{ opcion_form.descripcion }}
+              {% for error in opcion_form.descripcion.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold" for="{{ opcion_form.imagen.id_for_label }}">Imagen (opcional)</label>
+              {{ opcion_form.imagen }}
+              <div class="form-text">{{ opcion_form.imagen.help_text }}</div>
+              {% for error in opcion_form.imagen.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+            {% for error in opcion_form.non_field_errors %}<div class="text-danger small mt-2">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="modal-footer border-top">
+            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-dark fw-bold rounded-3 px-4" id="optionSubmitButton">Guardar opción</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -663,94 +873,168 @@
 {% block extra_js %}
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Búsqueda en tiempo real de categorías
       const searchInput = document.getElementById('searchCategoryInput');
       const rows = document.querySelectorAll('.category-row-item');
       const showingText = document.getElementById('showingCountText');
+      const statusFilter = document.getElementById('filterCategoryStatus');
+      const modalElement = document.getElementById('modalCategoryForm');
+      const modal = modalElement && window.bootstrap
+        ? bootstrap.Modal.getOrCreateInstance(modalElement)
+        : null;
+      const form = document.getElementById('formCategory');
+      const modalTitle = document.getElementById('modalCategoryFormLabel');
+      const submitButton = document.getElementById('categorySubmitButton');
+      const surveyModalElement = document.getElementById('modalSurveyForm');
+      const surveyModal = surveyModalElement && window.bootstrap
+        ? bootstrap.Modal.getOrCreateInstance(surveyModalElement)
+        : null;
+      const surveyForm = document.getElementById('formSurvey');
+      const surveyModalTitle = document.getElementById('modalSurveyFormLabel');
+      const surveyCategoryName = document.getElementById('surveyCategoryName');
+      const surveySubmitButton = document.getElementById('surveySubmitButton');
+      const optionModalElement = document.getElementById('modalOptionForm');
+      const optionModal = optionModalElement && window.bootstrap
+        ? bootstrap.Modal.getOrCreateInstance(optionModalElement)
+        : null;
+      const optionForm = document.getElementById('formOption');
+      const optionModalTitle = document.getElementById('modalOptionFormLabel');
+      const optionSurveyName = document.getElementById('optionSurveyName');
+      const optionSubmitButton = document.getElementById('optionSubmitButton');
 
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const query = e.target.value.toLowerCase().trim();
-          let visibleCount = 0;
+      const applyFilters = () => {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const status = statusFilter ? statusFilter.value : 'all';
+        let visibleCount = 0;
 
-          rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(query)) {
-              row.style.display = '';
-              visibleCount++;
-            } else {
-              row.style.display = 'none';
-            }
-          });
-
-          if (showingText) {
-            showingText.textContent = `Mostrando ${visibleCount} de ${rows.length} categorías`;
-          }
+        rows.forEach(row => {
+          const matchesQuery = row.textContent.toLowerCase().includes(query);
+          const matchesStatus = status === 'all' || row.dataset.active === status;
+          row.hidden = !(matchesQuery && matchesStatus);
+          if (!row.hidden) visibleCount++;
         });
-      }
 
-      // Botón + Nueva categoría
+        if (showingText) {
+          showingText.textContent = `Mostrando ${visibleCount} de ${rows.length} categorías`;
+        }
+      };
+
+      if (searchInput) searchInput.addEventListener('input', applyFilters);
+      if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+
       const btnNew = document.getElementById('btnNewCategory');
-      const modalNew = document.getElementById('modalNewCategory');
-      if (btnNew && modalNew && window.bootstrap) {
+      if (btnNew && modal && form) {
         btnNew.addEventListener('click', () => {
-          const bs = new bootstrap.Modal(modalNew);
-          bs.show();
+          form.reset();
+          document.getElementById('categoryId').value = '';
+          modalTitle.textContent = 'Crear nueva categoría';
+          submitButton.textContent = 'Guardar categoría';
+          modal.show();
         });
       }
 
-      // Formulario nueva categoría
-      const formNew = document.getElementById('formNewCategory');
-      if (formNew) {
-        formNew.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const name = document.getElementById('newCatName').value;
-          showToast(`Categoría "${name}" creada correctamente en modo demostración.`);
-          if (modalNew && window.bootstrap) {
-            const bs = bootstrap.Modal.getInstance(modalNew);
-            if (bs) bs.hide();
-          }
-          formNew.reset();
+      document.querySelectorAll('.js-edit-category').forEach(button => {
+        button.addEventListener('click', () => {
+          document.getElementById('categoryId').value = button.dataset.id;
+          document.getElementById('id_nombre').value = button.dataset.name;
+          document.getElementById('id_descripcion').value = button.dataset.description;
+          document.getElementById('id_icono').value = button.dataset.icon;
+          document.getElementById('id_activa').checked = button.dataset.active === 'true';
+          modalTitle.textContent = 'Editar categoría';
+          submitButton.textContent = 'Actualizar cambios';
+          modal.show();
         });
+      });
+
+      if (modal && modalElement.dataset.openModal) {
+        modalTitle.textContent = modalElement.dataset.openModal === 'edit'
+          ? 'Editar categoría'
+          : 'Crear nueva categoría';
+        submitButton.textContent = modalElement.dataset.openModal === 'edit'
+          ? 'Actualizar cambios'
+          : 'Guardar categoría';
+        modal.show();
       }
 
-      // Formulario editar categoría
-      const formEdit = document.getElementById('formEditCategory');
-      const modalEdit = document.getElementById('modalEditCategory');
-      if (formEdit) {
-        formEdit.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const name = document.getElementById('editCatName').value;
-          showToast(`Categoría "${name}" actualizada correctamente.`);
-          if (modalEdit && window.bootstrap) {
-            const bs = bootstrap.Modal.getInstance(modalEdit);
-            if (bs) bs.hide();
-          }
+      document.querySelectorAll('.js-new-survey').forEach(button => {
+        button.addEventListener('click', () => {
+          surveyForm.reset();
+          document.getElementById('surveyId').value = '';
+          document.getElementById('surveyCategoryId').value = button.dataset.categoryId;
+          surveyModalTitle.textContent = 'Nueva encuesta';
+          surveyCategoryName.textContent = button.dataset.categoryName;
+          surveySubmitButton.textContent = 'Guardar encuesta';
+          surveyModal.show();
         });
+      });
+
+      document.querySelectorAll('.js-edit-survey').forEach(button => {
+        button.addEventListener('click', () => {
+          document.getElementById('surveyId').value = button.dataset.id;
+          document.getElementById('surveyCategoryId').value = button.dataset.categoryId;
+          document.getElementById('id_encuesta-nombre').value = button.dataset.name;
+          document.getElementById('id_encuesta-descripcion').value = button.dataset.description;
+          document.getElementById('id_encuesta-detalle').value = button.dataset.detail;
+          document.getElementById('id_encuesta-estado').value = button.dataset.status;
+          document.getElementById('id_encuesta-fecha_apertura').value = button.dataset.opening;
+          document.getElementById('id_encuesta-fecha_cierre').value = button.dataset.closing;
+          surveyModalTitle.textContent = 'Editar encuesta';
+          surveyCategoryName.textContent = button.dataset.categoryName;
+          surveySubmitButton.textContent = 'Guardar cambios';
+          surveyModal.show();
+        });
+      });
+
+      if (surveyModal && surveyModalElement.dataset.openModal === 'true') {
+        surveyModalTitle.textContent = document.getElementById('surveyId').value
+          ? 'Editar encuesta'
+          : 'Nueva encuesta';
+        const categoryButton = document.querySelector(
+          `.js-new-survey[data-category-id="${document.getElementById('surveyCategoryId').value}"]`
+        );
+        surveyCategoryName.textContent = categoryButton
+          ? categoryButton.dataset.categoryName
+          : '';
+        surveySubmitButton.textContent = document.getElementById('surveyId').value
+          ? 'Guardar cambios'
+          : 'Guardar encuesta';
+        surveyModal.show();
+      }
+
+      document.querySelectorAll('.js-new-option').forEach(button => {
+        button.addEventListener('click', () => {
+          optionForm.reset();
+          document.getElementById('optionId').value = '';
+          document.getElementById('optionSurveyId').value = button.dataset.surveyId;
+          optionModalTitle.textContent = 'Nuevo candidato u opción';
+          optionSurveyName.textContent = button.dataset.surveyName;
+          optionSubmitButton.textContent = 'Guardar opción';
+          optionModal.show();
+        });
+      });
+
+      document.querySelectorAll('.js-edit-option').forEach(button => {
+        button.addEventListener('click', () => {
+          document.getElementById('optionId').value = button.dataset.id;
+          document.getElementById('optionSurveyId').value = button.dataset.surveyId;
+          document.getElementById('id_opcion-nombre').value = button.dataset.name;
+          document.getElementById('id_opcion-descripcion').value = button.dataset.description;
+          document.getElementById('id_opcion-imagen').value = button.dataset.image;
+          optionModalTitle.textContent = 'Editar candidato u opción';
+          optionSurveyName.textContent = button.dataset.surveyName;
+          optionSubmitButton.textContent = 'Guardar cambios';
+          optionModal.show();
+        });
+      });
+
+      if (optionModal && optionModalElement.dataset.openModal === 'true') {
+        optionModalTitle.textContent = document.getElementById('optionId').value
+          ? 'Editar candidato u opción'
+          : 'Nuevo candidato u opción';
+        optionSubmitButton.textContent = document.getElementById('optionId').value
+          ? 'Guardar cambios'
+          : 'Guardar opción';
+        optionModal.show();
       }
     });
-
-    function openEditCategoryModal(name, desc) {
-      const editName = document.getElementById('editCatName');
-      const editDesc = document.getElementById('editCatDesc');
-      if (editName) editName.value = name;
-      if (editDesc) editDesc.value = desc;
-
-      const modalEl = document.getElementById('modalEditCategory');
-      if (modalEl && window.bootstrap) {
-        const bs = new bootstrap.Modal(modalEl);
-        bs.show();
-      }
-    }
-
-    function showToast(message) {
-      const toastEl = document.getElementById('adminCategoryToast');
-      const msgEl = document.getElementById('toastCategoryMsg');
-      if (toastEl && window.bootstrap) {
-        if (msgEl) msgEl.textContent = message;
-        const bsToast = new bootstrap.Toast(toastEl);
-        bsToast.show();
-      }
-    }
   </script>
 {% endblock %}

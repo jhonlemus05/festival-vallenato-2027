@@ -14,5 +14,6 @@ urlpatterns = [
     path('perfil/', views.perfil_view, name='perfil'),
     path('perfil/contrasena/', views.perfil_contrasena_view, name='perfil_contrasena'),
     path('perfil/actividad/', views.perfil_actividad_view, name='perfil_actividad'),
+    path('perfil/comprobantes/', views.perfil_comprobantes_view, name='perfil_comprobantes'),
     path('logout/', views.logout_view, name='logout'),
 ]

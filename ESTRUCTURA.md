@@ -27,25 +27,28 @@ pr_festivalVallenato/
 │   └── views.py                     # Lógica de inicio y cierre de sesión
 │
 ├── votaciones/                      # APP 2: Experiencia del Votante (Pública)
-│   ├── migrations/
+│   ├── migrations/                  # Categorías, encuestas, opciones y votos
 │   ├── templates/
 │   │   └── votaciones/
 │   │       ├── base.html            # Layout público (Navbar festivo, footer, estilos)
 │   │       ├── index.html           # Página de bienvenida / Inicio
-│   │       ├── encuestas.html       # Formulario de votación / Preguntas
-│   │       └── exito.html           # Pantalla de "Voto registrado con éxito"
-│   ├── urls.py                      # Rutas públicas (ej: /, /encuestas/, /exito/)
-│   └── views.py                     # Lógica para mostrar encuestas y procesar votos
+│   │       ├── categorias.html       # Catálogo público de categorías activas
+│   │       ├── encuestas_categoria.html # Encuestas de una categoría
+│   │       ├── votacion.html         # Selección y confirmación de voto
+│   │       └── exito.html            # Comprobante de voto registrado
+│   ├── models.py                    # Categoria, Encuesta, OpcionEncuesta y Voto
+│   ├── urls.py                      # Catálogo, detalle de encuesta, voto y confirmación
+│   └── views.py                     # Catálogo y flujo público de votación
 │
-└── administracion/                  # APP 3: Panel de Control (Privado)
+└── administracion/                  # APP 3: Panel de Control (modo de demostración)
     ├── migrations/
     ├── templates/
     │   └── administracion/
     │       ├── admin_base.html      # Layout privado (Sidebar de navegación, barra superior)
     │       ├── panel_principal.html # Vista 'admin' general / Dashboard principal
-    │       ├── categorias.html      # Gestión de categorías del festival
-    │       ├── opciones.html        # Gestión de opciones por categoría
-    │       └── resultados.html      # Visualización de estadísticas y votos en vivo
-    ├── urls.py                      # Rutas administrativas (ej: /admin-panel/resultados/)
-    └── views.py                     # Lógica del panel (Protegida para que solo entre el staff)
+    │       ├── categorias.html      # Gestión de categorías y encuestas
+    │       └── votaciones.html      # Estado y resultados agregados por opción
+    ├── forms.py                     # Formularios de categorías, encuestas y candidatos/opciones
+    ├── urls.py                      # Rutas de categorías, votaciones y resultados
+    └── views.py                     # Gestión de categorías y vistas del panel
 ```

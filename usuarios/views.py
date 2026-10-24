@@ -12,6 +12,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_POST
+from votaciones.models import Voto
+
 from .models import Usuario, Bitacora
 
 
@@ -454,6 +456,43 @@ def perfil_actividad_view(request):
             'perfil': perfil,
             'actividad': actividad,
             'firmas_validas': sum(1 for evento in actividad if evento.firma_ok),
+        },
+    )
+
+
+@login_required
+@never_cache
+def perfil_comprobantes_view(request):
+    """
+    Perfil > Mis comprobantes (CU-05): encuestas en las que votó, con código y fecha.
+
+    Nunca muestra la opción elegida (postcondición del CU-05). El flujo 3a permite verificar un
+    código: confirma si existe un voto con ese comprobante, sin decir de quién es ni qué se eligió.
+    """
+    perfil = obtener_perfil(request.user)
+    votos = (
+        Voto.objects.filter(usuario=request.user)
+        .select_related('encuesta__categoria__edicion')
+        .order_by('-fecha_creacion')
+    )
+
+    codigo = request.GET.get('codigo', '').strip().upper()
+    verificacion = None
+    if codigo:
+        verificacion = {
+            'codigo': codigo,
+            'voto': Voto.objects.filter(codigo_comprobante=codigo).select_related('encuesta').first(),
+        }
+
+    return render(
+        request,
+        'usuarios/perfil_comprobantes.html',
+        {
+            'seccion_activa': 'cuenta',
+            'seccion_perfil': 'comprobantes',
+            'perfil': perfil,
+            'votos': votos,
+            'verificacion': verificacion,
         },
     )
 
