@@ -1,0 +1,80 @@
+{% extends 'administracion/admin_base.html' %}
+
+{% block titulo %}Festival de la Leyenda Vallenata 2027 | Votos registrados{% endblock %}
+{% block descripcion %}Consulta administrativa de los votos registrados en la base de datos.{% endblock %}
+
+{% block breadcrumb %}
+  <a href="{% url 'panel_principal' %}" class="bc-parent">Administración</a>
+  <i class="bi bi-chevron-right bc-sep"></i>
+  <span class="bc-current">Votos</span>
+{% endblock %}
+
+{% block contenido %}
+  <section class="dashboard-page-header">
+    <div class="panel-kicker">{% if edicion %}{{ edicion.nombre|upper }} · {{ edicion.anio }}{% else %}FESTIVAL DE LA LEYENDA VALLENATA{% endif %}</div>
+    <div class="panel-header-row">
+      <div>
+        <h1 class="panel-title">Votos registrados</h1>
+        <p class="panel-description">Registros guardados en MySQL. No se muestra quién votó: el código de comprobante identifica cada fila.</p>
+      </div>
+    </div>
+  </section>
+
+  <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <label class="small fw-bold" for="filtroCategoria">Categoría</label>
+    <select id="filtroCategoria" name="categoria" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+      <option value="">Todas</option>
+      {% for categoria in categorias %}
+        <option value="{{ categoria.pk }}"{% if categoria_id == categoria.pk|stringformat:"d" %} selected{% endif %}>{{ categoria.nombre }}</option>
+      {% endfor %}
+    </select>
+    <span class="small text-secondary ms-auto">{{ pagina.paginator.count }} voto{{ pagina.paginator.count|pluralize:"s" }}</span>
+  </form>
+
+  <div class="table-responsive bg-white border rounded-4">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th class="ps-4">Comprobante</th>
+          <th>Edición</th>
+          <th>Categoría</th>
+          <th>Votación</th>
+          <th>Opción</th>
+          <th class="pe-4">Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for voto in pagina %}
+          <tr>
+            <td class="ps-4 font-monospace small">{{ voto.codigo_comprobante }}</td>
+            <td>{{ voto.edicion.anio }}</td>
+            <td>{{ voto.categoria.nombre }}</td>
+            <td>{{ voto.encuesta.nombre }}</td>
+            <td class="fw-bold">{{ voto.opcion.nombre }}</td>
+            <td class="pe-4 small text-nowrap">{{ voto.fecha_creacion|date:"d/m/Y H:i:s" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-secondary py-4">Aún no hay votos registrados.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pagina.paginator.num_pages > 1 %}
+    <nav class="d-flex justify-content-between align-items-center mt-3 small" aria-label="Páginas de votos">
+      {% if pagina.has_previous %}
+        <a href="?pagina={{ pagina.previous_page_number }}{% if categoria_id %}&amp;categoria={{ categoria_id }}{% endif %}">Anterior</a>
+      {% else %}
+        <span></span>
+      {% endif %}
+      <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+      {% if pagina.has_next %}
+        <a href="?pagina={{ pagina.next_page_number }}{% if categoria_id %}&amp;categoria={{ categoria_id }}{% endif %}">Siguiente</a>
+      {% else %}
+        <span></span>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}

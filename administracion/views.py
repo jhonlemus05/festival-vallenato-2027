@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.paginator import Paginator
 from django.db.models import Count, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -117,6 +118,31 @@ def panel_votaciones(request):
 @administrador_requerido
 def panel_resultados(request):
     return _render_panel_votaciones(request, 'resultados')
+
+
+@administrador_requerido
+def panel_votos(request):
+    """
+    Registro de votos de la edición vigente, tal como están en MySQL. Muestra la opción pero no al
+    votante: el administrador no debe poder saber qué eligió cada persona (RF-10).
+    """
+    edicion = Edicion.vigente()
+    votos = Voto.objects.filter(edicion=edicion).select_related('edicion', 'categoria', 'encuesta', 'opcion').order_by('-fecha_creacion')
+    categoria_id = request.GET.get('categoria', '')
+    if categoria_id.isdecimal():
+        votos = votos.filter(categoria_id=categoria_id)
+
+    return render(
+        request,
+        'administracion/votos.html',
+        {
+            'seccion_admin': 'votos',
+            'edicion': edicion,
+            'categorias': Categoria.objects.filter(edicion=edicion),
+            'categoria_id': categoria_id,
+            'pagina': Paginator(votos, 25).get_page(request.GET.get('pagina')),
+        },
+    )
 
 
 @administrador_requerido

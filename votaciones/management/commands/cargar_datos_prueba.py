@@ -10,7 +10,8 @@ from votaciones.models import Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
 
 
 # Todo lo que crea este comando es de PRUEBA (capturas y video de la entrega), no datos de la Fundación.
-VOTANTES_PRUEBA = 12
+# 24 votantes: en Música de 2027 votan 12 en cada encuesta, porque nadie puede votar dos veces en una categoría.
+VOTANTES_PRUEBA = 24
 DOMINIO_PRUEBA = 'demo.festivalvallenato.test'
 
 
@@ -31,13 +32,13 @@ class Command(BaseCommand):
         # Edición 2027 (la de las migraciones): opciones y votos para que los paneles tengan datos.
         musica = self.buscar(Categoria, edicion=edicion_2027, nombre='Música')
         artista = self.buscar(Encuesta, categoria=musica, nombre='Artista favorito del público')
-        self.registrar_votos(artista, list(artista.opciones.order_by('orden', 'nombre')), [5, 3, 2, 2], votantes)
+        self.registrar_votos(artista, list(artista.opciones.order_by('orden', 'nombre')), [5, 3, 2, 2], votantes[:12])
 
         cancion = self.buscar(Encuesta, categoria=musica, nombre='Canción favorita del público')
         self.crear_opciones(cancion, ['Canción de prueba A', 'Canción de prueba B', 'Canción de prueba C'])
         # El texto original de la migración dice "6 canciones"; con los datos de prueba son 3.
         if cancion.detalle.startswith('6 canciones'):
-            cancion.detalle = '3 canciones de prueba · Un voto por persona'
+            cancion.detalle = '3 canciones de prueba · Un voto por categoría'
             cancion.save(update_fields=['detalle'])
 
         # RN-05: fechas de prueba para mostrar la ventana de votación (solo si la encuesta no tiene).
@@ -53,7 +54,35 @@ class Command(BaseCommand):
 
         clasico = self.buscar(Encuesta, categoria=musica, nombre='Clásico vallenato favorito')
         opciones_clasico = self.crear_opciones(clasico, ['Clásico de prueba A', 'Clásico de prueba B', 'Clásico de prueba C'])
-        self.registrar_votos(clasico, opciones_clasico, [5, 4, 3], votantes)
+        self.registrar_votos(clasico, opciones_clasico, [5, 4, 3], votantes[12:])
+
+        # Otras categorías: una abierta para votar en una categoría distinta (CP-03) y una sin
+        # votaciones abiertas para el intento de voto en una categoría no habilitada (CP-05).
+        piloneras = self.buscar(Categoria, edicion=edicion_2027, nombre='Piloneras')
+        grupo, _ = Encuesta.objects.get_or_create(
+            categoria=piloneras,
+            nombre='Grupo de piloneras favorito',
+            defaults={
+                'descripcion': 'Elige al grupo de piloneras que más te emociona.',
+                'detalle': '3 grupos de prueba · Un voto por categoría',
+                'estado': 'activa',
+                'fecha_cierre': cierre,
+                'orden': 1,
+            },
+        )
+        self.crear_opciones(grupo, ['Grupo de prueba A', 'Grupo de prueba B', 'Grupo de prueba C'])
+        comparsas = self.buscar(Categoria, edicion=edicion_2027, nombre='Comparsas')
+        comparsa, _ = Encuesta.objects.get_or_create(
+            categoria=comparsas,
+            nombre='Comparsa favorita',
+            defaults={
+                'descripcion': 'Consulta de prueba ya finalizada.',
+                'detalle': 'La consulta de esta edición ha finalizado.',
+                'estado': 'cerrada',
+                'orden': 1,
+            },
+        )
+        self.crear_opciones(comparsa, ['Comparsa de prueba A', 'Comparsa de prueba B'])
 
         # Una segunda edición, ya finalizada, para mostrar que el sistema maneja varias ediciones.
         edicion_2026, _ = Edicion.objects.get_or_create(
@@ -81,7 +110,8 @@ class Command(BaseCommand):
             },
         )
         opciones_2026 = self.crear_opciones(artista_2026, ['Artista de prueba A', 'Artista de prueba B', 'Artista de prueba C'])
-        self.registrar_votos(artista_2026, opciones_2026, [6, 4, 2], votantes)
+        # Los mismos votantes de 2027: la regla es por edición, así que Música se puede votar en cada una.
+        self.registrar_votos(artista_2026, opciones_2026, [6, 4, 2], votantes[:12])
 
         self.stdout.write(self.style.SUCCESS(
             f'Datos de prueba listos: {Edicion.objects.count()} ediciones, '
@@ -123,7 +153,7 @@ class Command(BaseCommand):
         return opciones
 
     def registrar_votos(self, encuesta, opciones, reparto, votantes):
-        # reparto[i] = cuántos votantes eligen opciones[i]. Cada votante vota una sola vez por encuesta,
+        # reparto[i] = cuántos votantes eligen opciones[i]. Cada votante vota una sola vez por categoría,
         # así que al correr el comando otra vez get_or_create encuentra el voto y no lo repite.
         siguiente = iter(votantes)
         for opcion, cantidad in zip(opciones, reparto):

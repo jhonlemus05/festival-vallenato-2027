@@ -456,7 +456,7 @@
       >
         Votar <i class="bi bi-check2" aria-hidden="true"></i>
       </button>
-      <p class="voting-footnote"><i class="bi bi-shield-check" aria-hidden="true"></i> Un voto por encuesta. Tu elección es definitiva.</p>
+      <p class="voting-footnote"><i class="bi bi-shield-check" aria-hidden="true"></i> Un voto por categoría en cada edición. Tu elección es definitiva.</p>
 
       <div class="modal fade vote-confirm-modal" id="voteConfirmModal" tabindex="-1" aria-labelledby="voteConfirmTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -473,7 +473,7 @@
             >
             <h2 class="confirm-title" id="voteConfirmTitle">¿Confirmas tu voto por <span id="confirmOptionName">{% if opcion_seleccionada %}{{ opcion_seleccionada.nombre }}{% endif %}</span>?</h2>
             <p class="confirm-survey-label">{{ encuesta.categoria.nombre }} · {{ encuesta.nombre }}</p>
-            <div class="confirm-warning">Una vez registrado, no podrás cambiar tu voto en esta encuesta.</div>
+            <div class="confirm-warning">Una vez registrado no podrás cambiarlo ni votar en otra encuesta de {{ encuesta.categoria.nombre }}.</div>
             <button type="submit" class="confirm-vote-button">Confirmar voto <i class="bi bi-check2" aria-hidden="true"></i></button>
             <button type="button" class="cancel-vote-button" data-bs-dismiss="modal">Cancelar</button>
           </div>

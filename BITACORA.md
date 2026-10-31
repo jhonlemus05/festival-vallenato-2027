@@ -421,6 +421,30 @@ D:\no_borrar\programacion\Python\Django\
   rutas, comandos, pruebas (78), estructura de carpetas y solución de problemas frecuentes. Sin emojis.
   Falta completar los nombres de los integrantes.
 
+### [20] Entrega 3: módulo de votaciones, validaciones y API GET
+- **Regla central**: un voto por usuario, categoría y edición (antes, uno por encuesta: en Música se podía votar en
+  cada subevento). `Voto` ahora tiene `edicion` y `categoria`, copiadas de la encuesta en `save()`, y la restricción
+  única `votacion_un_voto_por_usuario_categoria_edicion`. `save()` también rechaza una opción de otra encuesta.
+- **Migración `0009`**: rellena los campos nuevos, conserva el primer voto de cada usuario en cada categoría y elimina
+  los demás (con los datos de prueba anteriores son 12), y cambia "Un voto por persona" por "Un voto por categoría" en
+  los textos de las encuestas. Los votos eliminados no se recuperan al revertirla.
+- **Votación**: `votaciones/forms.py` (`VotoForm`) valida la opción en el servidor; una opción ajena responde 400 y
+  queda en la bitácora. Se rechaza votar si la edición no está activa. El segundo voto ya no redirige a la pantalla de
+  "Voto registrado con éxito": vuelve a la categoría con el motivo y se audita. Reabrir la encuesta votada sí lleva al
+  comprobante. Un `IntegrityError` por solicitudes simultáneas recibe el mismo rechazo.
+- **Participación**: Mis comprobantes muestra cada categoría como Votada o Pendiente; el catálogo marca "Ya votaste" y
+  la categoría votada desactiva sus botones.
+- **Panel**: `/admin-panel/votos/` lista los votos con filtro por categoría, sin mostrar quién votó (RF-10).
+- **API**: `GET /api/categorias/` en `votaciones/views.py` (`JsonResponse`), pública y sin votos ni conteos.
+- **Concurrencia**: `python manage.py probar_concurrencia` envía solicitudes HTTP simultáneas al servidor. Comprobado
+  al quitar la restricción en una copia del proyecto: quedaban 3 o 4 votos por categoría, así que la consulta previa de
+  la vista no basta y la restricción de MySQL es la que protege.
+- **Datos de prueba**: 24 votantes (12 por encuesta en Música de 2027); Piloneras con una encuesta activa y Comparsas
+  con una cerrada, para los casos CP-03 y CP-05. Una encuesta o categoría con votos no se puede mover de categoría o
+  edición: la copia guardada en el voto quedaría desactualizada.
+- **Django Admin**: la ficha del voto ya no muestra al votante junto a su opción (RF-10).
+- **Pruebas**: 31 nuevas y 4 ajustadas. Total: **109 pruebas OK en MySQL**. README actualizado (API, regla, pruebas).
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

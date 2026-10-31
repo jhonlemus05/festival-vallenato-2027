@@ -9,4 +9,5 @@ urlpatterns = [
     path('categorias/<int:categoria_id>/', views.categoria_encuestas, name='categoria_encuestas'),
     path('encuestas/<int:encuesta_id>/votar/', views.votar_encuesta, name='votar_encuesta'),
     path('votos/<int:voto_id>/exito/', views.voto_exitoso, name='voto_exitoso'),
+    path('api/categorias/', views.api_categorias, name='api_categorias'),
 ]

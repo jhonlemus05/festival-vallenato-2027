@@ -42,11 +42,13 @@ class OpcionEncuestaAdmin(admin.ModelAdmin):
 
 @admin.register(Voto)
 class VotoAdmin(admin.ModelAdmin):
-    list_display = ('codigo_comprobante', 'encuesta', 'opcion', 'fecha_creacion')
-    list_filter = ('encuesta__categoria', 'encuesta')
+    list_display = ('codigo_comprobante', 'edicion', 'categoria', 'encuesta', 'opcion', 'fecha_creacion')
+    list_filter = ('edicion', 'categoria', 'encuesta')
     search_fields = ('codigo_comprobante',)
     ordering = ('-fecha_creacion',)
-    readonly_fields = ('codigo_comprobante', 'encuesta', 'opcion', 'usuario', 'fecha_creacion')
+    # El votante no se muestra junto a su opción (RF-10).
+    fields = ('codigo_comprobante', 'edicion', 'categoria', 'encuesta', 'opcion', 'fecha_creacion')
+    readonly_fields = fields
 
     def has_add_permission(self, request):
         return False

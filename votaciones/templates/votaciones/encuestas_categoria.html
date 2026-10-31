@@ -139,6 +139,11 @@
       border: 1px solid #222;
     }
 
+    .survey-action:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
     .survey-empty {
       padding: 22px;
       color: #666;
@@ -189,6 +194,13 @@
     {% for message in messages %}
       <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} py-2 small" role="alert">{{ message }}</div>
     {% endfor %}
+    {# Regla central: con un voto en la categoría ya no se ofrece votar en sus demás encuestas. #}
+    {% if voto_usuario %}
+      <div class="alert alert-warning py-2 small" role="status">
+        <i class="bi bi-check2-circle" aria-hidden="true"></i>
+        Ya votaste en esta categoría en «{{ voto_usuario.encuesta.nombre }}» · <a href="{% url 'voto_exitoso' voto_usuario.pk %}" class="alert-link">Ver mi comprobante</a>
+      </div>
+    {% endif %}
 
     <div class="survey-list-heading">
       <span>{{ encuestas|length }} encuesta{{ encuestas|length|pluralize:"s" }} disponible{{ encuestas|length|pluralize:"s" }}</span>
@@ -217,7 +229,9 @@
               <p class="survey-detail mt-1"><i class="bi bi-calendar-event" aria-hidden="true"></i> Abre el {{ encuesta.fecha_apertura|date:"d/m/Y \a \l\a\s H:i" }}</p>
             {% endif %}
             {% if encuesta.estado == 'activa' %}
-              {% if encuesta.total_opciones %}
+              {% if voto_usuario %}
+                <button type="button" class="survey-action" disabled aria-disabled="true">Ya votaste en esta categoría</button>
+              {% elif encuesta.total_opciones %}
                 <a class="survey-action d-block text-center text-decoration-none" href="{% url 'votar_encuesta' encuesta.pk %}">Elegir mi favorito <i class="bi bi-arrow-right ms-1"></i></a>
               {% else %}
                 <button type="button" class="survey-action" disabled aria-disabled="true">Opciones próximamente <i class="bi bi-arrow-right ms-1"></i></button>

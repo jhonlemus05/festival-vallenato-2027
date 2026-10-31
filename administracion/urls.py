@@ -6,4 +6,5 @@ urlpatterns = [
     path('categorias/', views.categorias, name='categorias'),
     path('votaciones/', views.panel_votaciones, name='admin_votaciones'),
     path('resultados/', views.panel_resultados, name='admin_resultados'),
+    path('votos/', views.panel_votos, name='admin_votos'),
 ]

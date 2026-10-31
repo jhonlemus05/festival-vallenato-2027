@@ -89,6 +89,11 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+    def clean(self):
+        # El voto guarda su edición (regla de unicidad): mover la categoría dejaría esa fila desactualizada.
+        if self.pk and self.votos.exclude(edicion_id=self.edicion_id).exists():
+            raise ValidationError('No se puede mover a otra edición una categoría que ya tiene votos.')
+
 
 class Encuesta(models.Model):
     ESTADOS = [
@@ -136,6 +141,9 @@ class Encuesta(models.Model):
         # CU-06, flujo 5b: el cierre no puede ser anterior (ni igual) a la apertura.
         if self.fecha_apertura and self.fecha_cierre and self.fecha_cierre <= self.fecha_apertura:
             raise ValidationError({'fecha_cierre': 'El cierre debe ser posterior a la apertura.'})
+        # El voto guarda su categoría (regla de unicidad): mover la encuesta dejaría esa fila desactualizada.
+        if self.pk and self.votos.exclude(categoria_id=self.categoria_id).exists():
+            raise ValidationError('No se puede mover a otra categoría una votación que ya tiene votos.')
 
 
 def actualizar_estados_por_fecha():
@@ -186,6 +194,22 @@ class OpcionEncuesta(models.Model):
 
 
 class Voto(models.Model):
+    # Edición y categoría se copian de la encuesta al guardar (ver save()). Viven en la fila para que
+    # MySQL imponga la regla central: un voto por usuario, categoría y edición.
+    edicion = models.ForeignKey(
+        Edicion,
+        on_delete=models.PROTECT,
+        related_name='votos',
+        editable=False,
+        verbose_name='Edición',
+    )
+    categoria = models.ForeignKey(
+        Categoria,
+        on_delete=models.CASCADE,
+        related_name='votos',
+        editable=False,
+        verbose_name='Categoría',
+    )
     encuesta = models.ForeignKey(
         Encuesta,
         on_delete=models.CASCADE,
@@ -217,18 +241,30 @@ class Voto(models.Model):
     class Meta:
         ordering = ['-fecha_creacion']
         constraints = [
+            # Cubre también las categorías con varias encuestas (subeventos): el segundo voto se
+            # rechaza aunque sea en otra encuesta, y aunque dos solicitudes lleguen a la vez.
             models.UniqueConstraint(
-                fields=['encuesta', 'usuario'],
-                name='votacion_un_voto_por_usuario_encuesta',
+                fields=['usuario', 'categoria', 'edicion'],
+                name='votacion_un_voto_por_usuario_categoria_edicion',
             ),
         ]
         verbose_name = 'Voto'
         verbose_name_plural = 'Votos'
 
     def __str__(self):
-        return f'{self.usuario} - {self.encuesta.nombre}: {self.opcion.nombre}'
+        # Sin votante ni opción: este texto aparece en Django Admin y no debe asociarlos (RF-10).
+        return f'{self.codigo_comprobante} - {self.encuesta.nombre}'
+
+    def clean(self):
+        if self.opcion.encuesta_id != self.encuesta_id:
+            raise ValidationError({'opcion': 'La opción elegida no pertenece a esta votación.'})
 
     def save(self, *args, **kwargs):
+        # La opción es de la encuesta, y edición y categoría salen de ella: la fila no puede contradecir
+        # la jerarquía Edición → Categoría → Votación → Opción (RN-01).
+        self.clean()
+        self.categoria = self.encuesta.categoria
+        self.edicion = self.categoria.edicion
         if not self.codigo_comprobante:
             self.codigo_comprobante = generar_codigo_comprobante()
         super().save(*args, **kwargs)

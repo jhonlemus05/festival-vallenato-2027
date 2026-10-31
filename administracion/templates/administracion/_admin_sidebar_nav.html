@@ -41,5 +41,13 @@
         <span>Resultados</span>
       </a>
     </li>
+
+    <!-- 6. Votos registrados -->
+    <li>
+      <a href="{% url 'admin_votos' %}" class="sidebar-nav-link {% if seccion_admin == 'votos' %}active{% endif %}">
+        <i class="bi bi-receipt"></i>
+        <span>Votos</span>
+      </a>
+    </li>
   </ul>
 </div>

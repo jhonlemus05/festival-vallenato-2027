@@ -4,7 +4,7 @@
 {% block descripcion %}Consulta los comprobantes de tus votos en el Festival de la Leyenda Vallenata 2027.{% endblock %}
 
 {% block perfil_titulo %}Mis comprobantes{% endblock %}
-{% block perfil_descripcion %}Las encuestas en las que participaste, con el código y la fecha de tu voto. Por seguridad no se muestra la opción que elegiste.{% endblock %}
+{% block perfil_descripcion %}Las categorías en las que ya votaste, con la encuesta, el código y la fecha de tu voto. Por seguridad no se muestra la opción que elegiste.{% endblock %}
 
 {% block perfil_contenido %}
   {# Flujo 3a del CU-05: verificar un código sin revelar a quién pertenece ni qué se eligió. #}
@@ -44,6 +44,29 @@
     {% endif %}
   </div>
 
+  {# Solo se permite un voto por categoría y edición: esta lista muestra cuáles faltan. #}
+  {% if participacion %}
+    <div class="perfil-card mb-3">
+      <div class="field-label">Mi participación en {{ edicion.nombre }}</div>
+      <ul class="actividad-lista">
+        {% for fila in participacion %}
+        <li class="actividad-item">
+          <div class="actividad-icono"><i class="bi {% if fila.voto %}bi-check2-circle{% else %}bi-circle{% endif %}"></i></div>
+          <div class="actividad-cuerpo">
+            <div class="actividad-accion">{{ fila.categoria.nombre }}</div>
+            {% if fila.voto %}
+              <div class="actividad-detalles">Votaste en «{{ fila.voto.encuesta.nombre }}»</div>
+            {% else %}
+              <div class="actividad-detalles"><a href="{% url 'categoria_encuestas' fila.categoria.pk %}">Aún no has votado en esta categoría</a></div>
+            {% endif %}
+          </div>
+          <span class="hash-code-pill">{% if fila.voto %}Votada{% else %}Pendiente{% endif %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
   <div class="perfil-card">
     {% if votos %}
       <ul class="actividad-lista">
@@ -52,7 +75,7 @@
           <div class="actividad-icono"><i class="bi bi-receipt"></i></div>
           <div class="actividad-cuerpo">
             <div class="actividad-accion">{{ voto.encuesta.nombre }}</div>
-            <div class="actividad-detalles">{{ voto.encuesta.categoria.nombre }} · {{ voto.encuesta.categoria.edicion.nombre }}</div>
+            <div class="actividad-detalles">{{ voto.categoria.nombre }} · {{ voto.edicion.nombre }}</div>
             <div class="actividad-meta">Votaste el {{ voto.fecha_creacion|date:"d/m/Y" }} a las {{ voto.fecha_creacion|date:"H:i" }}</div>
           </div>
           <span class="hash-code-pill">{{ voto.codigo_comprobante }}</span>

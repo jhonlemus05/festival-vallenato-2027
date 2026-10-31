@@ -36,9 +36,10 @@ pr_festivalVallenato/
 │   │       ├── encuestas_categoria.html # Encuestas de una categoría
 │   │       ├── votacion.html         # Selección y confirmación de voto
 │   │       └── exito.html            # Comprobante de voto registrado
-│   ├── models.py                    # Categoria, Encuesta, OpcionEncuesta y Voto
-│   ├── urls.py                      # Catálogo, detalle de encuesta, voto y confirmación
-│   └── views.py                     # Catálogo y flujo público de votación
+│   ├── forms.py                     # VotoForm: valida en el servidor la opción enviada
+│   ├── models.py                    # Edicion, Categoria, Encuesta, OpcionEncuesta y Voto
+│   ├── urls.py                      # Catálogo, detalle de encuesta, voto, confirmación y API
+│   └── views.py                     # Catálogo, flujo público de votación y API GET
 │
 └── administracion/                  # APP 3: Panel de Control (modo de demostración)
     ├── migrations/
@@ -47,7 +48,8 @@ pr_festivalVallenato/
     │       ├── admin_base.html      # Layout privado (Sidebar de navegación, barra superior)
     │       ├── panel_principal.html # Vista 'admin' general / Dashboard principal
     │       ├── categorias.html      # Gestión de categorías y encuestas
-    │       └── votaciones.html      # Estado y resultados agregados por opción
+    │       ├── votaciones.html      # Estado y resultados agregados por opción
+    │       └── votos.html           # Consulta de los votos registrados
     ├── forms.py                     # Formularios de categorías, encuestas y candidatos/opciones
     ├── urls.py                      # Rutas de categorías, votaciones y resultados
     └── views.py                     # Gestión de categorías y vistas del panel

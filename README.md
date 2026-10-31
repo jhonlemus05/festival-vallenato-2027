@@ -2,15 +2,16 @@
 
 Plataforma web para gestionar las votaciones del público del Festival de la Leyenda Vallenata. Permite que los
 visitantes consulten las ediciones, categorías y encuestas del Festival, que los votantes registrados emitan un
-voto por encuesta con un comprobante verificable, y que los administradores configuren las votaciones y consulten
-sus resultados.
+voto por categoría y edición con un comprobante verificable, y que los administradores configuren las votaciones y
+consulten sus resultados y registros. Expone además una API GET de consulta con respuesta JSON.
 
 El proyecto se desarrolla en la asignatura **Desarrollo Web** de la **Fundación Universitaria del Área Andina**
-(Ingeniería de Sistemas, modalidad virtual). Esta versión corresponde a la **Entrega 2: desarrollo inicial del
-sistema**, construida a partir del análisis y diseño de la Entrega 1 (requerimientos, reglas de negocio, casos de
-uso y modelo conceptual).
+(Ingeniería de Sistemas, modalidad virtual). Esta versión corresponde a la **Entrega 3: implementación del módulo
+de votaciones, validaciones y API GET**, que continúa el desarrollo de la Entrega 2 y el análisis y diseño de la
+Entrega 1 (requerimientos, reglas de negocio, casos de uso y modelo conceptual).
 
-**Integrantes:** _por completar con los nombres completos de los cuatro integrantes._
+**Integrantes:** Camilo Alejandro Zarate Guzman, Daniel Andrés Martinez Daza, Jhon Fredy Lemus Valencia y Mateo
+Rangel Rangel.
 
 ---
 
@@ -43,7 +44,12 @@ Edición  ->  Categoría  ->  Encuesta (votación)  ->  Opción  ->  Voto
 ```
 
 Cada edición anual del Festival agrupa sus categorías; cada categoría, sus encuestas; cada encuesta, sus opciones;
-y cada voto pertenece a una encuesta, una opción y una cuenta. Ningún elemento puede existir sin su nivel superior.
+y cada voto pertenece a una cuenta, una edición, una categoría, una encuesta y una opción. Ningún elemento puede
+existir sin su nivel superior.
+
+**Regla central de votación:** cada cuenta puede elegir una sola opción por categoría y edición. Puede votar en
+otras categorías, pero no emitir un segundo voto en la misma categoría, aunque esta contenga varias encuestas
+(subeventos).
 
 **Incluido en esta versión**
 
@@ -51,7 +57,10 @@ y cada voto pertenece a una encuesta, una opción y una cuenta. Ningún elemento
 - Registro, inicio y cierre de sesión con el sistema de autenticación de Django.
 - Administración de ediciones, categorías, encuestas y opciones desde Django Admin y desde un panel propio.
 - Interfaz pública que consulta los datos reales de MySQL: ediciones, categorías, encuestas y votación.
-- Un voto por cuenta y por encuesta, con código de comprobante y verificación del comprobante.
+- Un voto por cuenta, categoría y edición, validado en Django y garantizado por una restricción única en MySQL,
+  con código de comprobante y verificación del comprobante.
+- Consulta de la participación del votante y consulta administrativa de los votos registrados.
+- API `GET /api/categorias/` con las categorías, votaciones y opciones de MySQL en formato JSON.
 - Apertura y cierre automático de encuestas según la fecha y hora programadas.
 - Bitácora de auditoría firmada con SHA-256 para accesos, votos y acciones administrativas.
 
@@ -61,7 +70,7 @@ La Entrega 1 identificó decisiones que el cliente todavía no confirma. El proy
 
 | Regla o elemento | Estado | Comportamiento actual |
 | --- | --- | --- |
-| RN-03 Límite de votos (por categoría o por votación, único o diario) | Pendiente | Un voto por cuenta y por encuesta |
+| RN-03 Límite de votos (por categoría o por votación, único o diario) | Fijado por la guía de la Entrega 3; falta la confirmación de la Fundación | Un voto por cuenta, categoría y edición |
 | RN-04 Mecanismo de identificación del votante | Pendiente | Correo o número de documento más contraseña |
 | RN-06 Visibilidad de resultados parciales | Pendiente | Los resultados solo los ve el administrador |
 | Rol Auditor | Pendiente | El rol existe en el modelo, sin pantallas propias |
@@ -122,6 +131,8 @@ erDiagram
     EDICION ||--o{ CATEGORIA : agrupa
     CATEGORIA ||--o{ ENCUESTA : contiene
     ENCUESTA ||--o{ OPCION_ENCUESTA : ofrece
+    EDICION ||--o{ VOTO : "agrupa"
+    CATEGORIA ||--o{ VOTO : "limita"
     ENCUESTA ||--o{ VOTO : recibe
     OPCION_ENCUESTA ||--o{ VOTO : "es elegida en"
     AUTH_USER ||--o{ VOTO : emite
@@ -159,6 +170,8 @@ erDiagram
     }
     VOTO {
         int id PK
+        int edicion_id FK
+        int categoria_id FK
         int encuesta_id FK
         int opcion_id FK
         int usuario_id FK
@@ -187,8 +200,11 @@ erDiagram
 Restricciones principales:
 
 - El nombre de una categoría es único **dentro de cada edición** (puede repetirse entre ediciones).
-- Una cuenta solo puede votar **una vez por encuesta** (restricción única sobre encuesta y usuario en la base de
-  datos, no solo en el código).
+- Una cuenta solo puede votar **una vez por categoría y edición**: restricción única
+  `votacion_un_voto_por_usuario_categoria_edicion` sobre `usuario`, `categoria` y `edicion` en la base de datos, no
+  solo en el código. Por eso el voto guarda su edición y su categoría, que se copian de la encuesta al guardarlo.
+- La opción de un voto debe pertenecer a su encuesta (`Voto.clean`, que `save()` ejecuta siempre).
+- Una encuesta o categoría con votos no se puede mover a otra categoría o edición.
 - `codigo_comprobante` es único y no se puede editar.
 - Una edición que todavía tiene categorías no se puede eliminar (`on_delete=PROTECT`).
 - Si se elimina una cuenta, sus eventos de bitácora se conservan sin usuario (`on_delete=SET_NULL`).
@@ -209,6 +225,7 @@ Restricciones principales:
 | Listado de ediciones y categorías de cada una | `/ediciones/`, `/ediciones/<año>/` | RF-01 |
 | Encuestas de una categoría con su estado y fechas | `/categorias/<id>/` | RF-01, CU-01 |
 | Registro e inicio de sesión | `/usuarios/login/` | RF-03, CU-03 |
+| API de consulta de categorías y opciones en JSON | `/api/categorias/` | Entrega 3 |
 
 ### Votante (con sesión)
 
@@ -219,7 +236,7 @@ Restricciones principales:
 | Perfil: datos de la cuenta | `/usuarios/perfil/` | |
 | Perfil: cambio de contraseña | `/usuarios/perfil/contrasena/` | RNF-01 |
 | Perfil: actividad reciente con firma verificada | `/usuarios/perfil/actividad/` | RNF-04 |
-| Perfil: mis comprobantes y verificación de un código | `/usuarios/perfil/comprobantes/` | CU-05 |
+| Perfil: participación por categoría, comprobantes y verificación de un código | `/usuarios/perfil/comprobantes/` | CU-05 |
 
 Flujo de votación (CU-04):
 
@@ -228,8 +245,12 @@ Flujo de votación (CU-04):
 2. Selecciona una opción (ninguna viene marcada) y confirma su elección en una ventana de confirmación.
 3. El sistema registra el voto, genera un código de comprobante (formato `FV-XXXX-XXXX`) y muestra la
    confirmación.
-4. Si intenta votar de nuevo en la misma encuesta, se le muestra su comprobante y el intento queda en la bitácora.
-5. Si la encuesta ya cerró o todavía no abre, el voto se rechaza y se le informa el motivo.
+4. Si intenta votar de nuevo en la misma categoría, por otra opción o en otra de sus encuestas, el voto se rechaza,
+   se le informa el motivo y el intento queda en la bitácora. Si dos solicitudes llegan a la vez, la restricción
+   única de MySQL deja pasar solo una y la otra recibe el mismo rechazo.
+5. Si la categoría está oculta, la edición no está activa, la encuesta ya cerró o todavía no abre, el voto se rechaza
+   y se le informa el motivo.
+6. Si la opción enviada no pertenece a la encuesta, el formulario la rechaza y el intento queda en la bitácora.
 
 ### Administrador
 
@@ -241,7 +262,8 @@ Flujo de votación (CU-04):
 | Resumen de participación de la edición vigente | `/admin-panel/` | |
 | Estado y distribución de votos de las encuestas activas | `/admin-panel/votaciones/` | RF-09 |
 | Resultados agregados de las encuestas cerradas | `/admin-panel/resultados/` | RF-09, RF-02 |
-| Consulta de la bitácora, cuentas y votos | Django Admin | RNF-04 |
+| Consulta de los votos registrados, con filtro por categoría y sin identificar al votante | `/admin-panel/votos/` | Entrega 3, RF-10 |
+| Consulta de la bitácora, cuentas y votos (sin mostrar quién votó) | Django Admin | RNF-04, RF-10 |
 
 Una encuesta con fecha de apertura pasa sola de "Próximamente" a "Activa" al llegar esa hora, y una encuesta con
 fecha de cierre pasa sola a "Cerrada" al vencerse (RN-05). El cambio lo hace un middleware en cada petición, por lo
@@ -261,13 +283,15 @@ que no se necesita una tarea programada, y queda registrado en la bitácora.
 | Cierre de sesión seguro | Solo por `POST` con token CSRF | RNF-01 |
 | Redirecciones seguras | Después del inicio de sesión solo se redirige a páginas del mismo sitio | RNF-01 |
 | Control de acceso | El panel administrativo exige rol de administrador; sin sesión redirige al inicio de sesión y sin permiso responde 403 | RF-02, riesgo R5102 |
-| Secreto del voto | La bitácora y los comprobantes nunca muestran la opción elegida | RF-05, RF-10 |
+| Secreto del voto | La bitácora y los comprobantes nunca muestran la opción elegida, y la consulta de votos del panel no muestra al votante | RF-05, RF-10 |
+| Integridad del voto | Validación en el servidor con `VotoForm` y en la vista, restricción única en MySQL y gestión del error de integridad ante solicitudes simultáneas | Entrega 3 |
 | Bitácora de auditoría | Cada evento queda con IP, fecha y una firma SHA-256 que permite detectar si la fila fue alterada | RNF-04 |
 | Secretos fuera del código | `SECRET_KEY` y credenciales de MySQL en un archivo `.env` que no se versiona | Entrega 2 |
 
 Eventos que registra la bitácora: registro de cuenta, inicio y cierre de sesión, intentos fallidos, bloqueos,
 intentos en cuenta bloqueada, cambio de contraseña, acceso denegado al panel, voto registrado, intento de voto
-duplicado, altas y cambios hechos desde el panel, y apertura o cierre automático de encuestas.
+duplicado, intento de voto con opción inválida, altas y cambios hechos desde el panel, y apertura o cierre
+automático de encuestas.
 
 Pendiente para un despliegue en producción: servir el sitio por HTTPS y activar `SESSION_COOKIE_SECURE`,
 `CSRF_COOKIE_SECURE` y `SECURE_SSL_REDIRECT`.
@@ -381,8 +405,10 @@ Este comando agrega datos **de demostración**, no datos oficiales de la Fundaci
 
 - Una edición de prueba 2026, ya finalizada, con una encuesta cerrada.
 - Opciones para las encuestas que no tenían y fechas de apertura y cierre de ejemplo.
-- Treinta y seis votos de doce votantes de prueba, para que los paneles muestren resultados. Estas cuentas no
-  tienen contraseña utilizable, por lo que nadie puede iniciar sesión con ellas.
+- Una encuesta activa en Piloneras (para votar en otra categoría) y una cerrada en Comparsas (categoría sin
+  votaciones habilitadas).
+- Treinta y seis votos de veinticuatro votantes de prueba, para que los paneles muestren resultados. Estas cuentas
+  no tienen contraseña utilizable, por lo que nadie puede iniciar sesión con ellas.
 
 Se puede ejecutar varias veces sin duplicar información.
 
@@ -407,9 +433,11 @@ La aplicación queda disponible en `http://127.0.0.1:8000/`.
 | `/ediciones/` | Ediciones del Festival | Público |
 | `/categorias/<id>/` | Encuestas de una categoría | Público |
 | `/encuestas/<id>/votar/` | Votación | Votante |
+| `/api/categorias/` | API de categorías y opciones en JSON | Público, solo GET |
 | `/usuarios/login/` | Registro e inicio de sesión | Público |
 | `/usuarios/perfil/` | Perfil del votante | Votante |
 | `/admin-panel/` | Panel administrativo | Administrador |
+| `/admin-panel/votos/` | Consulta de votos registrados | Administrador |
 | `/admin/` | Django Admin | Administrador |
 
 ### 9.2 Roles y cuentas
@@ -421,6 +449,38 @@ La aplicación queda disponible en `http://127.0.0.1:8000/`.
 
 El inicio de sesión acepta el correo electrónico o el número de documento.
 
+### 9.3 API de consulta
+
+`GET /api/categorias/` está implementada en la vista `api_categorias` de `votaciones/views.py` con `JsonResponse`.
+Es pública como el catálogo y responde con las categorías visibles de la edición vigente, con sus votaciones y
+opciones consultadas en MySQL. No incluye votos ni conteos. Con el servidor iniciado se abre en el navegador:
+`http://127.0.0.1:8000/api/categorias/`.
+
+```json
+{
+  "edicion": {"id": 1, "nombre": "60° Festival de la Leyenda Vallenata", "anio": 2027, "estado": "activa",
+              "fecha_inicio": "2027-04-28", "fecha_fin": "2027-05-01"},
+  "total_categorias": 3,
+  "categorias": [
+    {
+      "id": 1,
+      "nombre": "Música",
+      "descripcion": "Acordeones, voces y canciones que nos unen.",
+      "votaciones": [
+        {
+          "id": 2,
+          "nombre": "Artista favorito del público",
+          "estado": "activa",
+          "fecha_apertura": null,
+          "fecha_cierre": "2027-04-28T04:59:00Z",
+          "opciones": [{"id": 1, "nombre": "Mateo Díaz", "descripcion": "Mi tierra canta"}]
+        }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ## 10. Comandos de referencia
@@ -431,6 +491,7 @@ El inicio de sesión acepta el correo electrónico o el número de documento.
 | `python manage.py migrate` | Crea o actualiza las tablas en MySQL |
 | `python manage.py createsuperuser` | Crea una cuenta de administrador |
 | `python manage.py cargar_datos_prueba` | Carga los datos de demostración |
+| `python manage.py probar_concurrencia` | Envía solicitudes simultáneas al servidor en ejecución y muestra cuántos votos quedan en MySQL |
 | `python manage.py test` | Ejecuta todas las pruebas automatizadas |
 | `python manage.py check` | Revisa la configuración del proyecto |
 
@@ -442,17 +503,27 @@ El inicio de sesión acepta el correo electrónico o el número de documento.
 python manage.py test
 ```
 
-El proyecto incluye **78 pruebas automatizadas** que se ejecutan contra MySQL en una base temporal
+El proyecto incluye **109 pruebas automatizadas** que se ejecutan contra MySQL en una base temporal
 (`test_festival_vallenato`) creada y eliminada por Django en cada ejecución. Usan el cliente de pruebas de Django,
 que recorre rutas, middleware, sesiones y plantillas reales.
 
 | Aplicación | Pruebas | Qué cubren |
 | --- | --- | --- |
 | `usuarios` | 21 | Registro, inicio y cierre de sesión, bloqueo por intentos, firma de la bitácora, perfil, cambio de contraseña y comprobantes |
-| `votaciones` | 36 | Ediciones, categorías, votación, voto único, comprobantes, bitácora de votos, apertura y cierre automático y datos de prueba |
+| `votaciones` | 67 | Ediciones, categorías, votación, regla de un voto por categoría y edición, casos CP-01 a CP-10, API, concurrencia, comprobantes, bitácora de votos, apertura y cierre automático y datos de prueba |
 | `administracion` | 21 | Control de acceso al panel, gestión de categorías, encuestas y opciones, programación de fechas y bitácora de acciones |
 
 Para ejecutar las pruebas de una sola aplicación: `python manage.py test usuarios`.
+
+Prueba de concurrencia sobre el servidor real (CP-09). Con `python manage.py runserver` activo, en otra terminal:
+
+```bash
+python manage.py probar_concurrencia
+```
+
+El comando crea cuentas temporales, envía dos solicitudes HTTP simultáneas a dos encuestas de una misma categoría y
+muestra qué respondió el servidor y cuántos votos quedaron en MySQL. Se repite en cinco rondas y al terminar borra
+las cuentas temporales y sus votos. Las opciones `--rondas` y `--solicitudes` cambian esas cantidades.
 
 ---
 
@@ -477,14 +548,15 @@ festival-vallenato-2027/
 │   └── tests.py
 ├── votaciones/                   Ediciones, categorías, encuestas y votos
 │   ├── models.py                 Edicion, Categoria, Encuesta, OpcionEncuesta, Voto
-│   ├── views.py                  Vistas públicas y votación
+│   ├── forms.py                  VotoForm: valida en el servidor la opción enviada
+│   ├── views.py                  Vistas públicas, votación y API GET
 │   ├── middleware.py             Apertura y cierre automático de encuestas
-│   ├── management/commands/      cargar_datos_prueba
+│   ├── management/commands/      cargar_datos_prueba y probar_concurrencia
 │   ├── migrations/
 │   ├── templates/                Plantilla base pública y páginas del votante
 │   └── tests.py
 ├── administracion/               Panel administrativo
-│   ├── views.py                  Resumen, gestión, votaciones y resultados
+│   ├── views.py                  Resumen, gestión, votaciones, resultados y votos
 │   ├── forms.py                  Formularios de categorías, encuestas y opciones
 │   ├── templates/
 │   └── tests.py
@@ -515,6 +587,11 @@ La base de datos no fue creada. Ejecutar la sentencia `CREATE DATABASE` del paso
 
 **`Table ... doesn't exist` al abrir una página**
 Faltan migraciones por aplicar. Ejecutar `python manage.py migrate`.
+
+**Al migrar aparece `se eliminaron N votos repetidos`**
+Es normal en una base anterior a la Entrega 3: antes se podía votar en varias encuestas de una categoría. La
+migración `0009` conserva el primer voto de cada cuenta en cada categoría y elimina los demás. No se pueden
+recuperar, por lo que conviene respaldar la base antes si contiene datos que se deban conservar.
 
 **Las pruebas fallan al crear `test_festival_vallenato`**
 El usuario de MySQL no tiene permisos sobre la base de pruebas. Ejecutar el segundo `GRANT` del paso 8.3.

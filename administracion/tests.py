@@ -24,7 +24,7 @@ class GestionCategoriasTests(TestCase):
         self.client.force_login(self.admin)
 
     def test_panel_solo_para_administradores(self):
-        vistas = ['panel_principal', 'categorias', 'admin_votaciones', 'admin_resultados']
+        vistas = ['panel_principal', 'categorias', 'admin_votaciones', 'admin_resultados', 'admin_votos']
 
         # Sin sesión: al login, recordando a dónde quería ir.
         self.client.logout()

@@ -223,8 +223,8 @@
     </article>
 
     <a class="success-home-link" href="{% url 'index' %}">Volver al inicio <i class="bi bi-house" aria-hidden="true"></i></a>
-    <a class="success-more-link" href="{% url 'categoria_encuestas' voto.encuesta.categoria_id %}">
-      <i class="bi bi-info-circle" aria-hidden="true"></i> Puedes participar en otras encuestas activas.
+    <a class="success-more-link" href="{% url 'categorias_publicas' %}">
+      <i class="bi bi-info-circle" aria-hidden="true"></i> Puedes participar en otras categorías.
     </a>
   </section>
 {% endblock %}
