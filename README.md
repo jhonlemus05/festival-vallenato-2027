@@ -266,8 +266,9 @@ Flujo de votación (CU-04):
 | Consulta de la bitácora, cuentas y votos (sin mostrar quién votó) | Django Admin | RNF-04, RF-10 |
 
 Una encuesta con fecha de apertura pasa sola de "Próximamente" a "Activa" al llegar esa hora, y una encuesta con
-fecha de cierre pasa sola a "Cerrada" al vencerse (RN-05). El cambio lo hace un middleware en cada petición, por lo
-que no se necesita una tarea programada, y queda registrado en la bitácora.
+fecha de cierre pasa sola a "Cerrada" al vencerse (RN-05). Las fechas mandan sobre el estado: una encuesta marcada
+"Activa" con apertura futura pasa a "Próximamente" y no recibe votos hasta esa hora. El cambio lo hace un middleware
+en cada petición, por lo que no se necesita una tarea programada, y queda registrado en la bitácora.
 
 ---
 
@@ -283,15 +284,15 @@ que no se necesita una tarea programada, y queda registrado en la bitácora.
 | Cierre de sesión seguro | Solo por `POST` con token CSRF | RNF-01 |
 | Redirecciones seguras | Después del inicio de sesión solo se redirige a páginas del mismo sitio | RNF-01 |
 | Control de acceso | El panel administrativo exige rol de administrador; sin sesión redirige al inicio de sesión y sin permiso responde 403 | RF-02, riesgo R5102 |
-| Secreto del voto | La bitácora y los comprobantes nunca muestran la opción elegida, y la consulta de votos del panel no muestra al votante | RF-05, RF-10 |
+| Secreto del voto | Ninguna pantalla relaciona a un votante con su opción: la bitácora registra el voto sin usuario ni IP, la consulta de votos no muestra al votante y Django Admin no permite filtrar votos por cuenta ni cuentas por voto. El vínculo solo existe en la tabla de votos de MySQL, porque la regla de un voto por categoría y edición lo necesita | RF-05, RF-10 |
 | Integridad del voto | Validación en el servidor con `VotoForm` y en la vista, restricción única en MySQL y gestión del error de integridad ante solicitudes simultáneas | Entrega 3 |
-| Bitácora de auditoría | Cada evento queda con IP, fecha y una firma SHA-256 que permite detectar si la fila fue alterada | RNF-04 |
+| Bitácora de auditoría | Cada evento queda con fecha y una firma SHA-256 que permite detectar si la fila fue alterada, y sigue siendo válida si después se borra la cuenta. La IP es la de la conexión; el encabezado `X-Forwarded-For` se ignora porque lo escribe el cliente | RNF-04 |
 | Secretos fuera del código | `SECRET_KEY` y credenciales de MySQL en un archivo `.env` que no se versiona | Entrega 2 |
 
 Eventos que registra la bitácora: registro de cuenta, inicio y cierre de sesión, intentos fallidos, bloqueos,
-intentos en cuenta bloqueada, cambio de contraseña, acceso denegado al panel, voto registrado, intento de voto
-duplicado, intento de voto con opción inválida, altas y cambios hechos desde el panel, y apertura o cierre
-automático de encuestas.
+intentos en cuenta bloqueada, cambio de contraseña, acceso denegado al panel, voto registrado (anónimo), intento de
+voto duplicado, intento de voto con opción inválida, altas y cambios hechos desde el panel, y apertura, aplazamiento
+o cierre automático de encuestas.
 
 Pendiente para un despliegue en producción: servir el sitio por HTTPS y activar `SESSION_COOKIE_SECURE`,
 `CSRF_COOKIE_SECURE` y `SECURE_SSL_REDIRECT`.
@@ -301,7 +302,7 @@ Pendiente para un despliegue en producción: servir el sitio por HTTPS y activar
 ## 7. Requisitos previos
 
 - Python 3.12 o superior.
-- MySQL Server 8.
+- MySQL Server 8, obligatorio: el proyecto no funciona con otra base de datos.
 - Git.
 - En Linux (Ubuntu), las librerías para compilar `mysqlclient`:
   `pkg-config`, `default-libmysqlclient-dev`, `build-essential` y `python3-dev`.
@@ -316,16 +317,16 @@ Pendiente para un despliegue en producción: servir el sitio por HTTPS y activar
 ```bash
 git clone https://github.com/jhonlemus05/festival-vallenato-2027.git
 cd festival-vallenato-2027
-python -m venv env_django
+python -m venv .venv
 ```
 
 Activar el entorno virtual:
 
 | Sistema | Comando |
 | --- | --- |
-| Windows (Símbolo del sistema) | `env_django\Scripts\activate.bat` |
-| Windows (PowerShell) | `env_django\Scripts\Activate.ps1` |
-| Linux o macOS | `source env_django/bin/activate` |
+| Windows (Símbolo del sistema) | `.venv\Scripts\activate.bat` |
+| Windows (PowerShell) | `.venv\Scripts\Activate.ps1` |
+| Linux o macOS | `source .venv/bin/activate` |
 
 ### 8.2 Instalar las dependencias
 
@@ -380,7 +381,6 @@ Completar el archivo `.env`:
 | `DB_PASSWORD` | Contraseña del usuario de MySQL | (vacío) |
 | `DB_HOST` | Servidor de MySQL | `127.0.0.1` |
 | `DB_PORT` | Puerto de MySQL | `3306` |
-| `DB_ENGINE` | Solo con el valor `sqlite`, usa SQLite como respaldo temporal mientras se instala MySQL | (MySQL) |
 
 El archivo `.env` contiene secretos y está excluido del repositorio en `.gitignore`. La clave secreta no debe
 cambiarse después de tener datos, porque la bitácora la usa para firmar los eventos.
@@ -503,15 +503,15 @@ opciones consultadas en MySQL. No incluye votos ni conteos. Con el servidor inic
 python manage.py test
 ```
 
-El proyecto incluye **109 pruebas automatizadas** que se ejecutan contra MySQL en una base temporal
+El proyecto incluye **119 pruebas automatizadas** que se ejecutan contra MySQL en una base temporal
 (`test_festival_vallenato`) creada y eliminada por Django en cada ejecución. Usan el cliente de pruebas de Django,
 que recorre rutas, middleware, sesiones y plantillas reales.
 
 | Aplicación | Pruebas | Qué cubren |
 | --- | --- | --- |
-| `usuarios` | 21 | Registro, inicio y cierre de sesión, bloqueo por intentos, firma de la bitácora, perfil, cambio de contraseña y comprobantes |
-| `votaciones` | 67 | Ediciones, categorías, votación, regla de un voto por categoría y edición, casos CP-01 a CP-10, API, concurrencia, comprobantes, bitácora de votos, apertura y cierre automático y datos de prueba |
-| `administracion` | 21 | Control de acceso al panel, gestión de categorías, encuestas y opciones, programación de fechas y bitácora de acciones |
+| `usuarios` | 25 | Registro, inicio y cierre de sesión, bloqueo por intentos, firma de la bitácora, IP de auditoría, perfil, cambio de contraseña y comprobantes |
+| `votaciones` | 72 | Ediciones, categorías, votación, regla de un voto por categoría y edición, casos CP-01 a CP-10, API, concurrencia, comprobantes, secreto del voto, apertura, aplazamiento y cierre automático y datos de prueba |
+| `administracion` | 22 | Control de acceso al panel, gestión de categorías, encuestas y opciones, programación de fechas y bitácora de acciones |
 
 Para ejecutar las pruebas de una sola aplicación: `python manage.py test usuarios`.
 
@@ -597,7 +597,7 @@ recuperar, por lo que conviene respaldar la base antes si contiene datos que se 
 El usuario de MySQL no tiene permisos sobre la base de pruebas. Ejecutar el segundo `GRANT` del paso 8.3.
 
 **PowerShell no permite activar el entorno virtual**
-Usar el Símbolo del sistema con `env_django\Scripts\activate.bat`, que no depende de la política de ejecución de
+Usar el Símbolo del sistema con `.venv\Scripts\activate.bat`, que no depende de la política de ejecución de
 scripts de PowerShell.
 
 **`Error: That port is already in use`**

@@ -50,6 +50,13 @@ class VotoAdmin(admin.ModelAdmin):
     fields = ('codigo_comprobante', 'edicion', 'categoria', 'encuesta', 'opcion', 'fecha_creacion')
     readonly_fields = fields
 
+    def lookup_allowed(self, lookup, value, request):
+        # Django Admin acepta filtros por URL en cualquier campo propio: ?usuario=<id> listaría los
+        # votos de esa persona con su opción (RF-10).
+        if lookup.split('__')[0] in ('usuario', 'usuario_id'):
+            return False
+        return super().lookup_allowed(lookup, value, request)
+
     def has_add_permission(self, request):
         return False
 

@@ -24,6 +24,9 @@ DOCUMENTO_REGEX = re.compile(r'^[0-9]{5,15}$')
 # Cuántos eventos de la bitácora se muestran en "Mi actividad" del perfil.
 EVENTOS_ACTIVIDAD = 15
 
+# El correo también es el username: se valida aquí porque MySQL rechaza lo que no cabe en la columna.
+CORREO_MAX_CARACTERES = Usuario._meta.get_field('correo').max_length
+
 
 def clave_cumple_formato(password):
     """Regla básica de la UI (8+ caracteres, letras y números). Los validadores de Django se aplican aparte."""
@@ -32,15 +35,12 @@ def clave_cumple_formato(password):
 
 def obtener_ip_cliente(request):
     """
-    Saca la IP del cliente para la bitácora.
+    IP del cliente para la bitácora: la de la conexión, que el cliente no puede inventar.
 
-    Ojo: X-Forwarded-For lo puede falsificar cualquiera si no hay un proxy de confianza
-    delante. Para auditoría informativa en dev está bien; en producción detrás de
-    nginx/balanceador habría que confiar solo en el último salto conocido.
+    X-Forwarded-For no se usa porque lo escribe el propio cliente: falsificaría la auditoría y
+    un valor largo no cabe en la columna de MySQL. Si el sitio se publica detrás de un proxy
+    (nginx, balanceador), hay que leer ahí la IP que ese proxy de confianza haya verificado.
     """
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        return x_forwarded_for.split(',')[0].strip()
     return request.META.get('REMOTE_ADDR') or '127.0.0.1'
 
 
@@ -144,6 +144,8 @@ def login_view(request, modo_inicial=None):
 
                 if not correo_valido:
                     messages.error(request, 'Ingresa una dirección de correo electrónico válida.')
+                elif len(correo_val) > CORREO_MAX_CARACTERES:
+                    messages.error(request, f'El correo no puede superar los {CORREO_MAX_CARACTERES} caracteres.')
                 elif not DOCUMENTO_REGEX.fullmatch(identificacion_val):
                     messages.error(request, 'El número de documento debe contener únicamente entre 5 y 15 dígitos numéricos.')
                 elif not clave_cumple_formato(password):

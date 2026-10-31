@@ -1,5 +1,20 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 from .models import Usuario, Bitacora
+
+
+class CuentaAdmin(UserAdmin):
+    def lookup_allowed(self, lookup, value, request):
+        # Django Admin también acepta filtros por URL en relaciones inversas: ?votos_festival=<id>
+        # diría de quién es un voto (RF-10).
+        if lookup.split('__')[0] == 'votos_festival':
+            return False
+        return super().lookup_allowed(lookup, value, request)
+
+
+admin.site.unregister(User)
+admin.site.register(User, CuentaAdmin)
 
 
 @admin.register(Usuario)

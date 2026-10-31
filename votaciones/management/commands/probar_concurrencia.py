@@ -99,7 +99,8 @@ class Command(BaseCommand):
             preparadas.append((encuesta, ruta, cuerpo, cabeceras))
 
         # Cada hilo abre su conexión y espera en la barrera: así todas las solicitudes salen a la vez.
-        barrera = threading.Barrier(solicitudes)
+        # timeout: si un hilo no llega a la barrera, los demás fallan en vez de esperar para siempre.
+        barrera = threading.Barrier(solicitudes, timeout=30)
         respuestas = [None] * solicitudes
 
         def enviar(indice):

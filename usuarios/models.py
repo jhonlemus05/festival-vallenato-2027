@@ -35,9 +35,8 @@ class Usuario(models.Model):
         related_name='perfil_usuario',
         verbose_name='Usuario del sistema',
     )
-    # Documento único: es lo que garantiza "una persona = un votante" más adelante,
-    # junto con la restricción de un voto por encuesta (la regla definitiva, RN-03, sigue
-    # pendiente de validación con la Fundación).
+    # Documento único: es lo que garantiza "una persona = un votante", junto con la
+    # restricción de un voto por categoría y edición (RN-03).
     identificacion = models.CharField(
         max_length=50,
         unique=True,
@@ -170,6 +169,14 @@ class Bitacora(models.Model):
         related_name='bitacoras',
         verbose_name='Usuario',
     )
+    # Autor con el que se firmó el evento. `usuario` pasa a nulo si se borra la cuenta; esta copia no
+    # cambia, así que borrar a alguien no invalida la firma de sus eventos.
+    usuario_firmado = models.CharField(
+        max_length=20,
+        blank=True,
+        editable=False,
+        verbose_name='Autor firmado',
+    )
     accion = models.CharField(
         max_length=150,
         verbose_name='Acción',
@@ -206,19 +213,21 @@ class Bitacora(models.Model):
 
     def calcular_firma(self):
         """SHA-256 de los campos auditados. Lo usan save() al firmar y firma_valida() al verificar."""
-        identificador = str(self.usuario_id or 'anonimo')
         # Se concatena SECRET_KEY como "pimienta": sin ella cualquiera con acceso a la BD
         # podría recalcular un hash válido tras alterar una fila.
-        payload = f"{identificador}|{self.accion}|{self.detalles}|{self.ip_origen or ''}|{self.fecha_hora.isoformat()}|{settings.SECRET_KEY}"
+        payload = f"{self.usuario_firmado}|{self.accion}|{self.detalles}|{self.ip_origen or ''}|{self.fecha_hora.isoformat()}|{settings.SECRET_KEY}"
         return hashlib.sha256(payload.encode('utf-8')).hexdigest()
 
     def firma_valida(self):
         """True si la fila no se alteró desde que se creó (la firma recalculada coincide con la guardada)."""
-        return bool(self.hash_sha256) and self.hash_sha256 == self.calcular_firma()
+        # Un usuario nulo es legítimo (cuenta borrada); uno distinto del firmado significa que cambiaron al autor.
+        autor_intacto = self.usuario_id is None or str(self.usuario_id) == self.usuario_firmado
+        return autor_intacto and bool(self.hash_sha256) and self.hash_sha256 == self.calcular_firma()
 
     def save(self, *args, **kwargs):
         # Solo se firma una vez (al crear). Si ya trae hash, no se recalcula.
         if not self.hash_sha256:
+            self.usuario_firmado = str(self.usuario_id or 'anonimo')
             self.hash_sha256 = self.calcular_firma()
         super().save(*args, **kwargs)
 

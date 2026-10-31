@@ -26,7 +26,6 @@ function initAuthPage() {
   const termsHiddenInput = document.getElementById('termsHiddenInput');
   const passwordHint = document.getElementById('passwordHint');
   const passwordStrengthWrap = document.getElementById('passwordStrengthWrap');
-  const forgotPasswordWrap = document.getElementById('forgotPasswordWrap');
   const passInput = document.getElementById('passwordInput');
   // Input hidden que viaja en el POST; es lo que le dice a la vista qué flujo ejecutar.
   const authModeInput = document.getElementById('authModeInput');
@@ -64,7 +63,6 @@ function initAuthPage() {
       if (termsHiddenInput) termsHiddenInput.required = true;
       if (passwordHint) passwordHint.style.display = 'block';
       if (passwordStrengthWrap) passwordStrengthWrap.style.display = 'block';
-      if (forgotPasswordWrap) forgotPasswordWrap.style.display = 'none';
       if (passInput) {
         passInput.placeholder = 'Ingresa tu contraseña';
         // `new-password` le indica al gestor de contraseñas que ofrezca generar una nueva.
@@ -83,7 +81,6 @@ function initAuthPage() {
       if (termsHiddenInput) termsHiddenInput.required = false;
       if (passwordHint) passwordHint.style.display = 'none';
       if (passwordStrengthWrap) passwordStrengthWrap.style.display = 'none';
-      if (forgotPasswordWrap) forgotPasswordWrap.style.display = 'block';
       if (passInput) {
         passInput.placeholder = 'Ingresa tu contraseña';
         // `current-password` hace que el gestor autocomplete la clave guardada.

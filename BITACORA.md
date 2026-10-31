@@ -445,6 +445,32 @@ D:\no_borrar\programacion\Python\Django\
 - **Django Admin**: la ficha del voto ya no muestra al votante junto a su opción (RF-10).
 - **Pruebas**: 31 nuevas y 4 ajustadas. Total: **109 pruebas OK en MySQL**. README actualizado (API, regla, pruebas).
 
+### [21] Correcciones tras revisar el proyecto contra MySQL y la guía de la Entrega 3
+- **Secreto del voto (RF-10)**: el administrador podía saber qué eligió una persona. La bitácora guardaba usuario y
+  comprobante, y la consulta de votos muestra comprobante y opción; además Django Admin aceptaba `?usuario=<id>` en los
+  votos y `?votos_festival=<id>` en las cuentas. Ahora `Voto registrado` es un evento anónimo (sin usuario ni IP), el
+  intento duplicado ya no lleva el comprobante y esos dos filtros responden 400. La consulta de votos (CP-08) no cambia.
+  El vínculo sigue en la tabla de votos porque la guía lo exige y la regla de unicidad lo usa.
+- **Migración `usuarios.0004`**: añade `Bitacora.usuario_firmado` y anonimiza los eventos de voto ya guardados,
+  volviendo a firmarlos. No se puede revertir esa parte.
+- **Firmas de la bitácora**: la firma usa `usuario_firmado`, una copia fija del autor, así que borrar una cuenta ya no
+  invalida sus eventos. Cambiar el autor de un evento sí se detecta.
+- **Fechas (RN-05)**: una encuesta marcada Activa con apertura futura recibía votos. Ahora pasa sola a Próximamente y
+  queda el evento `Aplazamiento automático de encuesta`.
+- **Errores 500 en MySQL**: crear "Musica" existiendo "Música" (el formulario ahora compara con la colación de MySQL);
+  un correo de más de 150 caracteres al registrarse (se rechaza con un mensaje); y un `X-Forwarded-For` que no cabía
+  en la bitácora, que además dejaba votos sin evento (la IP sale siempre de la conexión).
+- **Solo MySQL**: se eliminó `DB_ENGINE=sqlite` porque MySQL es obligatorio y `manage.py test` se colgaba con SQLite.
+  Las barreras de la prueba de concurrencia y de `probar_concurrencia` tienen `timeout`: un hilo caído ya no cuelga nada.
+- **Opciones**: una opción con votos no se puede mover a otra votación, igual que encuestas y categorías.
+- **Textos y documentos**: el login decía "voto único por encuesta" y prometía recuperar la contraseña, función que no
+  existe (se quitó ese texto). `CUENTAS_PRUEBA.md` ya no publica contraseñas (lo pide la guía) y README usa `.venv`.
+- **Dependencias**: `requirements.txt` vuelve a fijar las versiones probadas (Django 6.1.2, mysqlclient 2.3.0 y
+  python-dotenv 1.2.4), para que todos instalen lo mismo, como dice el documento de la Entrega 2.
+- **Pruebas**: 10 nuevas y 2 ajustadas. Total: **119 pruebas OK en MySQL 8.4.11**. Verificado también con el servidor
+  real: los ataques que funcionaban antes ahora se rechazan, CP-09 da 10 de 10 rondas y la migración se probó sobre filas
+  creadas con el código anterior.
+
 ## 5. Vistas pendientes (por migrar del prototipo)
 
 Públicas (app `votaciones`):

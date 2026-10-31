@@ -151,7 +151,8 @@ def actualizar_estados_por_fecha():
     Abre y cierra encuestas según sus fechas (RN-05) y deja cada cambio en la bitácora (CU-07, paso 6).
 
     "Próximamente" con apertura cumplida → Activa. Activa o Próximamente con cierre cumplido → Cerrada.
-    Es un cambio "perezoso": se revisa en cada petición, así no hace falta un cron.
+    Activa con apertura futura → Próximamente: las fechas mandan sobre el estado, y marcarla Activa no
+    adelanta la votación. Es un cambio "perezoso": se revisa en cada petición, así no hace falta un cron.
     """
     ahora = timezone.now()
     cambios = []
@@ -159,6 +160,8 @@ def actualizar_estados_por_fecha():
         cambios.append((encuesta, 'cerrada', 'Cierre automático de encuesta'))
     for encuesta in Encuesta.objects.filter(estado='proxima', fecha_apertura__lte=ahora).exclude(fecha_cierre__lte=ahora):
         cambios.append((encuesta, 'activa', 'Apertura automática de encuesta'))
+    for encuesta in Encuesta.objects.filter(estado='activa', fecha_apertura__gt=ahora).exclude(fecha_cierre__lte=ahora):
+        cambios.append((encuesta, 'proxima', 'Aplazamiento automático de encuesta'))
 
     for encuesta, estado, accion in cambios:
         # El filtro por estado evita registrar dos veces el mismo cambio si dos peticiones llegan a la par.
@@ -191,6 +194,11 @@ class OpcionEncuesta(models.Model):
 
     def __str__(self):
         return f'{self.encuesta.nombre} - {self.nombre}'
+
+    def clean(self):
+        # El voto guarda su encuesta y su opción: mover la opción dejaría esas filas contradiciéndose.
+        if self.pk and self.votos.exclude(encuesta_id=self.encuesta_id).exists():
+            raise ValidationError('No se puede mover a otra votación una opción que ya tiene votos.')
 
 
 class Voto(models.Model):

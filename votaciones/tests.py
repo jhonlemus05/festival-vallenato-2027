@@ -209,7 +209,7 @@ class VotacionPublicaTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-    def test_voto_tiene_comprobante_y_queda_en_bitacora_sin_la_opcion(self):
+    def test_voto_tiene_comprobante_y_queda_en_bitacora_sin_opcion_ni_votante(self):
         self.client.force_login(self.usuario)
 
         self.client.post(self.url, {'opcion': self.opciones[1].pk})
@@ -218,8 +218,11 @@ class VotacionPublicaTests(TestCase):
         self.assertRegex(voto.codigo_comprobante, r'^FV-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$')
         evento = Bitacora.objects.get(accion='Voto registrado')
         self.assertIn(voto.codigo_comprobante, evento.detalles)
-        # El sentido del voto no queda en la bitácora (RF-10).
+        # Ni el sentido del voto ni quién lo emitió quedan en este evento (RF-10): el comprobante se
+        # puede buscar en la consulta de votos, así que junto al usuario revelaría su opción.
         self.assertNotIn(self.opciones[1].nombre, evento.detalles)
+        self.assertIsNone(evento.usuario)
+        self.assertIsNone(evento.ip_origen)
         self.assertTrue(evento.firma_valida())
         self.assertContains(self.client.get(reverse('voto_exitoso', args=[voto.pk])), voto.codigo_comprobante)
 
@@ -229,8 +232,40 @@ class VotacionPublicaTests(TestCase):
 
         self.client.post(self.url, {'opcion': self.opciones[1].pk})
 
-        self.assertEqual(Voto.objects.count(), 1)
-        self.assertTrue(Bitacora.objects.filter(accion='Intento de voto duplicado').exists())
+        voto = Voto.objects.get()
+        evento = Bitacora.objects.get(accion='Intento de voto duplicado')
+        self.assertEqual(evento.usuario.user, self.usuario)
+        # Este evento sí identifica al usuario, por eso no puede llevar su comprobante (RF-10).
+        self.assertNotIn(voto.codigo_comprobante, evento.detalles)
+
+
+class SecretoDelVotoTests(TestCase):
+    """RF-10: Django Admin no permite cruzar a un votante con su voto filtrando por URL."""
+
+    def setUp(self):
+        encuesta = Encuesta.objects.get(nombre='Artista favorito del público')
+        self.votante = User.objects.create_user(username='secreto@correo.com', password='TestPassword123!')
+        self.voto = Voto.objects.create(encuesta=encuesta, opcion=encuesta.opciones.first(), usuario=self.votante)
+        self.client.force_login(User.objects.create_superuser(username='admin-secreto', password='TestPassword123!'))
+
+    def test_no_se_filtran_votos_por_usuario(self):
+        for filtro in ('usuario', 'usuario__exact', 'usuario_id__exact', 'usuario__id__exact'):
+            with self.subTest(filtro=filtro):
+                response = self.client.get(reverse('admin:votaciones_voto_changelist'), {filtro: self.votante.pk})
+                self.assertEqual(response.status_code, 400)
+
+    def test_no_se_filtran_usuarios_por_voto(self):
+        for filtro in ('votos_festival', 'votos_festival__exact'):
+            with self.subTest(filtro=filtro):
+                response = self.client.get(reverse('admin:auth_user_changelist'), {filtro: self.voto.pk})
+                self.assertEqual(response.status_code, 400)
+
+    def test_los_filtros_normales_siguen_funcionando(self):
+        votos = self.client.get(reverse('admin:votaciones_voto_changelist'), {'categoria__id__exact': self.voto.categoria_id})
+        usuarios = self.client.get(reverse('admin:auth_user_changelist'), {'is_staff__exact': 1})
+
+        self.assertContains(votos, self.voto.codigo_comprobante)
+        self.assertEqual(usuarios.status_code, 200)
 
 
 class ReglaVotoPorCategoriaTests(TestCase):
@@ -474,6 +509,13 @@ class ReglaVotoPorCategoriaTests(TestCase):
         with self.assertRaises(ValidationError):
             self.musica.full_clean()
 
+    def test_no_se_mueve_una_opcion_con_votos(self):
+        Voto.objects.create(encuesta=self.artista, opcion=self.opcion, usuario=self.usuario)
+
+        self.opcion.encuesta = self.subevento
+        with self.assertRaises(ValidationError):
+            self.opcion.full_clean()
+
 
 class ApiCategoriasTests(TestCase):
     """CP-10: GET /api/categorias/."""
@@ -562,7 +604,8 @@ class ConcurrenciaVotoTests(DatosConcurrenciaMixin, TransactionTestCase):
 
         for ronda in range(10):
             usuario = User.objects.create_user(username=f'votante-simultaneo-{ronda}')
-            barrera = threading.Barrier(4)
+            # timeout: si un hilo falla antes de llegar a la barrera, la prueba falla en vez de colgarse.
+            barrera = threading.Barrier(4, timeout=30)
 
             def votar(encuesta):
                 cliente = Client()
@@ -838,6 +881,18 @@ class FechasEncuestaTests(TestCase):
 
         self.assertContains(response, 'abre el')
         self.assertContains(response, 'Abre el')  # también en la tarjeta de la categoría
+
+    def test_activa_con_apertura_futura_no_recibe_votos(self):
+        self.encuesta.fecha_apertura = timezone.now() + timedelta(days=2)
+        self.encuesta.save()
+
+        response = self.client.post(self.url, {'opcion': self.encuesta.opciones.first().pk}, follow=True)
+
+        self.encuesta.refresh_from_db()
+        self.assertEqual(self.encuesta.estado, 'proxima')
+        self.assertContains(response, 'abre el')
+        self.assertEqual(Voto.objects.count(), 0)
+        self.assertTrue(Bitacora.objects.filter(accion='Aplazamiento automático de encuesta').exists())
 
     def test_cierre_no_puede_ser_anterior_a_la_apertura(self):
         self.encuesta.fecha_apertura = timezone.now()

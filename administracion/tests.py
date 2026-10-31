@@ -122,6 +122,19 @@ class GestionCategoriasTests(TestCase):
         self.assertContains(response, 'Ya existe una categoría con ese nombre.')
         self.assertEqual(Categoria.objects.count(), 3)
 
+    def test_rechaza_nombre_que_solo_cambia_el_acento(self):
+        # La restricción única de MySQL ignora acentos: sin esta validación sería un error 500.
+        response = self.client.post(self.url, {
+            'nombre': 'Musica',
+            'descripcion': 'Nombre duplicado sin tilde.',
+            'icono': 'music',
+            'activa': 'on',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Ya existe una categoría con ese nombre.')
+        self.assertEqual(Categoria.objects.count(), 3)
+
     def test_altas_y_cambios_del_panel_quedan_en_bitacora(self):
         self.client.post(self.url, {
             'nombre': 'Canción inédita',

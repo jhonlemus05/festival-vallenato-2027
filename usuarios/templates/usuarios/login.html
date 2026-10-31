@@ -153,7 +153,7 @@
           <h1 class="screen-title">Sé parte de la leyenda</h1>
 
           <p class="screen-description">
-            Regístrate para elegir tus favoritos y participar con un voto único por encuesta.
+            Regístrate para elegir tus favoritos y participar con un voto por categoría en cada edición.
           </p>
 
           <div class="auth-toggle-pill">
@@ -186,6 +186,7 @@
                   class="native-input"
                   placeholder="tu@correo.com"
                   autocomplete="email"
+                  maxlength="150"
                   required
                 />
               </div>
@@ -231,10 +232,6 @@
                   <i id="passwordEyeIcon" class="bi bi-eye-slash"></i>
                 </button>
               </div>
-            </div>
-
-            <div id="forgotPasswordWrap" style="{% if modo_activo == 'login' %}display: block;{% else %}display: none;{% endif %} text-align: right; margin-top: 8px; margin-bottom: 8px;">
-              <span class="text-secondary small" style="font-size: 0.75rem;">¿Olvidaste tu contraseña? Solicítala con tu correo oficial</span>
             </div>
 
             <div class="field-hint-text" id="passwordHint" {% if modo_activo == 'login' %}style="display: none;"{% endif %}>

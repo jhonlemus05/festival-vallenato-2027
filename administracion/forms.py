@@ -45,12 +45,12 @@ class CategoriaForm(forms.ModelForm):
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre'].strip()
-        # Solo choca con categorías de la misma edición: "Música" puede repetirse en otro año.
-        duplicadas = Categoria.objects.filter(edicion_id=self.instance.edicion_id)
+        # Solo choca con categorías de la misma edición: "Música" puede repetirse en otro año. Compara
+        # MySQL, con la misma colación de la restricción única: ignora mayúsculas y acentos.
+        duplicadas = Categoria.objects.filter(edicion_id=self.instance.edicion_id, nombre=nombre)
         if self.instance.pk:
             duplicadas = duplicadas.exclude(pk=self.instance.pk)
-        if any(nombre.casefold() == nombre_existente.casefold()
-               for nombre_existente in duplicadas.values_list('nombre', flat=True)):
+        if duplicadas.exists():
             raise forms.ValidationError('Ya existe una categoría con ese nombre.')
         return nombre
 
@@ -84,7 +84,7 @@ class EncuestaForm(forms.ModelForm):
             }),
             'detalle': forms.TextInput(attrs={
                 'class': 'form-control rounded-3',
-                'placeholder': 'Ej. 4 participantes · Un voto por persona',
+                'placeholder': 'Ej. 4 participantes · Un voto por categoría',
                 'maxlength': 160,
             }),
             'estado': forms.Select(attrs={'class': 'form-select rounded-3'}),

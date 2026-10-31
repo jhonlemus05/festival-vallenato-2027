@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_GET
 
+from usuarios.models import Bitacora
 from usuarios.views import obtener_perfil, registrar_evento_bitacora
 
 from .forms import VotoForm
@@ -90,14 +91,14 @@ def categoria_encuestas(request, categoria_id):
 def rechazar_voto_duplicado(request, encuesta, voto_previo):
     """Un voto por usuario, categoría y edición: el segundo se rechaza aunque sea en otra encuesta (subevento)."""
     categoria = encuesta.categoria
-    # Enviar otro voto se audita (RNF-03, RNF-04); solo abrir la encuesta no.
+    # Enviar otro voto se audita (RNF-03, RNF-04); solo abrir la encuesta no. Este evento identifica
+    # al usuario, por eso no lleva su comprobante: con él se llegaría a su opción (RF-10).
     if request.method == 'POST':
         registrar_evento_bitacora(
             request,
             obtener_perfil(request.user),
             'Intento de voto duplicado',
-            f'Encuesta «{encuesta.nombre}» · categoría {categoria.nombre} · '
-            f'ya votó con el comprobante {voto_previo.codigo_comprobante}',
+            f'Encuesta «{encuesta.nombre}» · categoría {categoria.nombre}',
         )
     messages.error(
         request,
@@ -182,13 +183,12 @@ def votar_encuesta(request, encuesta_id):
                 raise
             return rechazar_voto_duplicado(request, encuesta, voto_previo)
 
-        # Se audita el voto con su comprobante pero SIN la opción elegida: ni el administrador ni el
-        # auditor deben ver el sentido del voto individual (RF-10).
-        registrar_evento_bitacora(
-            request,
-            obtener_perfil(request.user),
-            'Voto registrado',
-            f'Encuesta «{encuesta.nombre}» · comprobante {voto.codigo_comprobante}',
+        # Evento anónimo a propósito, sin usuario ni IP: la consulta de votos muestra cada comprobante con
+        # su opción, así que ligarlo a una persona revelaría qué eligió (RF-10). El vínculo queda solo en
+        # la tabla de votos, que lo necesita para aplicar la regla de un voto por categoría y edición.
+        Bitacora.objects.create(
+            accion='Voto registrado',
+            detalles=f'Encuesta «{encuesta.nombre}» · comprobante {voto.codigo_comprobante}',
         )
         return redirect('voto_exitoso', voto_id=voto.pk)
 

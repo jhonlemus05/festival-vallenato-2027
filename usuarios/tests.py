@@ -10,7 +10,7 @@ class UsuariosAuthSecurityTests(TestCase):
     """
     Pruebas de integración del flujo de autenticación. Usan el test client de Django,
     así que pasan por URLs, middleware, sesiones y templates reales (no mockeamos nada).
-    Cada test corre en una BD en memoria limpia: no hay que limpiar datos a mano.
+    Cada test corre dentro de una transacción que se revierte: no hay que limpiar datos a mano.
     """
 
     def test_login_page_renders(self):
@@ -206,6 +206,60 @@ class UsuariosAuthSecurityTests(TestCase):
         Bitacora.objects.filter(pk=registro.pk).update(detalles='Registro alterado a mano')
         registro.refresh_from_db()
         self.assertFalse(registro.firma_valida())
+
+    def crear_evento_con_autor(self, correo, documento):
+        user = User.objects.create_user(username=correo)
+        perfil = Usuario.objects.create(user=user, identificacion=documento, correo=correo)
+        return Bitacora.objects.create(usuario=perfil, accion='Evento de prueba', ip_origen='127.0.0.1')
+
+    def test_firma_sigue_valida_al_borrar_al_usuario(self):
+        evento = self.crear_evento_con_autor('borrado@correo.com', '5550001')
+
+        evento.usuario.user.delete()
+
+        evento.refresh_from_db()
+        self.assertIsNone(evento.usuario)
+        self.assertTrue(evento.firma_valida())
+
+    def test_firma_detecta_que_le_cambien_el_autor_al_evento(self):
+        evento = self.crear_evento_con_autor('autor@correo.com', '5550002')
+        otro = self.crear_evento_con_autor('otro@correo.com', '5550003').usuario
+
+        Bitacora.objects.filter(pk=evento.pk).update(usuario=otro)
+
+        evento.refresh_from_db()
+        self.assertFalse(evento.firma_valida())
+
+    def test_x_forwarded_for_no_se_usa_como_ip(self):
+        # Lo envía el cliente: no debe falsificar la auditoría ni tumbar la petición si no cabe en MySQL.
+        for cabecera in ('200.1.2.3', 'a' * 60):
+            with self.subTest(cabecera=cabecera):
+                response = self.client.post(
+                    reverse('login'),
+                    {'modo': 'login', 'correo': 'noexiste@correo.com', 'password': 'ClaveErrada123'},
+                    HTTP_X_FORWARDED_FOR=cabecera,
+                )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(Bitacora.objects.latest('fecha_hora').ip_origen, '127.0.0.1')
+
+    def test_registro_rechaza_correo_mas_largo_que_la_columna(self):
+        correo = f'{"a" * 60}@{"b" * 60}.{"c" * 60}.com'
+
+        response = self.client.post(
+            reverse('login'),
+            {
+                'modo': 'register',
+                'correo': correo,
+                'identificacion': '1065222444',
+                'password': 'Vallenato2027Segura',
+                'terminos': 'on',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'no puede superar los 150 caracteres')
+        self.assertFalse(User.objects.filter(email=correo).exists())
 
     def test_logout_por_get_no_cierra_sesion(self):
         # El registro deja la sesión iniciada.

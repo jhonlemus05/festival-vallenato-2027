@@ -90,29 +90,20 @@ WSGI_APPLICATION = 'pr_festivalVallenato.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-# MySQL es la base de datos del proyecto (arquitectura de la Entrega 1, obligatoria en la Entrega 2).
+# MySQL es la base de datos obligatoria del proyecto (arquitectura de la Entrega 1, exigida en la Entrega 3).
 # Driver: mysqlclient (el recomendado por Django). Los datos de conexión salen del .env.
-# DB_ENGINE=sqlite queda solo como respaldo temporal para quien todavía no instala MySQL.
-if os.environ.get('DB_ENGINE', 'mysql') == 'sqlite':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'festival_vallenato'),
+        'USER': os.environ.get('DB_USER', 'festival'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+        # utf8mb4 = UTF-8 completo (tildes, ñ y emojis); el "utf8" viejo de MySQL se queda corto.
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ.get('DB_NAME', 'festival_vallenato'),
-            'USER': os.environ.get('DB_USER', 'festival'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-            'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
-            'PORT': os.environ.get('DB_PORT', '3306'),
-            # utf8mb4 = UTF-8 completo (tildes, ñ y emojis); el "utf8" viejo de MySQL se queda corto.
-            'OPTIONS': {'charset': 'utf8mb4'},
-        }
-    }
+}
 
 
 # Password validation
