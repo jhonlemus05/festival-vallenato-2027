@@ -1,8 +1,8 @@
 {% extends 'votaciones/base.html' %}
 {% load static %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Inicio{% endblock %}
-{% block descripcion %}Votación Ciudadana oficial del Festival de la Leyenda Vallenata 2027 en Valledupar, Colombia.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Inicio{% endblock %}
+{% block descripcion %}Votación Ciudadana oficial del Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} en Valledupar, Colombia.{% endblock %}
 
 {% block extra_css %}
   <style>
@@ -78,7 +78,7 @@
       margin: 0;
     }
 
-    /* Año: 2027 en Oro Mostaza Gigante */
+    /* Año de la edición vigente en Oro Mostaza Gigante */
     .hero-year {
       color: var(--color-gold);
       font-family: var(--font-display);
@@ -232,7 +232,7 @@
 
           <!-- Titulares Principales -->
           <h1 class="hero-title">Festival de la<br>Leyenda Vallenata</h1>
-          <div class="hero-year">2027</div>
+          {% if edicion %}<div class="hero-year">{{ edicion.anio }}</div>{% endif %}
           <p class="hero-location">Valledupar, Colombia · Patrimonio de la Humanidad</p>
 
           <!-- Texto descriptivo enriquecido en desktop -->
@@ -260,7 +260,7 @@
           <div class="hero-desktop-visual-badge">
             <i class="bi bi-award"></i>
             <div>
-              <div class="fw-bold" style="font-size: 0.85rem;">Edición 60 Aniversario</div>
+              <div class="fw-bold" style="font-size: 0.85rem;">{{ edicion.nombre|default:"Festival de la Leyenda Vallenata" }}</div>
               <div style="font-size: 0.72rem; color: #CCCCCC;">Homenaje a los grandes juglares de la música tradicional</div>
             </div>
           </div>
@@ -317,7 +317,8 @@
         <span>{% if request.user.is_authenticated %}Sesión iniciada como {{ request.user.username }}{% else %}Crea tu cuenta para participar en la votación.{% endif %}</span>
       </a>
 
-      <!-- Vista previa de categorías en desktop (Música, Piloneras, Comparsas) -->
+      <!-- Vista previa de categorías en desktop: las primeras visibles de la edición vigente, desde MySQL -->
+      {% if categorias %}
       <div class="categories-preview-desktop d-none d-md-block mt-5 pt-4 border-top">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
@@ -330,54 +331,40 @@
         </div>
 
         <div class="row g-4">
+          {% for categoria in categorias %}
           <div class="col-md-4">
-            <a href="{% url 'categorias_publicas' %}" class="text-decoration-none">
+            <a href="{% url 'categoria_encuestas' categoria.pk %}" class="text-decoration-none">
               <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC; transition: transform 0.2s;">
                 <div class="d-flex justify-content-between align-items-start mb-3">
+                  {% if categoria.encuestas_activas %}
                   <div class="p-3 rounded-3" style="background: #FDF5E1; color: var(--color-gold);">
-                    <i class="bi bi-music-note-beamed fs-4"></i>
+                  {% else %}
+                  <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">
+                  {% endif %}
+                    {% if categoria.icono == 'music' %}<i class="bi bi-music-note-beamed fs-4"></i>
+                    {% elif categoria.icono == 'flower' %}<i class="bi bi-flower1 fs-4"></i>
+                    {% elif categoria.icono == 'mask' %}<i class="bi bi-palette fs-4"></i>
+                    {% else %}<i class="bi bi-trophy fs-4"></i>{% endif %}
                   </div>
+                  {% if categoria.encuestas_activas %}
                   <span class="badge bg-warning-subtle text-dark border border-warning-subtle">Votación Activa</span>
+                  {% else %}
+                  <span class="badge bg-light text-secondary border">Próximamente</span>
+                  {% endif %}
                 </div>
-                <h4 class="fw-bold fs-5 text-dark mb-2">Música Vallenata</h4>
-                <p class="text-secondary small mb-3">Acordeoneros profesionales, canción inédita y piqueria tradicional.</p>
+                <h4 class="fw-bold fs-5 text-dark mb-2">{{ categoria.nombre }}</h4>
+                <p class="text-secondary small mb-3">{{ categoria.descripcion }}</p>
+                {% if categoria.encuestas_activas %}
                 <span class="text-dark fw-bold small">Ver encuestas →</span>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-md-4">
-            <a href="{% url 'categorias_publicas' %}" class="text-decoration-none">
-              <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC;">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">
-                    <i class="bi bi-people fs-4"></i>
-                  </div>
-                  <span class="badge bg-light text-secondary border">Próximamente</span>
-                </div>
-                <h4 class="fw-bold fs-5 text-dark mb-2">Danza de Piloneras</h4>
-                <p class="text-secondary small mb-3">Categorías infantil, juvenil y mayores en el tradicional desfile folclórico.</p>
+                {% else %}
                 <span class="text-secondary fw-semibold small">Ver información →</span>
+                {% endif %}
               </div>
             </a>
           </div>
-
-          <div class="col-md-4">
-            <a href="{% url 'categorias_publicas' %}" class="text-decoration-none">
-              <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC;">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">
-                    <i class="bi bi-palette fs-4"></i>
-                  </div>
-                  <span class="badge bg-light text-secondary border">Próximamente</span>
-                </div>
-                <h4 class="fw-bold fs-5 text-dark mb-2">Comparsas y Tradición</h4>
-                <p class="text-secondary small mb-3">Expresiones artísticas y puestas en escena de las escuelas folclóricas.</p>
-                <span class="text-secondary fw-semibold small">Ver información →</span>
-              </div>
-            </a>
-          </div>
+          {% endfor %}
         </div>
       </div>
+      {% endif %}
     </section>
 {% endblock %}

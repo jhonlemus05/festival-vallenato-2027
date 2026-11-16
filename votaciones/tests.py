@@ -797,6 +797,30 @@ class EdicionesTests(TestCase):
         self.assertTrue(Edicion.objects.filter(anio=2028).exists())
         self.assertContains(self.client.get(reverse('admin:votaciones_edicion_changelist')), '2028')
 
+    def test_nueva_edicion_cambia_portada_y_titulos_sin_tocar_codigo(self):
+        Edicion.objects.filter(anio=2027).update(estado='finalizada')
+        nueva = self.crear_edicion(2028, estado='activa')
+        Categoria.objects.create(edicion=nueva, nombre='Canción inédita', descripcion='Votación de 2028.')
+
+        portada = self.client.get(reverse('index'))
+        login = self.client.get(reverse('login'))
+
+        self.assertContains(portada, '<div class="hero-year">2028</div>', html=True)
+        self.assertContains(portada, 'Festival de la Leyenda Vallenata 2028 | Inicio')
+        self.assertContains(portada, 'Canción inédita')
+        # Las categorías de 2027 ya no aparecen en la vista previa, ni el año anterior en ninguna parte.
+        self.assertNotContains(portada, 'Piloneras')
+        self.assertNotContains(portada, '2027')
+        self.assertContains(login, 'Festival de la Leyenda Vallenata 2028 | Registro')
+
+    def test_categorias_y_encuestas_muestran_su_anio_en_django_admin(self):
+        musica_2028 = Categoria.objects.create(edicion=self.crear_edicion(2028), nombre='Música', descripcion='2028.')
+        encuesta = Encuesta.objects.create(categoria=musica_2028, nombre='Acordeonista', descripcion='2028.')
+
+        self.assertEqual(str(Categoria.objects.get(nombre='Música', edicion__anio=2027)), 'Música (2027)')
+        self.assertEqual(str(musica_2028), 'Música (2028)')
+        self.assertEqual(str(encuesta), 'Música (2028) - Acordeonista')
+
 
 class CargarDatosPruebaTests(TestCase):
     def cargar(self):

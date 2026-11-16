@@ -1,7 +1,7 @@
 {% extends 'administracion/admin_base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | {% if seccion_admin == 'resultados' %}Resultados{% else %}Votaciones{% endif %}{% endblock %}
-{% block descripcion %}Estado y resultados agregados de las encuestas del Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | {% if seccion_admin == 'resultados' %}Resultados{% else %}Votaciones{% endif %}{% endblock %}
+{% block descripcion %}Estado y resultados agregados de las encuestas del Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}.{% endblock %}
 
 {% block breadcrumb %}
   <a href="{% url 'panel_principal' %}" class="bc-parent">Administración</a>

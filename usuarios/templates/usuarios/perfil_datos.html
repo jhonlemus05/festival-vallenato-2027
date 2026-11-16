@@ -1,7 +1,7 @@
 {% extends 'usuarios/perfil_base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Mis datos{% endblock %}
-{% block descripcion %}Consulta los datos de tu cuenta en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Mis datos{% endblock %}
+{% block descripcion %}Consulta los datos de tu cuenta en el Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}.{% endblock %}
 
 {% block perfil_titulo %}Mis datos{% endblock %}
 {% block perfil_descripcion %}La información de tu cuenta y cómo se protege tu contraseña.{% endblock %}

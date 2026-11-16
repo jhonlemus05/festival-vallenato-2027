@@ -1,7 +1,7 @@
 {% extends 'administracion/admin_base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Panel Principal de Administración{% endblock %}
-{% block descripcion %}Panel de administración y supervisión del Festival de la Leyenda Vallenata 2027. Monitoreo de votaciones ciudadanas, categorías y participación.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Panel Principal de Administración{% endblock %}
+{% block descripcion %}Panel de administración y supervisión del Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}. Monitoreo de votaciones ciudadanas, categorías y participación.{% endblock %}
 
 {% block extra_css %}
   <style>

@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>{% block titulo %}Festival de la Leyenda Vallenata 2027{% endblock %}</title>
-  <meta name="description" content="{% block descripcion %}Votación Ciudadana oficial del Festival de la Leyenda Vallenata 2027 en Valledupar, Colombia.{% endblock %}" />
+  <title>{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}{% endblock %}</title>
+  <meta name="description" content="{% block descripcion %}Votación Ciudadana oficial del Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} en Valledupar, Colombia.{% endblock %}" />
 
   <!-- Google Fonts: Poppins (Display/Titulares), Inter (Cuerpo), Playfair Display (Logo institucional) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -320,7 +320,7 @@
             </div>
           </div>
           <p>
-            Plataforma oficial de votación ciudadana para el Festival de la Leyenda Vallenata 2027. Transparencia, seguridad y participación para exaltar nuestro folclor.
+            Plataforma oficial de votación ciudadana para el Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}. Transparencia, seguridad y participación para exaltar nuestro folclor.
           </p>
         </div>
 
@@ -355,7 +355,7 @@
       </div>
 
       <div class="desktop-footer-bottom">
-        <div>© 2027 Fundación Festival de la Leyenda Vallenata. Todos los derechos reservados.</div>
+        <div>© {{ edicion_vigente.anio }} Fundación Festival de la Leyenda Vallenata. Todos los derechos reservados.</div>
         <div class="d-flex gap-3">
           <span>Votación Ciudadana Certificada</span>
           <span>·</span>
@@ -399,7 +399,7 @@
           <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" class="emblem-img" style="width: 32px; height: 32px;" referrerpolicy="no-referrer"/>
         </div>
         <div>
-          <h5 class="offcanvas-title fw-bold small text-white mb-0" id="drawerTitle">Festival Vallenato 2027</h5>
+          <h5 class="offcanvas-title fw-bold small text-white mb-0" id="drawerTitle">Festival Vallenato {{ edicion_vigente.anio }}</h5>
           <span class="text-secondary" style="font-size: 0.65rem;">Votación Ciudadana</span>
         </div>
       </div>

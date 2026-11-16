@@ -1,7 +1,7 @@
 {% extends 'votaciones/base.html' %}
 {% load static %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | {{ encuesta.nombre }}{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | {{ encuesta.nombre }}{% endblock %}
 {% block descripcion %}Selecciona una opción para {{ encuesta.nombre }}.{% endblock %}
 
 {% block extra_css %}

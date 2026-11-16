@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block titulo %}Panel de Administración | Festival de la Leyenda Vallenata 2027{% endblock %}</title>
-  <meta name="description" content="{% block descripcion %}Panel de administración y supervisión del Festival de la Leyenda Vallenata 2027. Monitoreo de votaciones ciudadanas, categorías y participación.{% endblock %}" />
+  <title>{% block titulo %}Panel de Administración | Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}{% endblock %}</title>
+  <meta name="description" content="{% block descripcion %}Panel de administración y supervisión del Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}. Monitoreo de votaciones ciudadanas, categorías y participación.{% endblock %}" />
 
   <!-- Google Fonts: Poppins (Titulares), Inter (Cuerpo y datos), Playfair Display (Logo institucional) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -698,7 +698,7 @@
       <!-- Titular del Sistema -->
       <div class="system-identity-block">
         <div class="system-kicker">SISTEMA DE VOTACIONES</div>
-        <div class="system-title">Festival {{ edicion.anio|default:"2027" }}</div>
+        <div class="system-title">Festival {{ edicion_vigente.anio }}</div>
       </div>
     </div>
 
@@ -758,7 +758,7 @@
       <div class="sidebar-header-box pt-3 pb-2">
         <div class="system-identity-block">
           <div class="system-kicker">SISTEMA DE VOTACIONES</div>
-          <div class="system-title" style="font-size: 1.25rem;">Festival {{ edicion.anio|default:"2027" }}</div>
+          <div class="system-title" style="font-size: 1.25rem;">Festival {{ edicion_vigente.anio }}</div>
         </div>
       </div>
 
@@ -812,7 +812,7 @@
             referrerpolicy="no-referrer"
             onerror="this.onerror=null; this.src='https://fflv.makingid.com/wp-content/uploads/2019/03/logo-1.png';"
           />
-          <span class="mobile-brand-title">Festival {{ edicion.anio|default:"2027" }}</span>
+          <span class="mobile-brand-title">Festival {{ edicion_vigente.anio }}</span>
         </div>
 
         <!-- Breadcrumb de navegación (Escritorio) -->

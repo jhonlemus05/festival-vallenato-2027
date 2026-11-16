@@ -1,7 +1,7 @@
 {% extends 'usuarios/perfil_base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Mis comprobantes{% endblock %}
-{% block descripcion %}Consulta los comprobantes de tus votos en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Mis comprobantes{% endblock %}
+{% block descripcion %}Consulta los comprobantes de tus votos en el Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}.{% endblock %}
 
 {% block perfil_titulo %}Mis comprobantes{% endblock %}
 {% block perfil_descripcion %}Las categorías en las que ya votaste, con la encuesta, el código y la fecha de tu voto. Por seguridad no se muestra la opción que elegiste.{% endblock %}

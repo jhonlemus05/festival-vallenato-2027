@@ -87,6 +87,9 @@ class Categoria(models.Model):
         verbose_name_plural = 'Categorías'
 
     def __str__(self):
+        # Con el año: en Django Admin los selectores mezclan ediciones y "Música" se repite cada año.
+        if self.edicion_id:
+            return f'{self.nombre} ({self.edicion.anio})'
         return self.nombre
 
     def clean(self):
@@ -135,7 +138,7 @@ class Encuesta(models.Model):
         verbose_name_plural = 'Encuestas'
 
     def __str__(self):
-        return f'{self.categoria.nombre} - {self.nombre}'
+        return f'{self.categoria} - {self.nombre}'
 
     def clean(self):
         # CU-06, flujo 5b: el cierre no puede ser anterior (ni igual) a la apertura.

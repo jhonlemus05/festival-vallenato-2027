@@ -1,8 +1,8 @@
 {% extends 'votaciones/base.html' %}
 {% load static %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Registro e Inicio de Sesión{% endblock %}
-{% block descripcion %}Regístrate o inicia sesión para participar con tu voto oficial en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Registro e Inicio de Sesión{% endblock %}
+{% block descripcion %}Regístrate o inicia sesión para participar con tu voto oficial en el Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}.{% endblock %}
 
 {% block extra_css %}
   {# Estilos compartidos con perfil.html (campos, botones, alertas, medidor). Aquí solo va lo propio del login. #}
@@ -115,7 +115,7 @@
               <div class="emblem-wrapper" style="width: 40px; height: 40px;">
                 <img src="https://festivalvallenato.com/wp-content/uploads/2020/02/cropped-icon-festival-1-192x192.png" alt="Escudo Festival" class="emblem-img" style="width: 40px; height: 40px;" referrerpolicy="no-referrer"/>
               </div>
-              <span class="fw-bold fs-6 text-white" style="font-family: var(--font-serif-logo); font-style: italic;">Festival Vallenato 2027</span>
+              <span class="fw-bold fs-6 text-white" style="font-family: var(--font-serif-logo); font-style: italic;">Festival Vallenato {{ edicion_vigente.anio }}</span>
             </div>
 
             <h2 class="fw-bold fs-3 text-white mb-3" style="font-family: var(--font-display);">Sé parte viva del folclor</h2>

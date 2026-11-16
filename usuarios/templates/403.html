@@ -3,7 +3,7 @@
 
 {# Página 403 de todo el proyecto: Django la usa cuando una vista lanza PermissionDenied (p. ej. administrador_requerido). #}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Acceso restringido{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Acceso restringido{% endblock %}
 {% block descripcion %}No tienes permiso para ver esta sección.{% endblock %}
 
 {% block extra_css %}

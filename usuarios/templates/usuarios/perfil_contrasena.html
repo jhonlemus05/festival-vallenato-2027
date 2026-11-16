@@ -1,8 +1,8 @@
 {% extends 'usuarios/perfil_base.html' %}
 {% load static %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Cambiar contraseña{% endblock %}
-{% block descripcion %}Cambia la contraseña de tu cuenta en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Cambiar contraseña{% endblock %}
+{% block descripcion %}Cambia la contraseña de tu cuenta en el Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}.{% endblock %}
 
 {% block perfil_titulo %}Cambiar contraseña{% endblock %}
 {% block perfil_descripcion %}Confirma tu contraseña actual. Al cambiarla se cierran las demás sesiones abiertas de tu cuenta.{% endblock %}

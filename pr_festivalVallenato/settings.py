@@ -79,6 +79,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'usuarios.context_processors.permisos',
+                'votaciones.context_processors.edicion_vigente',
             ],
         },
     },

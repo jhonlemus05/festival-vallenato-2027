@@ -24,8 +24,16 @@ def voto_en_categoria(usuario, categoria):
 
 
 def index(request):
-    # La edición vigente alimenta el contador regresivo y las fechas de la portada.
-    return render(request, 'votaciones/index.html', {'seccion_activa': 'inicio', 'edicion': Edicion.vigente()})
+    # La edición vigente alimenta el año, el contador regresivo, las fechas y la vista previa de categorías.
+    edicion = Edicion.vigente()
+    categorias_preview = Categoria.objects.filter(activa=True, edicion=edicion).annotate(
+        encuestas_activas=Count('encuestas', filter=Q(encuestas__estado='activa')),
+    ).order_by('orden', 'nombre')[:3]
+    return render(
+        request,
+        'votaciones/index.html',
+        {'seccion_activa': 'inicio', 'edicion': edicion, 'categorias': categorias_preview},
+    )
 
 
 def ediciones(request):

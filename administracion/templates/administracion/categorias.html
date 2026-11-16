@@ -1,7 +1,7 @@
 {% extends 'administracion/admin_base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Gestión de Categorías{% endblock %}
-{% block descripcion %}Gestión de categorías del Festival de la Leyenda Vallenata 2027. Organiza las categorías visibles en la aplicación de votación.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Gestión de Categorías{% endblock %}
+{% block descripcion %}Gestión de categorías del Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}. Organiza las categorías visibles en la aplicación de votación.{% endblock %}
 
 {% block breadcrumb %}
           <a href="{% url 'panel_principal' %}" class="bc-parent">Administración</a>
@@ -678,7 +678,7 @@
             <h3 class="info-card-title">Visibilidad en la aplicación</h3>
           </div>
           <p class="info-card-body-text">
-            Una categoría activa aparece en el catálogo público. Piloneras y Comparsas están disponibles para crear sus primeras votaciones.
+            Una categoría activa aparece en el catálogo público. Mientras no tenga votaciones activas, el público la ve como «Próximamente».
           </p>
         </div>
 

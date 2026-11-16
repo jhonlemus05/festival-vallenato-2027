@@ -27,6 +27,8 @@ class CategoriaAdmin(admin.ModelAdmin):
 @admin.register(Encuesta)
 class EncuestaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'categoria', 'estado', 'fecha_apertura', 'fecha_cierre', 'orden')
+    # El nombre de la categoría lleva el año de su edición: así no se hace una consulta por fila.
+    list_select_related = ('categoria__edicion',)
     list_filter = ('categoria', 'estado')
     search_fields = ('nombre', 'descripcion', 'categoria__nombre')
     ordering = ('categoria__orden', 'orden', 'nombre')
@@ -35,6 +37,7 @@ class EncuestaAdmin(admin.ModelAdmin):
 @admin.register(OpcionEncuesta)
 class OpcionEncuestaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'encuesta', 'orden')
+    list_select_related = ('encuesta__categoria__edicion',)
     list_filter = ('encuesta__categoria', 'encuesta')
     search_fields = ('nombre', 'descripcion', 'encuesta__nombre')
     ordering = ('encuesta__orden', 'orden', 'nombre')
@@ -43,6 +46,7 @@ class OpcionEncuestaAdmin(admin.ModelAdmin):
 @admin.register(Voto)
 class VotoAdmin(admin.ModelAdmin):
     list_display = ('codigo_comprobante', 'edicion', 'categoria', 'encuesta', 'opcion', 'fecha_creacion')
+    list_select_related = ('edicion', 'categoria__edicion', 'encuesta__categoria__edicion', 'opcion__encuesta')
     list_filter = ('edicion', 'categoria', 'encuesta')
     search_fields = ('codigo_comprobante',)
     ordering = ('-fecha_creacion',)

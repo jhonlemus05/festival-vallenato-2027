@@ -1,7 +1,7 @@
 {% extends 'usuarios/perfil_base.html' %}
 
-{% block titulo %}Festival de la Leyenda Vallenata 2027 | Mi actividad{% endblock %}
-{% block descripcion %}Revisa la actividad reciente de tu cuenta en el Festival de la Leyenda Vallenata 2027.{% endblock %}
+{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} | Mi actividad{% endblock %}
+{% block descripcion %}Revisa la actividad reciente de tu cuenta en el Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}.{% endblock %}
 
 {% block perfil_titulo %}Mi actividad{% endblock %}
 {% block perfil_descripcion %}Últimos eventos de tu cuenta en la bitácora de auditoría. Cada uno lleva una firma SHA-256: si alguien altera el registro, la firma deja de coincidir.{% endblock %}
