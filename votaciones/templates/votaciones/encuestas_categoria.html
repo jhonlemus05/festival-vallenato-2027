@@ -232,7 +232,7 @@
               {% if voto_usuario %}
                 <button type="button" class="survey-action" disabled aria-disabled="true">Ya votaste en esta categoría</button>
               {% elif encuesta.total_opciones %}
-                <a class="survey-action d-block text-center text-decoration-none" href="{% url 'votar_encuesta' encuesta.pk %}">Elegir mi favorito <i class="bi bi-arrow-right ms-1"></i></a>
+                <a class="survey-action text-decoration-none" href="{% url 'votar_encuesta' encuesta.pk %}">Elegir mi favorito <i class="bi bi-arrow-right flecha" aria-hidden="true"></i></a>
               {% else %}
                 <button type="button" class="survey-action" disabled aria-disabled="true">Opciones próximamente <i class="bi bi-arrow-right ms-1"></i></button>
               {% endif %}

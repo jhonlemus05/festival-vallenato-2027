@@ -7,58 +7,48 @@
 {% block extra_css %}
   <style>
     /* ------------------------------------------------------------
-       2. SECCIÓN HERO (FOTO ACORDEONERO + TITULARES DORADOS)
+       1. PORTADA: la primera pantalla completa
+       La fotografía del acordeonero ocupa el lado derecho y se funde
+       con el negro; las palabras van sobre el lado tranquilo.
        ------------------------------------------------------------ */
-    .hero-section {
-      background-color: var(--color-black);
+    .inicio-hero {
       position: relative;
-      padding: 34px 22px 30px 22px;
+      isolation: isolate;
       overflow: hidden;
-      min-height: 310px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
+      /* Pantalla menos el encabezado y la barra inferior del móvil */
+      min-height: calc(100svh - var(--header-h) - 64px);
+      padding: 0 0 20px;
+      background-color: var(--color-black);
+      color: var(--color-white);
     }
 
-    /* Imagen de fondo del acordeonero con desvanecido sutil hacia la izquierda */
-    .hero-bg-media {
+    .inicio-hero__foto {
       position: absolute;
+      z-index: -1;
       top: 0;
-      right: -10px;
-      bottom: 0;
-      width: 68%;
-      height: 100%;
+      right: 0;
+      width: 100%;
+      height: 250px;
       object-fit: cover;
-      object-position: center top;
-      opacity: 0.78;
+      object-position: 50% 39%;
       pointer-events: none;
-      mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 20%, rgba(0, 0, 0, 0.95) 75%, black 100%);
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 20%, rgba(0, 0, 0, 0.95) 75%, black 100%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 50%, transparent 100%);
     }
 
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 310px;
+    .inicio-hero__texto {
+      /* Las palabras empiezan bajo el rostro, donde la fotografía ya se fundió con el negro */
+      padding-top: min(132px, 17svh);
     }
 
-    /* Kicker: Corona dorada + VOTACIÓN CIUDADANA */
-    .hero-kicker-wrap {
+    .inicio-hero__kicker {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .crown-icon-svg {
-      width: 17px;
-      height: 17px;
-      stroke: var(--color-gold);
-      fill: none;
-      stroke-width: 2.2;
-    }
-
-    .hero-kicker-text {
+      margin: 0 0 12px;
       color: var(--color-gold);
       font-family: var(--font-display);
       font-size: 0.74rem;
@@ -67,304 +57,644 @@
       text-transform: uppercase;
     }
 
-    /* Titular: Festival de la Leyenda Vallenata */
-    .hero-title {
-      color: var(--color-white);
+    .inicio-hero__kicker svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .inicio-hero__titulo {
+      margin: 0;
       font-family: var(--font-display);
-      font-size: 1.88rem;
+      font-size: clamp(1.9rem, 8.4vw, 2.5rem);
       font-weight: 800;
-      line-height: 1.14;
-      letter-spacing: -0.02em;
-      margin: 0;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
     }
 
-    /* Año de la edición vigente en Oro Mostaza Gigante */
-    .hero-year {
+    /* Cada renglón del título sale de su propia máscara al cargar */
+    .inicio-hero__renglon {
+      display: block;
+      overflow: hidden;
+      padding-bottom: 0.12em;
+      margin-bottom: -0.12em;
+    }
+
+    .inicio-hero__renglon > span {
+      display: block;
+    }
+
+    .inicio-hero__anio {
       color: var(--color-gold);
-      font-family: var(--font-display);
+      font-size: 1.85em;
       font-weight: 900;
-      font-size: 3.35rem;
-      line-height: 0.95;
-      margin: 8px 0 6px 0;
-      letter-spacing: -0.03em;
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
     }
 
-    /* Ubicación: Valledupar, Colombia */
-    .hero-location {
-      color: #E2E2E2;
-      font-size: 0.86rem;
-      font-weight: 400;
+    .inicio-hero__bajada {
+      max-width: 34em;
+      margin: 14px 0 0;
+      color: #D4D4D4;
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .inicio-hero__acciones {
+      display: flex;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .inicio-hero__acciones .btn-festival {
+      flex: 1 1 0;
+      padding: 0 12px;
+    }
+
+    /* Fechas y cuenta regresiva: el dato duro de la primera pantalla */
+    .inicio-cuenta {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .inicio-cuenta__titulo {
       margin: 0;
-    }
-
-    /* ------------------------------------------------------------
-       3. CONTENIDO INFERIOR BLANCO (CUENTA REGRESIVA Y ACCIÓN)
-       ------------------------------------------------------------ */
-    .body-content {
-      background-color: var(--color-white);
-      padding: 26px 20px 96px 20px; /* Padding inferior para navbar fija */
-      flex: 1;
-    }
-
-    .section-headline {
       font-family: var(--font-display);
+      font-size: 0.95rem;
       font-weight: 700;
-      font-size: 1.08rem;
-      color: var(--color-text-dark);
-      margin-bottom: 14px;
       letter-spacing: -0.01em;
     }
 
-    /* Cuadrícula de 4 cajas del contador */
-    .countdown-grid {
+    .inicio-cuenta__fechas {
+      margin: 2px 0 0;
+      color: #B5B5B5;
+      font-size: 0.8rem;
+    }
+
+    .inicio-cuenta__reloj {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 8px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0;
     }
 
-    .countdown-tile {
-      background: var(--color-white);
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      padding: 10px 4px 8px 4px;
+    .inicio-cuenta__celda {
+      padding: 10px 4px 9px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--r-sm);
+      background: rgba(255, 255, 255, 0.04);
       text-align: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
 
-    .countdown-value {
+    .inicio-cuenta__valor {
+      display: block;
+      margin: 0;
+      color: var(--color-gold);
       font-family: var(--font-display);
-      font-size: 1.25rem;
+      font-size: 1.45rem;
       font-weight: 800;
-      color: var(--color-text-dark);
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
 
-    .countdown-label {
+    .inicio-cuenta__etiqueta {
+      display: block;
+      margin-top: 5px;
+      color: #B5B5B5;
       font-size: 0.68rem;
-      color: var(--color-text-muted);
-      margin-top: 4px;
       font-weight: 500;
     }
 
-    .countdown-footnote {
-      color: var(--color-text-muted);
-      font-size: 0.75rem;
-      margin-bottom: 16px;
+    /* ------------------------------------------------------------
+       2. SECCIONES BAJO LA PORTADA
+       ------------------------------------------------------------ */
+    .inicio-seccion {
+      padding: 44px 0 48px;
+      background-color: var(--color-white);
     }
 
-    .promo-paragraph {
-      font-size: 0.88rem;
-      line-height: 1.48;
-      color: #222222;
-      margin-bottom: 22px;
+    .inicio-seccion--marca {
+      padding-bottom: 112px; /* deja libre la barra inferior del móvil */
+      background-color: var(--color-gold-tint);
     }
 
-    /* Botón Dorado Mostaza (Ver Categorías →) */
-    .btn-gold-action {
-      background-color: var(--color-gold);
-      color: #000000;
+    .inicio-seccion__cabecera {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px 32px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .inicio-seccion__titulo {
+      margin: 0;
+      color: var(--color-text-dark);
       font-family: var(--font-display);
-      font-weight: 700;
+      font-size: clamp(1.45rem, 3.2vw, 2.25rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+    }
+
+    .inicio-seccion__bajada {
+      max-width: 36em;
+      margin: 8px 0 0;
+      color: #52525B;
       font-size: 0.95rem;
-      border: none;
-      border-radius: 12px;
-      padding: 15px 20px;
-      width: 100%;
-      display: flex;
+      line-height: 1.55;
+    }
+
+    .inicio-enlace {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-      box-shadow: 0 4px 14px rgba(216, 166, 41, 0.25);
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .btn-gold-action:hover, .btn-gold-action:focus {
-      background-color: var(--color-gold-hover);
-      color: #000000;
-      transform: translateY(-1px);
-    }
-
-    .btn-gold-action i {
-      font-size: 1rem;
-      stroke-width: 1;
-    }
-
-    /* Insignia de Confianza / Registro */
-    .trust-badge-wrap {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-top: 14px;
-      color: var(--color-text-muted);
-      font-size: 0.74rem;
-    }
-
-    .trust-badge-wrap i {
+      gap: 8px;
+      min-height: 44px;
+      color: var(--color-text-dark);
+      font-family: var(--font-display);
       font-size: 0.9rem;
-      color: #9CA3AF;
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 5px;
+    }
+
+    .inicio-enlace:hover {
+      color: var(--color-gold-ink);
+    }
+
+    /* Tarjetas de categoría */
+    .inicio-categorias {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .inicio-categoria {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--r-lg);
+      background: var(--color-white);
+      color: var(--color-text-dark);
+      text-decoration: none;
+    }
+
+    .inicio-categoria:hover {
+      border-color: var(--color-gold);
+      color: var(--color-text-dark);
+    }
+
+    .inicio-categoria__arriba {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .inicio-categoria__icono {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--r-md);
+      background: #F4F4F5;
+      color: #3F3F46;
+      font-size: 1.4rem;
+    }
+
+    .inicio-categoria--activa .inicio-categoria__icono {
+      background: #000000;
+      color: var(--color-gold);
+    }
+
+    .inicio-estado {
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: #F4F4F5;
+      color: #52525B;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .inicio-categoria--activa .inicio-estado {
+      background: #FBEFCB;
+      color: #4A3600;
+    }
+
+    .inicio-categoria__nombre {
+      margin: 0 0 6px;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .inicio-categoria__descripcion {
+      margin: 0 0 22px;
+      color: #52525B;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .inicio-categoria__accion {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+      font-family: var(--font-display);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    /* Pasos para votar */
+    .inicio-pasos {
+      display: grid;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .inicio-paso {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 4px 12px;
+      padding: 20px 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.14);
+    }
+
+    .inicio-paso__numero {
+      grid-row: span 2;
+      color: var(--color-gold-ink);
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .inicio-paso__titulo {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+    }
+
+    .inicio-paso__texto {
+      margin: 0;
+      color: #3F3F46;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    /* ------------------------------------------------------------
+       3. TABLETA Y ESCRITORIO
+       ------------------------------------------------------------ */
+    @media (min-width: 768px) {
+      .inicio-hero {
+        justify-content: center;
+        min-height: calc(100svh - var(--header-h));
+        padding: 48px 0;
+      }
+
+      .inicio-hero__foto {
+        width: min(54%, 860px);
+        height: 100%;
+        object-position: 50% 58%;
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 46%);
+        mask-image: linear-gradient(to right, transparent 0%, #000 46%);
+      }
+
+      .inicio-hero__texto {
+        max-width: min(58%, 680px);
+        padding-top: 0;
+      }
+
+      .inicio-hero__kicker {
+        margin-bottom: 18px;
+        font-size: 0.8rem;
+      }
+
+      .inicio-hero__titulo {
+        font-size: clamp(2.4rem, 4.5vw, 4.1rem);
+        line-height: 1.06;
+      }
+
+      .inicio-hero__anio {
+        font-size: 1.9em;
+        line-height: 0.95;
+      }
+
+      .inicio-hero__bajada {
+        margin-top: 20px;
+        font-size: 1.08rem;
+      }
+
+      .inicio-hero__acciones {
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .inicio-hero__acciones .btn-festival {
+        flex: 0 0 auto;
+        padding: 0 26px;
+      }
+
+      .inicio-cuenta {
+        gap: 16px;
+        margin-top: 40px;
+        padding-top: 24px;
+      }
+
+      .inicio-cuenta__titulo {
+        font-size: 1.05rem;
+      }
+
+      .inicio-cuenta__fechas {
+        font-size: 0.88rem;
+      }
+
+      .inicio-cuenta__reloj {
+        grid-template-columns: repeat(4, 76px);
+        gap: 10px;
+      }
+
+      /* Con sitio de sobra, las fechas y el reloj comparten renglón */
+      @media (min-width: 1200px) {
+        .inicio-cuenta {
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 24px;
+        }
+      }
+
+      .inicio-cuenta__celda {
+        padding: 12px 4px 11px;
+      }
+
+      .inicio-cuenta__valor {
+        font-size: 1.7rem;
+      }
+
+      .inicio-seccion {
+        padding: 96px 0;
+      }
+
+      .inicio-seccion--marca {
+        padding-bottom: 96px;
+      }
+
+      .inicio-seccion__cabecera {
+        margin-bottom: 40px;
+      }
+
+      .inicio-seccion__bajada {
+        font-size: 1.02rem;
+      }
+
+      .inicio-categorias {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      .inicio-categoria {
+        padding: 28px;
+      }
+
+      .inicio-categoria__arriba {
+        margin-bottom: 56px;
+      }
+
+      .inicio-categoria__nombre {
+        font-size: 1.5rem;
+      }
+
+      .inicio-pasos {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      .inicio-paso {
+        display: block;
+        padding: 24px 0 0;
+        border-top: 2px solid #000000;
+      }
+
+      .inicio-paso__numero {
+        display: block;
+        margin-bottom: 40px;
+        font-size: 3.4rem;
+      }
+
+      .inicio-paso__titulo {
+        margin-bottom: 8px;
+        font-size: 1.3rem;
+      }
+
+      .inicio-paso__texto {
+        max-width: 30em;
+        font-size: 0.98rem;
+      }
+    }
+
+    /* ------------------------------------------------------------
+       4. ENTRADA DE LA PORTADA (una vez, al cargar)
+       El título sube renglón por renglón, lo demás aparece detrás y
+       la fotografía se asienta. Sin esto la portada se lee igual.
+       ------------------------------------------------------------ */
+    /* `backwards` y no `both`: al terminar, la animación suelta el transform y los botones pueden responder al puntero. */
+    @media (prefers-reduced-motion: no-preference) {
+      .inicio-hero__renglon > span {
+        animation: inicio-sube 700ms var(--ease-enter) backwards;
+        animation-delay: calc(var(--i, 0) * 80ms);
+      }
+
+      .inicio-hero__aparece {
+        animation: inicio-aparece 520ms var(--ease-enter) backwards;
+        animation-delay: calc(420ms + var(--i, 0) * 60ms);
+      }
+
+      .inicio-hero__foto {
+        animation: inicio-asienta 1100ms var(--ease-enter) backwards;
+      }
+    }
+
+    @keyframes inicio-sube {
+      from { transform: translateY(105%); }
+      to { transform: translateY(0); }
+    }
+
+    @keyframes inicio-aparece {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes inicio-asienta {
+      from { transform: scale(1.05); }
+      to { transform: scale(1); }
     }
   </style>
 {% endblock %}
 
 {% block contenido %}
-    <!-- 2. SECCIÓN HERO (FOTO ACORDEONERO + TITULARES DORADOS) -->
-    <section class="hero-section">
-      <!-- Foto de fondo para móvil (idéntica a la maqueta Figma) -->
+    <!-- 1. PORTADA: marca, fechas de la edición vigente, cuenta regresiva y la acción principal -->
+    <section class="inicio-hero" aria-labelledby="inicio-titulo">
       <img
         src="{% static 'images/hero_accordionist_banner_1791518403166.jpg' %}"
-        alt="Acordeonero interpretando acordeón vallenato"
-        class="hero-bg-media d-md-none"
+        alt="Acordeonero interpretando un acordeón vallenato en tarima"
+        class="inicio-hero__foto"
+        width="768"
+        height="1376"
+        fetchpriority="high"
       />
 
-      <div class="hero-desktop-container">
-        <div class="hero-content">
-          <!-- Corona y Kicker VOTACIÓN CIUDADANA -->
-          <div class="hero-kicker-wrap">
-            <svg class="crown-icon-svg" viewBox="0 0 24 24">
+      <div class="wrap">
+        <div class="inicio-hero__texto">
+          <p class="inicio-hero__kicker inicio-hero__aparece" style="--i: -7">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M3 5l3 13h12l3-13-5 6-4-6-4 6-5-6zm2 15h14" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="hero-kicker-text">Votación Ciudadana</span>
-          </div>
-
-          <!-- Titulares Principales -->
-          <h1 class="hero-title">Festival de la<br>Leyenda Vallenata</h1>
-          {% if edicion %}<div class="hero-year">{{ edicion.anio }}</div>{% endif %}
-          <p class="hero-location">Valledupar, Colombia · Patrimonio de la Humanidad</p>
-
-          <!-- Texto descriptivo enriquecido en desktop -->
-          <p class="text-secondary d-none d-md-block mb-4" style="font-size: 0.95rem; line-height: 1.6; max-width: 480px;">
-            Participa en la elección oficial de tus artistas y agrupaciones preferidas. Tu voto rinde homenaje a las raíces y juglares del folclor vallenato.
+            Votación Ciudadana
           </p>
 
-          <!-- Botones de acción en desktop -->
-          <div class="d-none d-md-flex align-items-center gap-3">
-            <a href="{% url 'categorias_publicas' %}" class="btn btn-warning fw-bold px-4 py-2 text-dark rounded-3" style="background-color: var(--color-gold); border: none;">
-              Explorar Categorías <i class="bi bi-arrow-right"></i>
+          <h1 class="inicio-hero__titulo" id="inicio-titulo">
+            <span class="inicio-hero__renglon"><span style="--i: 0">Festival de la</span></span>
+            <span class="inicio-hero__renglon"><span style="--i: 1">Leyenda Vallenata</span></span>
+            {% if edicion %}<span class="inicio-hero__renglon inicio-hero__anio"><span style="--i: 2">{{ edicion.anio }}</span></span>{% endif %}
+          </h1>
+
+          <p class="inicio-hero__bajada inicio-hero__aparece" style="--i: 0">
+            Elige a tus artistas y agrupaciones preferidas del Festival. Es un voto por categoría y cada voto deja su comprobante.
+          </p>
+
+          <div class="inicio-hero__acciones">
+            <a href="{% url 'categorias_publicas' %}" class="btn-festival btn-festival--gold inicio-hero__aparece" style="--i: 1">
+              Votar ahora <i class="bi bi-arrow-right flecha" aria-hidden="true"></i>
             </a>
-            <a href="{% url 'login' %}" class="btn btn-outline-light px-3 py-2 rounded-3">
-              <i class="bi bi-shield-check text-warning"></i> {% if request.user.is_authenticated %}Mi cuenta{% else %}Regístrate{% endif %}
+            <a href="{% url 'login' %}" class="btn-festival btn-festival--line inicio-hero__aparece" style="--i: 2">
+              {% if request.user.is_authenticated %}Ver mi cuenta{% else %}Crear mi cuenta{% endif %}
             </a>
           </div>
-        </div>
 
-        <!-- Columna visual para pantallas de escritorio -->
-        <div class="hero-desktop-visual d-none d-md-block">
-          <img
-            src="{% static 'images/hero_accordionist_banner_1791518403166.jpg' %}"
-            alt="Maestro del acordeón vallenato en tarima"
-          />
-          <div class="hero-desktop-visual-badge">
-            <i class="bi bi-award"></i>
+          <!-- Fechas y cuenta regresiva (Días, Horas, Minutos, Segundos) -->
+          {# data-inicio: fecha de inicio de la edición vigente (la lee countdown.js); sin edición quedan los guiones. #}
+          <div class="inicio-cuenta inicio-hero__aparece" style="--i: 3">
             <div>
-              <div class="fw-bold" style="font-size: 0.85rem;">{{ edicion.nombre|default:"Festival de la Leyenda Vallenata" }}</div>
-              <div style="font-size: 0.72rem; color: #CCCCCC;">Homenaje a los grandes juglares de la música tradicional</div>
+              <p class="inicio-cuenta__titulo">La leyenda se acerca</p>
+              <p class="inicio-cuenta__fechas">
+                {% if edicion %}Del {{ edicion.fecha_inicio|date:"j \d\e F"|lower }} al {{ edicion.fecha_fin|date:"j \d\e F \d\e Y"|lower }} · Valledupar, Colombia{% else %}Fechas oficiales por anunciar.{% endif %}
+              </p>
             </div>
+            <dl class="inicio-cuenta__reloj countdown-grid" {% if edicion %}data-inicio="{{ edicion.fecha_inicio|date:'Y-m-d' }}"{% endif %}>
+              <div class="inicio-cuenta__celda">
+                <dd class="inicio-cuenta__valor" id="count-days">--</dd>
+                <dt class="inicio-cuenta__etiqueta">Días</dt>
+              </div>
+              <div class="inicio-cuenta__celda">
+                <dd class="inicio-cuenta__valor" id="count-hours">--</dd>
+                <dt class="inicio-cuenta__etiqueta">Horas</dt>
+              </div>
+              <div class="inicio-cuenta__celda">
+                <dd class="inicio-cuenta__valor" id="count-minutes">--</dd>
+                <dt class="inicio-cuenta__etiqueta">Minutos</dt>
+              </div>
+              <div class="inicio-cuenta__celda">
+                <dd class="inicio-cuenta__valor" id="count-seconds">--</dd>
+                <dt class="inicio-cuenta__etiqueta">Segundos</dt>
+              </div>
+            </dl>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 3. CONTENIDO INFERIOR (CUENTA REGRESIVA Y LLAMADO A LA ACCIÓN) -->
-    <section class="body-content">
-      <div class="countdown-desktop-row">
-        <div class="countdown-desktop-left">
-          <!-- Título de sección -->
-          <h2 class="section-headline">La leyenda se acerca</h2>
-          <div class="countdown-footnote mt-0 mb-3">
-            {% if edicion %}Del {{ edicion.fecha_inicio|date:"j \d\e F"|lower }} al {{ edicion.fecha_fin|date:"j \d\e F \d\e Y"|lower }} · Valledupar{% else %}Fechas oficiales por anunciar.{% endif %}
-          </div>
-          <!-- Texto descriptivo de la votación -->
-          <p class="promo-paragraph mb-0">
-            Tu voz también hace parte de la leyenda. Conoce las categorías y elige tus favoritos.
-          </p>
-        </div>
-
-        <!-- Cuadrícula de 4 tarjetas de cuenta regresiva (Días, Horas, Minutos, Segundos) -->
-        {# data-inicio: fecha de inicio de la edición vigente (la lee countdown.js); sin edición quedan los guiones. #}
-        <div class="countdown-grid" {% if edicion %}data-inicio="{{ edicion.fecha_inicio|date:'Y-m-d' }}"{% endif %}>
-          <div class="countdown-tile">
-            <div class="countdown-value" id="count-days">--</div>
-            <div class="countdown-label">Días</div>
-          </div>
-          <div class="countdown-tile">
-            <div class="countdown-value" id="count-hours">--</div>
-            <div class="countdown-label">Horas</div>
-          </div>
-          <div class="countdown-tile">
-            <div class="countdown-value" id="count-minutes">--</div>
-            <div class="countdown-label">Minutos</div>
-          </div>
-          <div class="countdown-tile">
-            <div class="countdown-value" id="count-seconds">--</div>
-            <div class="countdown-label">Segundos</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Botón de llamado a la acción móvil: Ver Categorías → -->
-      <a href="{% url 'categorias_publicas' %}" class="btn-gold-action d-md-none">
-        <span>Ver Categorías</span>
-        <i class="bi bi-arrow-right"></i>
-      </a>
-
-      <!-- Insignia de seguridad / registro móvil -->
-      <a href="{% url 'login' %}" class="trust-badge-wrap text-decoration-none d-md-none">
-        <i class="bi bi-shield-check"></i>
-        <span>{% if request.user.is_authenticated %}Sesión iniciada como {{ request.user.username }}{% else %}Crea tu cuenta para participar en la votación.{% endif %}</span>
-      </a>
-
-      <!-- Vista previa de categorías en desktop: las primeras visibles de la edición vigente, desde MySQL -->
-      {% if categorias %}
-      <div class="categories-preview-desktop d-none d-md-block mt-5 pt-4 border-top">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- 2. CATEGORÍAS: las primeras visibles de la edición vigente, desde MySQL -->
+    {% if categorias %}
+    <section class="inicio-seccion" aria-labelledby="inicio-categorias-titulo">
+      <div class="wrap">
+        <div class="inicio-seccion__cabecera">
           <div>
-            <h3 class="fw-bold fs-4 mb-1" style="font-family: var(--font-display);">Categorías en Competencia</h3>
-            <p class="text-secondary small mb-0">Selecciona el rubro donde deseas votar por tus favoritos</p>
+            <h2 class="inicio-seccion__titulo" id="inicio-categorias-titulo">Categorías en competencia</h2>
+            <p class="inicio-seccion__bajada">Entra a una categoría para ver sus encuestas y votar por tu favorito.</p>
           </div>
-          <a href="{% url 'categorias_publicas' %}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
-            Ver todas <i class="bi bi-arrow-right"></i>
+          <a href="{% url 'categorias_publicas' %}" class="inicio-enlace">
+            Ver todas las categorías <i class="bi bi-arrow-right flecha" aria-hidden="true"></i>
           </a>
         </div>
 
-        <div class="row g-4">
+        <ul class="inicio-categorias">
           {% for categoria in categorias %}
-          <div class="col-md-4">
-            <a href="{% url 'categoria_encuestas' categoria.pk %}" class="text-decoration-none">
-              <div class="card h-100 border-0 shadow-sm rounded-4 p-4" style="background: #FFFFFF; border: 1px solid #ECECEC; transition: transform 0.2s;">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  {% if categoria.encuestas_activas %}
-                  <div class="p-3 rounded-3" style="background: #FDF5E1; color: var(--color-gold);">
-                  {% else %}
-                  <div class="p-3 rounded-3" style="background: #F5F5F5; color: #444444;">
-                  {% endif %}
-                    {% if categoria.icono == 'music' %}<i class="bi bi-music-note-beamed fs-4"></i>
-                    {% elif categoria.icono == 'flower' %}<i class="bi bi-flower1 fs-4"></i>
-                    {% elif categoria.icono == 'mask' %}<i class="bi bi-palette fs-4"></i>
-                    {% else %}<i class="bi bi-trophy fs-4"></i>{% endif %}
-                  </div>
-                  {% if categoria.encuestas_activas %}
-                  <span class="badge bg-warning-subtle text-dark border border-warning-subtle">Votación Activa</span>
-                  {% else %}
-                  <span class="badge bg-light text-secondary border">Próximamente</span>
-                  {% endif %}
-                </div>
-                <h4 class="fw-bold fs-5 text-dark mb-2">{{ categoria.nombre }}</h4>
-                <p class="text-secondary small mb-3">{{ categoria.descripcion }}</p>
-                {% if categoria.encuestas_activas %}
-                <span class="text-dark fw-bold small">Ver encuestas →</span>
-                {% else %}
-                <span class="text-secondary fw-semibold small">Ver información →</span>
-                {% endif %}
+          <li>
+            <a href="{% url 'categoria_encuestas' categoria.pk %}" class="inicio-categoria tarjeta-enlace {% if categoria.encuestas_activas %}inicio-categoria--activa{% endif %}">
+              <div class="inicio-categoria__arriba">
+                <span class="inicio-categoria__icono" aria-hidden="true">
+                  {% if categoria.icono == 'music' %}<i class="bi bi-music-note-beamed"></i>
+                  {% elif categoria.icono == 'flower' %}<i class="bi bi-flower1"></i>
+                  {% elif categoria.icono == 'mask' %}<i class="bi bi-palette"></i>
+                  {% else %}<i class="bi bi-trophy"></i>{% endif %}
+                </span>
+                <span class="inicio-estado">{% if categoria.encuestas_activas %}Votación activa{% else %}Próximamente{% endif %}</span>
               </div>
+              <h3 class="inicio-categoria__nombre">{{ categoria.nombre }}</h3>
+              <p class="inicio-categoria__descripcion">{{ categoria.descripcion }}</p>
+              <span class="inicio-categoria__accion">
+                {% if categoria.encuestas_activas %}Ver encuestas{% else %}Ver información{% endif %}
+                <i class="bi bi-arrow-right flecha" aria-hidden="true"></i>
+              </span>
             </a>
-          </div>
+          </li>
           {% endfor %}
-        </div>
+        </ul>
       </div>
-      {% endif %}
+    </section>
+    {% endif %}
+
+    <!-- 3. CÓMO SE VOTA: los tres pasos reales del sistema -->
+    <section class="inicio-seccion inicio-seccion--marca" aria-labelledby="inicio-pasos-titulo">
+      <div class="wrap">
+        <div class="inicio-seccion__cabecera">
+          <div>
+            <h2 class="inicio-seccion__titulo" id="inicio-pasos-titulo">Tres pasos para votar</h2>
+            <p class="inicio-seccion__bajada">Solo necesitas tu correo y tu número de documento.</p>
+          </div>
+          {% if not request.user.is_authenticated %}
+          <a href="{% url 'login' %}" class="btn-festival btn-festival--dark">
+            Crear mi cuenta <i class="bi bi-arrow-right flecha" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+        </div>
+
+        <ol class="inicio-pasos">
+          <li class="inicio-paso">
+            <span class="inicio-paso__numero" aria-hidden="true">01</span>
+            <h3 class="inicio-paso__titulo">Crea tu cuenta</h3>
+            <p class="inicio-paso__texto">Regístrate con tu correo, tu documento y una contraseña.</p>
+          </li>
+          <li class="inicio-paso">
+            <span class="inicio-paso__numero" aria-hidden="true">02</span>
+            <h3 class="inicio-paso__titulo">Elige a tu favorito</h3>
+            <p class="inicio-paso__texto">Abre una encuesta activa y marca una opción. Tienes un voto por categoría en cada edición.</p>
+          </li>
+          <li class="inicio-paso">
+            <span class="inicio-paso__numero" aria-hidden="true">03</span>
+            <h3 class="inicio-paso__titulo">Guarda tu comprobante</h3>
+            <p class="inicio-paso__texto">Cada voto genera un código de comprobante que puedes consultar en tu perfil.</p>
+          </li>
+        </ol>
+      </div>
     </section>
 {% endblock %}

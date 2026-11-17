@@ -6,7 +6,7 @@
    ============================================================ */
 
 :root {
-  --color-input-border: #2B2B2B;
+  --color-input-border: #B4B4B8;
   --color-pill-bg: #EAE6DF;
   --color-text-muted: #555555;
 }
@@ -68,12 +68,21 @@
   border: 1.5px solid var(--color-input-border);
   border-radius: 12px;
   background-color: var(--color-white);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.input-box-minimal:hover {
+  border-color: #6B7280;
 }
 
 .input-box-minimal:focus-within {
   border-color: var(--color-black);
-  box-shadow: 0 0 0 2px rgba(216, 166, 41, 0.25);
+  box-shadow: 0 0 0 3px rgba(216, 166, 41, 0.32);
+}
+
+/* El anillo lo dibuja la caja completa; el campo interior no necesita otro. */
+.native-input:focus-visible {
+  outline: none;
 }
 
 .input-icon-svg {
@@ -95,15 +104,18 @@
 }
 
 .native-input::placeholder {
-  color: #555555;
+  color: #7A7A80;
   font-size: 0.88rem;
 }
 
 .btn-toggle-eye {
   background: transparent;
   border: none;
+  border-radius: 8px;
   color: #6B7280;
   cursor: pointer;
+  min-width: 36px;
+  min-height: 36px;
   padding: 4px;
   display: flex;
   align-items: center;
@@ -165,8 +177,6 @@
   justify-content: center;
   gap: 10px;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(216, 166, 41, 0.25);
-  transition: all 0.2s ease;
   cursor: pointer;
   margin-top: 24px;
   margin-bottom: 20px;
@@ -194,7 +204,7 @@
   justify-content: center;
   gap: 10px;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
   cursor: pointer;
 }
 

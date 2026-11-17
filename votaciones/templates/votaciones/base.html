@@ -3,7 +3,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
   <title>{% block titulo %}Festival de la Leyenda Vallenata {{ edicion_vigente.anio }}{% endblock %}</title>
   <meta name="description" content="{% block descripcion %}Votación Ciudadana oficial del Festival de la Leyenda Vallenata {{ edicion_vigente.anio }} en Valledupar, Colombia.{% endblock %}" />
 
@@ -39,6 +40,25 @@
       --font-display: 'Poppins', sans-serif;
       --font-body: 'Inter', sans-serif;
       --font-serif-logo: 'Playfair Display', serif;
+
+      /* Sistema compartido: un solo ancho de contenido, una escala de radios y una curva de movimiento */
+      --color-gold-ink: #7A5A00;      /* dorado legible como texto sobre fondos claros */
+      --color-gold-tint: #FBF5E4;     /* franja de marca clara */
+      --wrap: 1200px;
+      --gut: 20px;
+      --header-h: 71px;
+      --r-sm: 10px;
+      --r-md: 14px;
+      --r-lg: 20px;
+      --ease: cubic-bezier(.2, .8, .2, 1);
+      --ease-enter: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    @media (min-width: 768px) {
+      :root {
+        --gut: 32px;
+        --header-h: 80px;
+      }
     }
 
     * {
@@ -87,7 +107,8 @@
        ------------------------------------------------------------ */
     .app-header {
       background-color: var(--color-black);
-      padding: 12px 18px;
+      padding: 12px var(--gut);
+      min-height: var(--header-h);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -95,6 +116,33 @@
       top: 0;
       z-index: 50;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* La marca a la izquierda y el menú a la derecha, en una sola fila en cualquier ancho */
+    .header-inner-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: var(--gut);
+      top: -60px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: var(--r-sm);
+      background: var(--color-gold);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
+    .skip-link:focus {
+      top: 10px;
     }
 
     .header-brand-lockup {
@@ -165,6 +213,9 @@
       background: transparent;
       border: none;
       padding: 8px 4px;
+      min-width: 44px;
+      min-height: 44px;
+      align-items: center;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -242,13 +293,17 @@
   </style>
 
   {% block extra_css %}{% endblock %}
+
+  <!-- Capa de diseño compartida: contenedor único, movimiento y pie. Va al final para unificar todas las vistas. -->
+  <link rel="stylesheet" href="{% static 'css/sitio.css' %}">
 </head>
 <body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
   <!-- ============================================================
        CONTENEDOR DE LA APLICACIÓN (MÓVIL NATIVO / RESPONSIVE EN PC)
        ============================================================ -->
-  <main class="app-viewport">
+  <main class="app-viewport" id="contenido">
 
     <!-- 1. ENCABEZADO INSTITUCIONAL OFICIAL (RESPONSIVE) -->
     <header class="app-header">
@@ -297,7 +352,7 @@
           </div>
 
           <!-- Botón Hamburguesa con 3 líneas doradas (Móvil) -->
-          <button class="btn-hamburger d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#institutionalDrawer" aria-label="Abrir Menú">
+          <button class="btn-hamburger d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#institutionalDrawer" aria-controls="institutionalDrawer" aria-label="Abrir menú">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -329,8 +384,8 @@
           <ul class="desktop-footer-links">
             <li><a href="{% url 'index' %}">Inicio</a></li>
             <li><a href="{% url 'categorias_publicas' %}">Categorías</a></li>
-            <li><a href="{% url 'categorias_publicas' %}">Encuestas Activas</a></li>
-            <li><a href="{% url 'login' %}">Registro y Cuenta</a></li>
+            <li><a href="{% url 'ediciones' %}">Ediciones</a></li>
+            <li><a href="{% url 'login' %}">Mi cuenta</a></li>
           </ul>
         </div>
 

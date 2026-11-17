@@ -11,8 +11,9 @@
       border-bottom: 1.5px solid var(--color-gold);
     }
 
+    /* El perfil va sobre las mismas líneas que el encabezado y el pie (--wrap) */
     .perfil-wrapper {
-      max-width: 1040px;
+      max-width: var(--wrap);
       margin: 0 auto;
     }
 
@@ -127,7 +128,8 @@
       font-size: 0.74rem;
       font-weight: 600;
       text-align: center;
-      transition: all 0.2s ease;
+      min-height: 44px;
+      transition: background-color 150ms var(--ease), color 150ms var(--ease);
     }
 
     .perfil-menu-link i {
@@ -171,9 +173,56 @@
 
     .perfil-card {
       background-color: var(--color-white);
-      border: 1.5px solid #E5E7EB;
+      border: 1px solid #E5E7EB;
       border-radius: 16px;
       padding: 20px;
+    }
+
+    .perfil-card-titulo {
+      margin: 0 0 6px;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--color-text-dark);
+    }
+
+    .perfil-link {
+      color: var(--color-gold-ink);
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .perfil-link:hover {
+      color: #111111;
+    }
+
+    /* Estado de cada categoría: votada (dorado lleno) o pendiente (contorno) */
+    .estado-pill {
+      flex-shrink: 0;
+      padding: 4px 11px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .estado-pill--votada {
+      background-color: #FBEFCB;
+      color: #4A3600;
+    }
+
+    .estado-pill--pendiente {
+      border-color: #D4D4D8;
+      color: #52525B;
+    }
+
+    .actividad-icono.pendiente {
+      background-color: #F4F4F5;
+      color: #71717A;
     }
 
     .account-badge-verified {
@@ -214,10 +263,36 @@
     }
 
     .account-detail-value {
+      min-width: 0;
       color: #111111;
       font-weight: 700;
       text-align: right;
-      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
+
+    /* En el teléfono cada dato va bajo su etiqueta: un correo largo ya no se parte a media palabra */
+    @media (max-width: 575.98px) {
+      .account-detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+      }
+
+      .account-detail-label {
+        font-size: 0.76rem;
+      }
+
+      .account-detail-value {
+        text-align: left;
+      }
+
+      .comprobante-verificar-fila {
+        flex-direction: column;
+      }
+
+      .comprobante-verificar-btn {
+        width: 100%;
+      }
     }
 
     .hash-code-pill {
@@ -353,8 +428,25 @@
         gap: 28px;
       }
 
+      /* El menú acompaña al contenido mientras se recorre una lista larga (Mi actividad) */
       .perfil-sidebar {
+        position: sticky;
+        top: calc(var(--header-h) + 24px);
         padding: 28px 18px 18px 18px;
+      }
+
+      .perfil-card {
+        padding: 24px;
+      }
+
+      /* Los formularios del perfil no se estiran a todo el ancho de la tarjeta */
+      .perfil-card form:not(.comprobante-verificar) {
+        max-width: 560px;
+      }
+
+      .perfil-card .btn-gold-submit {
+        width: auto;
+        padding: 0 28px;
       }
 
       .perfil-identidad {

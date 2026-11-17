@@ -26,8 +26,9 @@
       --color-sidebar-bg: #000000;
       --color-sidebar-active: #18181A;
       --color-sidebar-border: #1F1F23;
-      --color-gold: #D4AF37;
-      --color-gold-hover: #b89326;
+      --color-gold: #D8A629;           /* el mismo dorado de la vista pública */
+      --color-gold-hover: #c49420;
+      --color-gold-ink: #7A5A00;       /* dorado legible como texto sobre fondos claros */
       --color-main-bg: #F8F9FA;
       --color-card-border: #E5E7EB;
       --color-text-dark: #111111;
@@ -36,6 +37,10 @@
       --font-display: 'Poppins', sans-serif;
       --font-body: 'Inter', sans-serif;
       --font-serif-logo: 'Playfair Display', serif;
+      --r-sm: 10px;
+      --r-md: 14px;
+      --r-lg: 16px;
+      --ease: cubic-bezier(.2, .8, .2, 1);
     }
 
     * {
@@ -670,6 +675,9 @@
   </style>
 
   {% block extra_css %}{% endblock %}
+
+  <!-- Capa compartida del panel: encabezados, métricas, tablas y respuesta al puntero iguales en las cinco vistas. -->
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
 </head>
 <body>
 

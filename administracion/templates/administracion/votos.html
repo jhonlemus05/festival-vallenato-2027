@@ -20,61 +20,66 @@
     </div>
   </section>
 
-  <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-3">
-    <label class="small fw-bold" for="filtroCategoria">Categoría</label>
-    <select id="filtroCategoria" name="categoria" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-      <option value="">Todas</option>
-      {% for categoria in categorias %}
-        <option value="{{ categoria.pk }}"{% if categoria_id == categoria.pk|stringformat:"d" %} selected{% endif %}>{{ categoria.nombre }}</option>
-      {% endfor %}
-    </select>
-    <span class="small text-secondary ms-auto">{{ pagina.paginator.count }} voto{{ pagina.paginator.count|pluralize:"s" }}</span>
-  </form>
+  {# Tarjeta y tabla compartidas del panel (static/css/admin.css). En el teléfono cada voto se muestra como ficha. #}
+  <section class="admin-card">
+    <div class="admin-card__header">
+      <form method="get" class="admin-filter">
+        <label for="filtroCategoria">Categoría</label>
+        <select id="filtroCategoria" name="categoria" onchange="this.form.submit()">
+          <option value="">Todas</option>
+          {% for categoria in categorias %}
+            <option value="{{ categoria.pk }}"{% if categoria_id == categoria.pk|stringformat:"d" %} selected{% endif %}>{{ categoria.nombre }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      <span class="admin-count">{{ pagina.paginator.count }} voto{{ pagina.paginator.count|pluralize:"s" }}</span>
+    </div>
 
-  <div class="table-responsive bg-white border rounded-4">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light">
+    <table class="admin-table admin-table--fichas">
+      <thead>
         <tr>
-          <th class="ps-4">Comprobante</th>
+          <th>Comprobante</th>
           <th>Edición</th>
           <th>Categoría</th>
           <th>Votación</th>
           <th>Opción</th>
-          <th class="pe-4">Fecha</th>
+          <th>Fecha</th>
         </tr>
       </thead>
       <tbody>
         {% for voto in pagina %}
           <tr>
-            <td class="ps-4 font-monospace small">{{ voto.codigo_comprobante }}</td>
-            <td>{{ voto.edicion.anio }}</td>
-            <td>{{ voto.categoria.nombre }}</td>
-            <td>{{ voto.encuesta.nombre }}</td>
-            <td class="fw-bold">{{ voto.opcion.nombre }}</td>
-            <td class="pe-4 small text-nowrap">{{ voto.fecha_creacion|date:"d/m/Y H:i:s" }}</td>
+            <td class="celda-codigo">{{ voto.codigo_comprobante }}</td>
+            <td class="celda-edicion">{{ voto.edicion.anio }}</td>
+            <td class="celda-categoria">{{ voto.categoria.nombre }}</td>
+            <td class="celda-votacion">{{ voto.encuesta.nombre }}</td>
+            <td class="celda-fuerte">{{ voto.opcion.nombre }}</td>
+            <td class="celda-fecha">{{ voto.fecha_creacion|date:"d/m/Y H:i:s" }}</td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="6" class="text-center text-secondary py-4">Aún no hay votos registrados.</td>
+            <td colspan="6" class="celda-vacia text-center text-secondary py-4">Aún no hay votos registrados.</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
-  </div>
 
-  {% if pagina.paginator.num_pages > 1 %}
-    <nav class="d-flex justify-content-between align-items-center mt-3 small" aria-label="Páginas de votos">
-      {% if pagina.has_previous %}
-        <a href="?pagina={{ pagina.previous_page_number }}{% if categoria_id %}&amp;categoria={{ categoria_id }}{% endif %}">Anterior</a>
-      {% else %}
-        <span></span>
-      {% endif %}
-      <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
-      {% if pagina.has_next %}
-        <a href="?pagina={{ pagina.next_page_number }}{% if categoria_id %}&amp;categoria={{ categoria_id }}{% endif %}">Siguiente</a>
-      {% else %}
-        <span></span>
-      {% endif %}
-    </nav>
-  {% endif %}
+    {% if pagina.paginator.num_pages > 1 %}
+      <nav class="admin-card__footer" aria-label="Páginas de votos">
+        <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+        <div class="admin-pager">
+          {% if pagina.has_previous %}
+            <a href="?pagina={{ pagina.previous_page_number }}{% if categoria_id %}&amp;categoria={{ categoria_id }}{% endif %}">Anterior</a>
+          {% else %}
+            <span aria-disabled="true">Anterior</span>
+          {% endif %}
+          {% if pagina.has_next %}
+            <a href="?pagina={{ pagina.next_page_number }}{% if categoria_id %}&amp;categoria={{ categoria_id }}{% endif %}">Siguiente</a>
+          {% else %}
+            <span aria-disabled="true">Siguiente</span>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
+  </section>
 {% endblock %}

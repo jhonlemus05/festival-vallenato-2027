@@ -27,6 +27,10 @@ function initAuthPage() {
   const passwordHint = document.getElementById('passwordHint');
   const passwordStrengthWrap = document.getElementById('passwordStrengthWrap');
   const passInput = document.getElementById('passwordInput');
+  const emailInput = document.getElementById('emailInput');
+  const emailLabel = document.getElementById('emailLabel');
+  const authTitle = document.getElementById('authTitle');
+  const authDescription = document.getElementById('authDescription');
   // Input hidden que viaja en el POST; es lo que le dice a la vista qué flujo ejecutar.
   const authModeInput = document.getElementById('authModeInput');
 
@@ -53,9 +57,21 @@ function initAuthPage() {
       authModeInput.value = mode;
     }
 
+    // Las pestañas son botones de alternancia: aria-pressed le dice al lector de pantalla cuál está activa.
+    btnRegister.setAttribute('aria-pressed', mode === 'register' ? 'true' : 'false');
+    btnLogin.setAttribute('aria-pressed', mode === 'login' ? 'true' : 'false');
+
     if (mode === 'register') {
       btnRegister.classList.add('active');
       btnLogin.classList.remove('active');
+      if (authTitle) authTitle.textContent = 'Sé parte de la leyenda';
+      if (authDescription) authDescription.textContent = 'Regístrate para elegir tus favoritos y participar con un voto por categoría en cada edición.';
+      if (emailLabel) emailLabel.textContent = 'Correo electrónico';
+      if (emailInput) {
+        emailInput.type = 'email';
+        emailInput.placeholder = 'tu@correo.com';
+        emailInput.setAttribute('autocomplete', 'email');
+      }
       if (submitBtnText) submitBtnText.textContent = 'Crear cuenta';
       if (docNumberGroup) docNumberGroup.style.display = 'block';
       if (docInput) docInput.required = true;
@@ -69,11 +85,20 @@ function initAuthPage() {
         passInput.setAttribute('autocomplete', 'new-password');
       }
       if (footerToggleText) {
-        footerToggleText.innerHTML = '¿Ya tienes una cuenta? <span class="fw-semibold text-dark text-decoration-underline" style="cursor:pointer;" onclick="setAuthModeExternal(\'login\')">Iniciar sesión</span>';
+        footerToggleText.innerHTML = '¿Ya tienes una cuenta? <button type="button" class="auth-switch-link" data-auth-mode="login">Iniciar sesión</button>';
       }
     } else {
       btnLogin.classList.add('active');
       btnRegister.classList.remove('active');
+      if (authTitle) authTitle.textContent = 'Entra a tu cuenta';
+      if (authDescription) authDescription.textContent = 'Usa tu correo o tu número de documento y tu contraseña.';
+      // La vista acepta el correo o el documento en este mismo campo (login_view), así que deja de ser type="email".
+      if (emailLabel) emailLabel.textContent = 'Correo o número de documento';
+      if (emailInput) {
+        emailInput.type = 'text';
+        emailInput.placeholder = 'tu@correo.com o tu documento';
+        emailInput.setAttribute('autocomplete', 'username');
+      }
       if (submitBtnText) submitBtnText.textContent = 'Iniciar sesión';
       if (docNumberGroup) docNumberGroup.style.display = 'none';
       if (docInput) docInput.required = false;
@@ -87,13 +112,18 @@ function initAuthPage() {
         passInput.setAttribute('autocomplete', 'current-password');
       }
       if (footerToggleText) {
-        footerToggleText.innerHTML = '¿No tienes una cuenta? <span class="fw-semibold text-dark text-decoration-underline" style="cursor:pointer;" onclick="setAuthModeExternal(\'register\')">Registrarse</span>';
+        footerToggleText.innerHTML = '¿No tienes una cuenta? <button type="button" class="auth-switch-link" data-auth-mode="register">Registrarse</button>';
       }
     }
   }
 
-  // Se expone en window porque el enlace del pie del formulario la invoca con onclick inline.
-  window.setAuthModeExternal = setMode;
+  // El botón del pie se reescribe en cada cambio de modo, así que se escucha en su contenedor.
+  if (footerToggleText) {
+    footerToggleText.addEventListener('click', (e) => {
+      const boton = e.target.closest('[data-auth-mode]');
+      if (boton) setMode(boton.dataset.authMode);
+    });
+  }
 
   // Al cargar, aplica el modo que decidió el servidor (p. ej. tras un error de registro
   // duplicado el servidor devuelve modo "login" y la UI debe reflejarlo).
@@ -172,24 +202,4 @@ function updatePasswordStrength(val) {
     seg.style.backgroundColor = idx < score ? colors[score] : '#E5E7EB';
   });
   label.textContent = texts[score];
-}
-
-/**
- * Checkbox de términos personalizado (cuadrado dorado del Figma).
- * El checkbox real está oculto y es el que viaja en el POST; este div solo lo "maquilla".
- * Se invoca con onclick inline desde el template, por eso es global.
- */
-function toggleTerms() {
-  const hidden = document.getElementById('termsHiddenInput');
-  const box = document.getElementById('termsBox');
-  const icon = document.getElementById('termsCheckIcon');
-  if (!hidden || !box || !icon) return;
-  hidden.checked = !hidden.checked;
-  if (hidden.checked) {
-    box.style.backgroundColor = 'var(--color-gold)';
-    icon.style.display = 'block';
-  } else {
-    box.style.backgroundColor = '#FFFFFF';
-    icon.style.display = 'none';
-  }
 }

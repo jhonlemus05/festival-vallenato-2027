@@ -805,7 +805,11 @@ class EdicionesTests(TestCase):
         portada = self.client.get(reverse('index'))
         login = self.client.get(reverse('login'))
 
-        self.assertContains(portada, '<div class="hero-year">2028</div>', html=True)
+        self.assertContains(
+            portada,
+            '<span class="inicio-hero__renglon inicio-hero__anio"><span style="--i: 2">2028</span></span>',
+            html=True,
+        )
         self.assertContains(portada, 'Festival de la Leyenda Vallenata 2028 | Inicio')
         self.assertContains(portada, 'Canción inédita')
         # Las categorías de 2027 ya no aparecen en la vista previa, ni el año anterior en ninguna parte.

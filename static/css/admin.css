@@ -1,0 +1,654 @@
+/* ============================================================
+   CAPA COMPARTIDA DEL PANEL DE ADMINISTRACIÓN
+   Festival de la Leyenda Vallenata · Votación Ciudadana
+   Se carga al final de admin_base.html. Pone de acuerdo a las
+   cinco vistas del panel: un encabezado de página, una tarjeta de
+   métrica, una tabla y una respuesta al puntero. Los colores y
+   medidas salen de las variables de admin_base.html.
+   ============================================================ */
+
+/* 1. Foco visible con teclado */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.admin-sidebar :focus-visible,
+.admin-offcanvas :focus-visible {
+  outline-color: #FFFFFF;
+}
+
+/* 2. Encabezado de página: la misma escala en Panel, Categorías, Votaciones, Resultados y Votos */
+.panel-kicker,
+.vote-admin-kicker {
+  margin-bottom: 6px;
+  color: var(--color-gold-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.panel-title,
+.vote-admin-title {
+  margin-bottom: 6px;
+  color: var(--color-text-dark);
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.panel-description,
+.vote-admin-description {
+  max-width: 62em;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.dashboard-page-header,
+.vote-admin-intro {
+  margin-bottom: 28px;
+}
+
+/* 3. Tarjetas de métrica: una sola forma en todo el panel */
+.metrics-grid-row,
+.vote-admin-metrics {
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.metric-card,
+.metric-card-simple,
+.vote-admin-metric {
+  padding: 20px 22px;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--r-lg);
+  background: #FFFFFF;
+  box-shadow: none;
+}
+
+/* Una tarjeta que no lleva a ninguna parte no se mueve al señalarla */
+.metric-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.metric-card-label,
+.metric-simple-label,
+.vote-admin-metric-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #4B5563;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.metric-card-top {
+  align-items: flex-start;
+  margin-bottom: 0;
+}
+
+.metric-card-number,
+.metric-simple-number,
+.vote-admin-metric-value {
+  margin-bottom: 0;
+  color: var(--color-text-dark);
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-card-subtext {
+  margin-top: 8px;
+  font-size: 0.78rem;
+}
+
+/* 4. Tarjeta y tabla de datos compartidas (las usa Votos) */
+.admin-card {
+  overflow: hidden;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--r-lg);
+  background: #FFFFFF;
+}
+
+.admin-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
+  padding: 18px 24px;
+}
+
+.admin-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--color-card-border);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.admin-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.admin-filter label {
+  color: #374151;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.admin-filter select {
+  min-height: 40px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--r-sm);
+  background-color: #FFFFFF;
+  color: var(--color-text-dark);
+  font-size: 0.86rem;
+}
+
+.admin-count {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.admin-table thead th {
+  padding: 12px 24px;
+  border-top: 1px solid var(--color-card-border);
+  border-bottom: 1px solid var(--color-card-border);
+  background-color: #F9FAFB;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 13px 24px;
+  border-bottom: 1px solid #F3F4F6;
+  color: #374151;
+  font-size: 0.86rem;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #FAFAFA;
+}
+
+.admin-table .celda-codigo {
+  color: var(--color-text-dark);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.admin-table .celda-fuerte {
+  color: var(--color-text-dark);
+  font-weight: 700;
+}
+
+.admin-table .celda-fecha {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.admin-pager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-pager a,
+.admin-pager span {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--r-sm);
+  color: var(--color-text-dark);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-pager a:hover {
+  border-color: #111111;
+}
+
+.admin-pager span {
+  color: #B6BAC1;
+}
+
+/* Enlace de texto del panel (ver todo, actualizar) */
+.admin-link,
+.activity-full-link,
+.vote-admin-update-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-gold-ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-link:hover,
+.activity-full-link:hover,
+.vote-admin-update-link:hover {
+  color: #5C4300;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.admin-link .bi-arrow-right {
+  transition: transform 150ms var(--ease);
+}
+
+/* 5. Respuesta al puntero y al clic */
+.btn-new-poll,
+.btn-action-dark {
+  min-height: 44px;
+  border-radius: var(--r-md);
+  box-shadow: none;
+  transition: background-color 150ms var(--ease), transform 150ms var(--ease);
+}
+
+.btn-new-poll:active,
+.btn-action-dark:active {
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 90ms;
+}
+
+.sidebar-nav-link {
+  position: relative;
+  min-height: 44px;
+  border: 1px solid transparent;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease);
+}
+
+/* La sección actual se marca con una barra dorada a la izquierda */
+.sidebar-nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-gold);
+}
+
+.sidebar-back-link {
+  min-height: 32px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-link:hover .bi-arrow-right {
+    transform: translateX(3px);
+  }
+}
+
+/* 6. Barra superior */
+@media (min-width: 992px) {
+  .badge-demo-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .badge-demo-mode::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2E9E5B;
+  }
+}
+
+/* 7. Pantallas angostas */
+@media (max-width: 991px) {
+  /* Las tres métricas siguen en una fila, en versión compacta */
+  .metrics-grid-row,
+  .vote-admin-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .metric-card,
+  .metric-card-simple,
+  .vote-admin-metric {
+    padding: 14px 12px;
+    border-radius: var(--r-md);
+  }
+
+  .metric-card-label,
+  .metric-simple-label,
+  .vote-admin-metric-label {
+    min-height: 2.5em;
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  .metric-card-number,
+  .metric-simple-number,
+  .vote-admin-metric-value {
+    font-size: 1.6rem;
+  }
+
+  .metric-card-icon,
+  .metric-card-subtext {
+    display: none;
+  }
+
+  .dashboard-page-header,
+  .vote-admin-intro {
+    margin-bottom: 20px;
+  }
+
+  .panel-header-row {
+    gap: 14px;
+  }
+
+  /* Actividad reciente: sin la columna de estado, el nombre ya no se parte palabra por palabra */
+  .activity-table thead th,
+  .activity-table tbody td {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .activity-table .col-estado {
+    display: none;
+  }
+
+  .activity-table .td-time {
+    width: 84px;
+  }
+
+  /* Catálogo de categorías: la tabla conserva un ancho cómodo y se desliza dentro de su tarjeta */
+  .categories-table {
+    min-width: 620px;
+  }
+
+  .categories-table thead th,
+  .categories-table tbody td {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* El buscador y el filtro del catálogo bajan a su propio renglón en vez de cortarse */
+  .catalog-card-header {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .catalog-header-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .catalog-header-controls .search-box-wrap {
+    flex: 1 1 180px;
+  }
+
+  .admin-card__header,
+  .admin-card__footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* Votos en el teléfono: cada voto es una ficha, no una fila que obliga a deslizar de lado */
+@media (max-width: 767px) {
+  .admin-table--fichas thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .admin-table--fichas,
+  .admin-table--fichas tbody {
+    display: block;
+  }
+
+  .admin-table--fichas tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #F3F4F6;
+  }
+
+  .admin-table--fichas tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-table--fichas tbody td {
+    padding: 0;
+    border: 0;
+  }
+
+  .admin-table--fichas .celda-fuerte {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 0.95rem;
+  }
+
+  .admin-table--fichas .celda-codigo {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+  }
+
+  .admin-table--fichas .celda-votacion {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 0.82rem;
+  }
+
+  .admin-table--fichas .celda-categoria,
+  .admin-table--fichas .celda-edicion,
+  .admin-table--fichas .celda-fecha {
+    grid-row: 3;
+    color: var(--color-text-muted);
+    font-size: 0.74rem;
+  }
+
+  .admin-table--fichas .celda-categoria {
+    grid-column: 1;
+  }
+
+  .admin-table--fichas .celda-edicion {
+    display: none;
+  }
+
+  .admin-table--fichas .celda-fecha {
+    grid-column: 2;
+  }
+
+  .admin-table--fichas .celda-vacia {
+    grid-column: 1 / -1;
+    padding: 12px 0;
+  }
+}
+
+/* 8. Formularios en ventana (crear y editar categorías, encuestas y opciones)
+   Usan los controles de Bootstrap; aquí toman la tipografía, el foco dorado y los botones del panel
+   en lugar del azul por defecto. */
+.modal-content {
+  border: 0;
+  border-radius: var(--r-lg) !important;
+}
+
+.modal-header,
+.modal-footer {
+  padding: 18px 24px;
+  border-color: var(--color-card-border) !important;
+}
+
+.modal-title {
+  color: var(--color-text-dark);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
+.modal-body .form-label {
+  margin-bottom: 6px;
+  color: #374151;
+  font-size: 0.82rem;
+}
+
+.modal-body .form-control,
+.modal-body .form-select {
+  min-height: 44px;
+  border-color: #C9CBD1;
+  border-radius: var(--r-sm) !important;
+  font-size: 0.9rem;
+}
+
+.modal-body textarea.form-control {
+  min-height: 88px;
+}
+
+.modal-body .form-control:hover,
+.modal-body .form-select:hover {
+  border-color: #6B7280;
+}
+
+.form-control:focus,
+.form-select:focus,
+.search-input-field:focus,
+.admin-filter select:focus {
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(216, 166, 41, 0.32);
+  outline: none;
+}
+
+.form-check-input {
+  border-color: #9CA3AF;
+  cursor: pointer;
+}
+
+.form-check-input:checked {
+  border-color: var(--color-gold);
+  background-color: var(--color-gold);
+}
+
+.form-check-input:focus {
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(216, 166, 41, 0.32);
+}
+
+/* En el interruptor apagado Bootstrap pinta el botón de azul al enfocar: vuelve al gris */
+.form-switch .form-check-input:focus:not(:checked) {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%239CA3AF'/%3e%3c/svg%3e");
+}
+
+.modal-footer .btn {
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: var(--r-sm) !important;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease);
+}
+
+.modal-footer .btn-dark {
+  border-color: #1E1E20;
+  background-color: #1E1E20;
+}
+
+.modal-footer .btn-dark:hover {
+  border-color: #000000;
+  background-color: #000000;
+}
+
+.modal-footer .btn-light,
+.modal-footer .btn-secondary {
+  border: 1px solid #D4D4D8;
+  background-color: #FFFFFF;
+  color: #111111;
+}
+
+.modal-footer .btn-light:hover,
+.modal-footer .btn-secondary:hover {
+  border-color: #111111;
+  background-color: #FAFAFA;
+  color: #111111;
+}
+
+.modal-footer .btn:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.modal-body .text-danger {
+  color: #B91C1C !important;
+}
+
+@media (max-width: 575.98px) {
+  /* En el teléfono los dos botones del pie se reparten el ancho */
+  .modal-footer {
+    flex-wrap: nowrap;
+  }
+
+  .modal-footer .btn {
+    flex: 1 1 auto;
+    padding: 0 16px;
+    white-space: nowrap;
+  }
+
+  /* "Cancelar" ocupa solo lo suyo; el botón de guardar se queda con el resto, en un renglón */
+  .modal-footer .btn-light,
+  .modal-footer .btn-secondary {
+    flex: 0 0 auto;
+  }
+}
+
+/* 9. Quien pide menos movimiento ve el panel quieto */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -29,6 +29,8 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
+      gap: 8px 16px;
+      flex-wrap: wrap;
     }
 
     .activity-title {
@@ -264,7 +266,7 @@
         <!-- Métrica 1: Total Votos -->
         <div class="metric-card">
           <div class="metric-card-top">
-            <span class="metric-card-label">Total Votos</span>
+            <span class="metric-card-label">Votos totales</span>
             <i class="bi bi-check2-square metric-card-icon"></i>
           </div>
           <div class="metric-card-number">{{ total_votos }}</div>
@@ -280,7 +282,7 @@
         <!-- Métrica 2: Votaciones Activas -->
         <div class="metric-card">
           <div class="metric-card-top">
-            <span class="metric-card-label">Votaciones Activas</span>
+            <span class="metric-card-label">Votaciones activas</span>
             <i class="bi bi-broadcast metric-card-icon"></i>
           </div>
           <div class="metric-card-number">{{ total_encuestas_activas }}</div>
@@ -290,7 +292,7 @@
         <!-- Métrica 3: Usuarios Registrados -->
         <div class="metric-card">
           <div class="metric-card-top">
-            <span class="metric-card-label">Usuarios Registrados</span>
+            <span class="metric-card-label">Usuarios registrados</span>
             <i class="bi bi-people metric-card-icon"></i>
           </div>
           <div class="metric-card-number">{{ total_usuarios }}</div>
@@ -308,9 +310,9 @@
               <h2 class="activity-title">Actividad reciente</h2>
               <p class="activity-subtitle">Últimos votos guardados en la base de datos</p>
             </div>
-            <button type="button" class="btn-filter-icon" aria-label="Filtrar registros">
-              <i class="bi bi-filter-right fs-4"></i>
-            </button>
+            <a href="{% url 'admin_votos' %}" class="admin-link">
+              Ver todos los votos <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
           </div>
 
           <!-- Tabla de Votos en Tiempo Real -->
@@ -320,7 +322,7 @@
                 <tr>
                   <th>HORA</th>
                   <th>OPCIÓN Y VOTACIÓN</th>
-                  <th class="text-end">ESTADO</th>
+                  <th class="text-end col-estado">ESTADO</th>
                 </tr>
               </thead>
               <tbody>
@@ -331,7 +333,7 @@
                     <div class="td-option-name">{{ voto.opcion.nombre }}</div>
                     <div class="td-poll-name">{{ voto.encuesta.nombre }}</div>
                   </td>
-                  <td class="text-end">
+                  <td class="text-end col-estado">
                     <span class="badge-status-registered">Registrado</span>
                   </td>
                 </tr>
@@ -364,7 +366,7 @@
                   <span class="poll-vote-count">{{ encuesta.total_votos }} voto{{ encuesta.total_votos|pluralize:"s" }}</span>
                 </div>
                 <h3 class="poll-breakdown-title">{{ encuesta.nombre }}</h3>
-                <p class="poll-breakdown-sub">{{ encuesta.categoria.nombre }} · {{ encuesta.total_opciones }} opción{{ encuesta.total_opciones|pluralize:"es" }}</p>
+                <p class="poll-breakdown-sub">{{ encuesta.categoria.nombre }} · {{ encuesta.total_opciones }} opci{{ encuesta.total_opciones|pluralize:"ón,ones" }}</p>
                 <div class="poll-progress-track">
                   <div class="poll-progress-fill" style="width: {{ encuesta.porcentaje_votos }}%;"></div>
                 </div>
