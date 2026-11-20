@@ -13,8 +13,26 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 from pathlib import Path
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 from django.core.exceptions import ImproperlyConfigured
+from django.db.backends.mysql.base import DatabaseWrapper as _MySQLDatabaseWrapper
 from dotenv import load_dotenv
+
+# TiDB Cloud se identifica como "8.0.11-TiDB-vX.Y.Z" aunque soporta lo que exige
+# Django 6.1, que pide MySQL 8.4 o superior y bloquearía la conexión por ese número.
+# Se omite únicamente ese chequeo cuando el servidor es TiDB; con un MySQL real se mantiene.
+_check_version_original = _MySQLDatabaseWrapper.check_database_version_supported
+
+
+def _check_database_version_supported(self):
+    if 'tidb' in self.mysql_server_info.lower():
+        return
+    _check_version_original(self)
+
+
+_MySQLDatabaseWrapper.check_database_version_supported = _check_database_version_supported
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -101,8 +119,13 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
         'PORT': os.environ.get('DB_PORT', '3306'),
-        # utf8mb4 = UTF-8 completo (tildes, ñ y emojis); el "utf8" viejo de MySQL se queda corto.
-        'OPTIONS': {'charset': 'utf8mb4'},
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'ssl': {
+                'ca': str(BASE_DIR / 'tidb-ca.pem'),
+                'verify_cert': True,
+            },
+        },
     }
 }
 
